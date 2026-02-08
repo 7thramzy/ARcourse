@@ -1,0 +1,2149 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المحاضرة الثانية: تاريخ الواقع المعزز وتطوره</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Cairo', sans-serif;
+        }
+        
+        .slide {
+            min-height: 100vh;
+            padding: 2rem;
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .slide.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-right: 40px;
+            margin-bottom: 30px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 4px solid;
+        }
+        
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            right: 8px;
+            top: 20px;
+            width: 4px;
+            height: calc(100% + 10px);
+        }
+        
+        .timeline-item:last-child::after {
+            display: none;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background-color: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #4F46E5, #7C3AED);
+            transition: width 0.5s ease;
+        }
+        
+        .era-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-right: 5px solid;
+        }
+        
+        .era-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .quiz-option {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .quiz-option:hover {
+            background-color: #f3f4f6;
+            transform: scale(1.02);
+        }
+        
+        .quiz-option.selected {
+            border-color: #4F46E5;
+            background-color: #eef2ff;
+        }
+        
+        .quiz-option.correct {
+            border-color: #10b981;
+            background-color: #d1fae5;
+        }
+        
+        .quiz-option.incorrect {
+            border-color: #ef4444;
+            background-color: #fee2e2;
+        }
+        
+        .person-card {
+            border-top: 4px solid;
+            transition: all 0.3s ease;
+        }
+        
+        .person-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <!-- شريط التقدم -->
+    <div class="fixed top-0 left-0 right-0 z-50">
+        <div class="progress-bar">
+            <div id="progressFill" class="progress-fill" style="width: 7.14%"></div>
+        </div>
+    </div>
+    
+    <!-- شريط التنقل -->
+    <nav class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg z-40 p-2 flex items-center space-x-2 space-x-reverse">
+        <button id="prevBtn" class="p-3 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+        <div class="px-4 py-2 text-sm font-medium text-gray-700">
+            <span id="currentSlide">1</span> / 14
+        </div>
+        <button id="nextBtn" class="p-3 rounded-full bg-purple-600 hover:bg-purple-700 text-white">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button id="menuBtn" class="p-3 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700">
+            <i class="fas fa-bars"></i>
+        </button>
+    </nav>
+    
+    <!-- قائمة الشرائح -->
+    <div id="slideMenu" class="fixed inset-0 bg-black/70 z-50 hidden items-center justify-center">
+        <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4 max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-800">قائمة الشرائح</h3>
+                <button id="closeMenuBtn" class="p-2 rounded-full hover:bg-gray-100">
+                    <i class="fas fa-times text-gray-600"></i>
+                </button>
+            </div>
+            <div class="space-y-2">
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="1">
+                    <span class="font-medium text-gray-700">1. العنوان والأهداف</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="2">
+                    <span class="font-medium text-gray-700">2. مدخل المحاضرة</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="3">
+                    <span class="font-medium text-gray-700">3. المرحلة 1: البدايات النظرية</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="4">
+                    <span class="font-medium text-gray-700">4. المرحلة 2: البحث والتجارب</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="5">
+                    <span class="font-medium text-gray-700">5. المرحلة 3: التحول الرقمي</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="6">
+                    <span class="font-medium text-gray-700">6. المرحلة 4: ثورة الهواتف</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="7">
+                    <span class="font-medium text-gray-700">7. المرحلة 5: الانتشار الجماهيري</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="8">
+                    <span class="font-medium text-gray-700">8. خط زمني تفاعلي</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="9">
+                    <span class="font-medium text-gray-700">9. عوامل النجاح والتحديات</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="10">
+                    <span class="font-medium text-gray-700">10. مستقبل الواقع المعزز</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="11">
+                    <span class="font-medium text-gray-700">11. اختبار قصير</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="12">
+                    <span class="font-medium text-gray-700">12. واجب منزلي</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="13">
+                    <span class="font-medium text-gray-700">13. مصادر ومراجع</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="14">
+                    <span class="font-medium text-gray-700">14. خاتمة المحاضرة</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- الشرائح -->
+    <div id="slidesContainer">
+        <!-- الشريحة 1: العنوان والأهداف -->
+        <section id="slide1" class="slide active bg-gradient-to-br from-amber-50 to-orange-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="text-center mb-12">
+                    <span class="inline-block px-4 py-2 bg-amber-100 text-amber-800 rounded-full text-sm font-semibold mb-4">المحاضرة الثانية</span>
+                    <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                        <span class="text-amber-600">تاريخ الواقع المعزز (AR)</span><br>
+                        وتطوره عبر الزمن
+                    </h1>
+                    <p class="text-xl text-gray-600 max-w-3xl mx-auto">التطور التاريخي للواقع المعزز: من الأفكار النظرية إلى التطبيقات اليومية</p>
+                </div>
+                
+                <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 border-r-4 border-amber-500 pr-4">
+                        <i class="fas fa-bullseye text-amber-600 ml-2"></i>
+                        الأهداف التعليمية
+                    </h2>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-gradient-to-r from-amber-50 to-white p-6 rounded-xl border border-amber-100">
+                            <div class="flex items-center mb-4">
+                                <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center ml-3">
+                                    <i class="fas fa-history text-amber-600"></i>
+                                </div>
+                                <h3 class="text-lg font-bold text-gray-800">التتبع التاريخي</h3>
+                            </div>
+                            <p class="text-gray-700">تتبع المراحل التاريخية الرئيسية لتطور تقنية الواقع المعزز</p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-r from-orange-50 to-white p-6 rounded-xl border border-orange-100">
+                            <div class="flex items-center mb-4">
+                                <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center ml-3">
+                                    <i class="fas fa-microchip text-orange-600"></i>
+                                </div>
+                                <h3 class="text-lg font-bold text-gray-800">فهم تطور العتاد</h3>
+                            </div>
+                            <p class="text-gray-700">فهم العلاقة بين تطور العتاد (Hardware) وتقدم تطبيقات AR</p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-r from-red-50 to-white p-6 rounded-xl border border-red-100">
+                            <div class="flex items-center mb-4">
+                                <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center ml-3">
+                                    <i class="fas fa-users text-red-600"></i>
+                                </div>
+                                <h3 class="text-lg font-bold text-gray-800">التعرف على الشخصيات</h3>
+                            </div>
+                            <p class="text-gray-700">التعرف على الشخصيات والمشاريع المفصلية في تاريخ AR</p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-r from-yellow-50 to-white p-6 rounded-xl border border-yellow-100">
+                            <div class="flex items-center mb-4">
+                                <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center ml-3">
+                                    <i class="fas fa-question-circle text-yellow-600"></i>
+                                </div>
+                                <h3 class="text-lg font-bold text-gray-800">تفسير التطور</h3>
+                            </div>
+                            <p class="text-gray-700">تفسير لماذا لم تنتشر تقنية AR مبكرًا رغم ظهورها منذ عقود</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-12">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-clock text-amber-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">رحلة عبر 60 عاماً من التطور التقني</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 2: مدخل المحاضرة -->
+        <section id="slide2" class="slide bg-gradient-to-br from-blue-50 to-indigo-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-blue-700">2</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">مدخل المحاضرة</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-8">
+                    <div class="flex items-start mb-10">
+                        <div class="w-16 h-16 rounded-full bg-yellow-100 flex items-center justify-center ml-6 flex-shrink-0">
+                            <i class="fas fa-question-circle text-2xl text-yellow-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-800 mb-4">سؤال تحفيزي للتفكير</h3>
+                            <div class="bg-yellow-50 border-r-4 border-yellow-400 p-6 rounded-lg mb-6">
+                                <p class="text-xl text-gray-800 font-medium text-center">
+                                    "لماذا نرى الواقع المعزز منتشرًا بقوة اليوم، رغم أن فكرته ليست جديدة؟"
+                                </p>
+                            </div>
+                            
+                            <div class="bg-blue-50 p-5 rounded-lg border border-blue-200">
+                                <h4 class="font-bold text-blue-800 mb-3 flex items-center">
+                                    <i class="fas fa-lightbulb ml-2"></i>
+                                    الفكرة الرئيسية
+                                </h4>
+                                <p class="text-gray-800">
+                                    التقنيات لا تنتشر فور اختراعها، بل تحتاج إلى <span class="font-bold text-blue-700">بيئة تقنية مناسبة</span>:
+                                </p>
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                                    <div class="bg-white p-3 rounded-lg text-center">
+                                        <i class="fas fa-mobile-alt text-blue-600 text-xl mb-2"></i>
+                                        <p class="text-sm font-medium text-gray-800">أجهزة متطورة</p>
+                                    </div>
+                                    <div class="bg-white p-3 rounded-lg text-center">
+                                        <i class="fas fa-wifi text-blue-600 text-xl mb-2"></i>
+                                        <p class="text-sm font-medium text-gray-800">إنترنت سريع</p>
+                                    </div>
+                                    <div class="bg-white p-3 rounded-lg text-center">
+                                        <i class="fas fa-microchip text-blue-600 text-xl mb-2"></i>
+                                        <p class="text-sm font-medium text-gray-800">معالجات قوية</p>
+                                    </div>
+                                    <div class="bg-white p-3 rounded-lg text-center">
+                                        <i class="fas fa-users text-blue-600 text-xl mb-2"></i>
+                                        <p class="text-sm font-medium text-gray-800">مستخدمون مستعدون</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="border-t border-gray-200 pt-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">الجدول الزمني للتطور</h3>
+                        <div class="relative">
+                            <!-- الخط الزمني البسيط -->
+                            <div class="hidden md:block absolute right-1/2 transform translate-x-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-400 to-indigo-500"></div>
+                            
+                            <div class="grid md:grid-cols-5 gap-4">
+                                <div class="text-center">
+                                    <div class="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center mx-auto mb-2 font-bold">1960</div>
+                                    <p class="text-sm font-medium text-gray-800">البدايات النظرية</p>
+                                </div>
+                                <div class="text-center">
+                                    <div class="w-12 h-12 rounded-full bg-blue-500 text-white flex items-center justify-center mx-auto mb-2 font-bold">1980</div>
+                                    <p class="text-sm font-medium text-gray-800">البحث والتجارب</p>
+                                </div>
+                                <div class="text-center">
+                                    <div class="w-12 h-12 rounded-full bg-indigo-500 text-white flex items-center justify-center mx-auto mb-2 font-bold">2000</div>
+                                    <p class="text-sm font-medium text-gray-800">التحول الرقمي</p>
+                                </div>
+                                <div class="text-center">
+                                    <div class="w-12 h-12 rounded-full bg-purple-500 text-white flex items-center justify-center mx-auto mb-2 font-bold">2010</div>
+                                    <p class="text-sm font-medium text-gray-800">ثورة الهواتف</p>
+                                </div>
+                                <div class="text-center">
+                                    <div class="w-12 h-12 rounded-full bg-purple-600 text-white flex items-center justify-center mx-auto mb-2 font-bold">2016</div>
+                                    <p class="text-sm font-medium text-gray-800">الانتشار الجماهيري</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-10">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-hourglass-start text-blue-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">استعدوا لرحلة عبر تاريخ تقني مثير</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 3: المرحلة الأولى - البدايات النظرية -->
+        <section id="slide3" class="slide bg-gradient-to-br from-gray-50 to-slate-100">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-gray-700">3</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">المرحلة الأولى: البدايات النظرية (1960–1980)</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-lightbulb text-yellow-500 ml-2"></i>
+                            أول فكرة للواقع المعزز
+                        </h3>
+                        
+                        <div class="grid md:grid-cols-2 gap-8 items-center">
+                            <div>
+                                <div class="person-card bg-white rounded-xl shadow-md p-6 border-t-yellow-500">
+                                    <div class="flex items-center mb-4">
+                                        <div class="w-16 h-16 rounded-full bg-yellow-100 flex items-center justify-center ml-4">
+                                            <span class="text-xl font-bold text-yellow-700">IS</span>
+                                        </div>
+                                        <div>
+                                            <h4 class="text-xl font-bold text-gray-800">إيفان ساذرلاند</h4>
+                                            <p class="text-gray-600">Ivan Sutherland</p>
+                                        </div>
+                                    </div>
+                                    <p class="text-gray-700 mb-4">
+                                        في عام <span class="font-bold text-yellow-700">1968</span>، قدّم العالم الأمريكي جهاز "سيفورد العظيم" (The Sword of Damocles) الذي يُعدّ أول نموذج لما يمكن اعتباره واقعًا معززًا/مختلطًا.
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gray-100 p-6 rounded-xl border border-gray-300">
+                                <h4 class="font-bold text-gray-800 mb-3">وصف الجهاز:</h4>
+                                <ul class="list-disc pr-6 text-gray-700 space-y-2">
+                                    <li>كان الجهاز عبارة عن <span class="font-bold">نظارة ضخمة</span> متصلة بالحاسوب</li>
+                                    <li>يتم تعليقها من السقف بسبب ثقلها</li>
+                                    <li>تعرض <span class="font-bold">رسومات ثلاثية الأبعاد بسيطة</span> فوق المشهد الحقيقي</li>
+                                    <li>تتبع حركة رأس المستخدم</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-list text-blue-500 ml-2"></i>
+                            خصائص هذه المرحلة
+                        </h3>
+                        
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="bg-blue-50 p-5 rounded-xl border border-blue-200">
+                                <div class="flex items-center mb-3">
+                                    <i class="fas fa-desktop text-blue-600 ml-2"></i>
+                                    <h4 class="font-bold text-gray-800 mr-3">خصائص تقنية</h4>
+                                </div>
+                                <ul class="list-disc pr-6 text-gray-700 space-y-2">
+                                    <li>أجهزة ضخمة جدًا وثقيلة</li>
+                                    <li>قدرات حوسبة محدودة للغاية</li>
+                                    <li>رسومات بسيطة جدًا (خطوط وأشكال هندسية)</li>
+                                    <li>تكلفة باهظة للغاية</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="bg-purple-50 p-5 rounded-xl border border-purple-200">
+                                <div class="flex items-center mb-3">
+                                    <i class="fas fa-user-graduate text-purple-600 ml-2"></i>
+                                    <h4 class="font-bold text-gray-800 mr-3">نطاق الاستخدام</h4>
+                                </div>
+                                <ul class="list-disc pr-6 text-gray-700 space-y-2">
+                                    <li>استخدام أكاديمي وتجريبي فقط</li>
+                                    <li>غير موجهة لعامة المستخدمين</li>
+                                    <li>أبحاث جامعية ومخبرية</li>
+                                    <li>بدايات التفكير في التطبيقات العملية</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-yellow-50 to-amber-50 p-6 rounded-2xl border border-yellow-200">
+                        <h4 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                            <i class="fas fa-quote-right text-yellow-600 ml-2"></i>
+                            خلاصة المرحلة
+                        </h4>
+                        <div class="flex items-start">
+                            <div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center ml-4 flex-shrink-0 mt-1">
+                                <i class="fas fa-exclamation text-yellow-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-lg text-gray-800 font-medium">
+                                    الفكرة وُجدت مبكرًا، لكن التقنية لم تكن جاهزة بعد.
+                                </p>
+                                <p class="text-gray-700 mt-2">
+                                    لقد أثبت ساذرلاند أن الفكرة ممكنة نظريًا، لكن تطبيقها العملي كان يحتاج إلى عقود من التطور التقني.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-seedling text-green-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">البذرة الأولى للواقع المعزز قد زرعت</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 4: المرحلة الثانية - البحث والتجارب الصناعية -->
+        <section id="slide4" class="slide bg-gradient-to-br from-green-50 to-emerald-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-green-700">4</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">المرحلة الثانية: البحث والتجارب الصناعية (1980–1999)</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-book text-green-600 ml-2"></i>
+                            ظهور مصطلح "Augmented Reality"
+                        </h3>
+                        
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <div class="person-card bg-white rounded-xl shadow-md p-6 border-t-green-500">
+                                    <div class="flex items-center mb-4">
+                                        <div class="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center ml-4">
+                                            <span class="text-xl font-bold text-green-700">TC</span>
+                                        </div>
+                                        <div>
+                                            <h4 class="text-xl font-bold text-gray-800">توم كوديل</h4>
+                                            <p class="text-gray-600">Tom Caudell</p>
+                                        </div>
+                                    </div>
+                                    <p class="text-gray-700 mb-4">
+                                        في عام <span class="font-bold text-green-700">1992</span>، استخدم الباحث الأمريكي هذا المصطلح رسميًا لأول مرة أثناء عمله في شركة <span class="font-bold">بوينغ (Boeing)</span>.
+                                    </p>
+                                    <div class="bg-green-50 p-3 rounded-lg">
+                                        <p class="text-sm text-gray-800">
+                                            <i class="fas fa-industry text-green-600 ml-1"></i>
+                                            كان يعمل على نظام لمساعدة العمال في تجميع الأسلاك داخل الطائرات
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-green-50 p-6 rounded-xl border border-green-200">
+                                <h4 class="font-bold text-gray-800 mb-4">الابتكار في بوينغ:</h4>
+                                <ul class="list-disc pr-6 text-gray-700 space-y-3">
+                                    <li>استبدال <span class="font-bold">الدلائل الورقية</span> المعقدة لتجميع الأسلاك</li>
+                                    <li>عرض <span class="font-bold">إرشادات رقمية</span> مباشرة في مجال رؤية العامل</li>
+                                    <li>تقليل الأخطاء وزيادة الكفاءة</li>
+                                    <li>أول تطبيق عملي لـ AR في بيئة صناعية</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-cogs text-blue-600 ml-2"></i>
+                            تطبيقات هذه المرحلة
+                        </h3>
+                        
+                        <div class="grid md:grid-cols-4 gap-4">
+                            <div class="bg-blue-50 p-4 rounded-xl text-center">
+                                <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
+                                    <i class="fas fa-industry text-blue-600"></i>
+                                </div>
+                                <p class="font-medium text-gray-800">التدريب الصناعي</p>
+                            </div>
+                            
+                            <div class="bg-purple-50 p-4 rounded-xl text-center">
+                                <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-3">
+                                    <i class="fas fa-plane text-purple-600"></i>
+                                </div>
+                                <p class="font-medium text-gray-800">الطيران</p>
+                            </div>
+                            
+                            <div class="bg-red-50 p-4 rounded-xl text-center">
+                                <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-3">
+                                    <i class="fas fa-shield-alt text-red-600"></i>
+                                </div>
+                                <p class="font-medium text-gray-800">الجيش</p>
+                            </div>
+                            
+                            <div class="bg-orange-50 p-4 rounded-xl text-center">
+                                <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-3">
+                                    <i class="fas fa-vr-cardboard text-orange-600"></i>
+                                </div>
+                                <p class="font-medium text-gray-800">المحاكاة</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-question-circle text-red-600 ml-2"></i>
+                            لماذا بقيت التقنية محدودة في هذه المرحلة؟
+                        </h3>
+                        
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="bg-red-50 p-5 rounded-xl border border-red-200">
+                                <div class="flex items-center mb-3">
+                                    <i class="fas fa-money-bill-wave text-red-600 ml-2"></i>
+                                    <h4 class="font-bold text-gray-800 mr-3">التكلفة العالية</h4>
+                                </div>
+                                <p class="text-gray-700">تكلفة الأجهزة والبرمجيات كانت باهظة للغاية، مما حدّ من انتشارها خارج المؤسسات الكبيرة.</p>
+                            </div>
+                            
+                            <div class="bg-yellow-50 p-5 rounded-xl border border-yellow-200">
+                                <div class="flex items-center mb-3">
+                                    <i class="fas fa-tools text-yellow-600 ml-2"></i>
+                                    <h4 class="font-bold text-gray-800 mr-3">الأجهزة الخاصة</h4>
+                                </div>
+                                <p class="text-gray-700">الحاجة إلى أجهزة خاصة وضخمة لم تكن متاحة للاستخدام الشخصي أو المنزلي.</p>
+                            </div>
+                            
+                            <div class="bg-blue-50 p-5 rounded-xl border border-blue-200">
+                                <div class="flex items-center mb-3">
+                                    <i class="fas fa-mobile text-blue-600 ml-2"></i>
+                                    <h4 class="font-bold text-gray-800 mr-3">غياب الأجهزة المحمولة</h4>
+                                </div>
+                                <p class="text-gray-700">لم تكن هناك أجهزة محمولة قوية بما يكفي لتشغيل تطبيقات AR بشكل عملي.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-flask text-green-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">مرحلة التجارب المخبرية والتطبيقات المتخصصة</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 5: المرحلة الثالثة - بداية التحول الرقمي -->
+        <section id="slide5" class="slide bg-gradient-to-br from-cyan-50 to-blue-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-cyan-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-cyan-700">5</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">المرحلة الثالثة: بداية التحول الرقمي (2000–2010)</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-sync-alt text-cyan-600 ml-2"></i>
+                            تطورات تقنية مهمة
+                        </h3>
+                        
+                        <div class="grid md:grid-cols-3 gap-6 mb-8">
+                            <div class="bg-cyan-50 p-5 rounded-xl border border-cyan-200">
+                                <div class="flex items-center mb-3">
+                                    <i class="fas fa-wifi text-cyan-600 ml-2"></i>
+                                    <h4 class="font-bold text-gray-800 mr-3">انتشار الإنترنت</h4>
+                                </div>
+                                <p class="text-gray-700">وصول الإنترنت إلى المنازل والمؤسسات، مما سمح بتحديث المحتوى ونقل البيانات.</p>
+                            </div>
+                            
+                            <div class="bg-blue-50 p-5 rounded-xl border border-blue-200">
+                                <div class="flex items-center mb-3">
+                                    <i class="fas fa-camera text-blue-600 ml-2"></i>
+                                    <h4 class="font-bold text-gray-800 mr-3">الكاميرات الرقمية</h4>
+                                </div>
+                                <p class="text-gray-700">ظهور كاميرات رقمية مدمجة في الأجهزة المحمولة بأسعار معقولة.</p>
+                            </div>
+                            
+                            <div class="bg-indigo-50 p-5 rounded-xl border border-indigo-200">
+                                <div class="flex items-center mb-3">
+                                    <i class="fas fa-laptop-code text-indigo-600 ml-2"></i>
+                                    <h4 class="font-bold text-gray-800 mr-3">الحواسيب المحمولة</h4>
+                                </div>
+                                <p class="text-gray-700">انتشار الحواسيب المحمولة القوية بما يكفي لتشغيل تطبيقات AR الأساسية.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gradient-to-r from-cyan-50 to-blue-50 p-5 rounded-xl border border-cyan-300">
+                            <h4 class="font-bold text-gray-800 mb-3">إنجاز تقني مهم:</h4>
+                            <p class="text-gray-800">
+                                <span class="font-bold text-cyan-700">ظهور أولى مكتبات الرؤية الحاسوبية</span> مفتوحة المصدر مثل OpenCV (2000)، مما سهل على المطورين إنشاء تطبيقات AR دون الحاجة لبناء كل شيء من الصفر.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-rocket text-purple-600 ml-2"></i>
+                            تطبيقات مبكرة في هذه المرحلة
+                        </h3>
+                        
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="era-card bg-white rounded-xl shadow-md p-5 border-r-purple-400">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center ml-3">
+                                        <i class="fas fa-book-open text-purple-600"></i>
+                                    </div>
+                                    <h4 class="font-bold text-gray-800">عرض معلومات فوق الكتب</h4>
+                                </div>
+                                <p class="text-gray-700 text-sm">
+                                    تطبيقات تعرض معلومات إضافية أو نماذج ثلاثية الأبعاد عند توجيه الكاميرا نحو صفحات كتب معينة.
+                                </p>
+                            </div>
+                            
+                            <div class="era-card bg-white rounded-xl shadow-md p-5 border-r-blue-400">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center ml-3">
+                                        <i class="fas fa-landmark text-blue-600"></i>
+                                    </div>
+                                    <h4 class="font-bold text-gray-800">متاحف تفاعلية</h4>
+                                </div>
+                                <p class="text-gray-700 text-sm">
+                                    استخدام AR في المتاحف لعرض معلومات عن القطع الأثرية أو إعادة بناء المواقع التاريخية.
+                                </p>
+                            </div>
+                            
+                            <div class="era-card bg-white rounded-xl shadow-md p-5 border-r-green-400">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center ml-3">
+                                        <i class="fas fa-university text-green-600"></i>
+                                    </div>
+                                    <h4 class="font-bold text-gray-800">مشاريع جامعية</h4>
+                                </div>
+                                <p class="text-gray-700 text-sm">
+                                    أبحاث وتجارب في الجامعات لاستكشاف إمكانيات AR في التعليم والتدريب.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-exclamation-triangle text-orange-600 ml-2"></i>
+                            التحديات التي واجهتها هذه المرحلة
+                        </h3>
+                        
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="bg-orange-50 p-4 rounded-xl">
+                                <h4 class="font-bold text-gray-800 mb-2">ضعف دقة التتبع</h4>
+                                <p class="text-gray-700 text-sm">صعوبة تتبع الأشياء والمساحات بدقة عالية.</p>
+                            </div>
+                            
+                            <div class="bg-yellow-50 p-4 rounded-xl">
+                                <h4 class="font-bold text-gray-800 mb-2">بطء المعالجة</h4>
+                                <p class="text-gray-700 text-sm">الحواسيب لم تكن قوية بما يكفي لمعالجة الفيديو والرسومات في الوقت الفعلي.</p>
+                            </div>
+                            
+                            <div class="bg-red-50 p-4 rounded-xl">
+                                <h4 class="font-bold text-gray-800 mb-2">صعوبة الاستخدام</h4>
+                                <p class="text-gray-700 text-sm">التطبيقات كانت معقدة وتتطلب إعدادات كثيرة للمستخدم العادي.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-laptop text-cyan-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">بداية انتقال AR من المختبرات إلى الحياة اليومية</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 6: المرحلة الرابعة - ثورة الهواتف الذكية -->
+        <section id="slide6" class="slide bg-gradient-to-br from-purple-50 to-pink-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-purple-700">6</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">المرحلة الرابعة: ثورة الهواتف الذكية (2010–2016)</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-mobile-alt text-purple-600 ml-2"></i>
+                            نقطة التحول الحقيقية
+                        </h3>
+                        
+                        <div class="bg-purple-50 p-6 rounded-xl border border-purple-200 mb-8">
+                            <p class="text-lg text-gray-800 mb-4">
+                                مع ظهور الهواتف الذكية المتطورة، أصبحت كل المكونات اللازمة لتشغيل AR متاحة في جيب كل شخص:
+                            </p>
+                            
+                            <div class="grid md:grid-cols-4 gap-4">
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-camera text-purple-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">كاميرا عالية الجودة</p>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-map-marker-alt text-blue-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">GPS دقيق</p>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-compass text-green-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">جيروسكوب</p>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-microchip text-red-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">معالج قوي</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="text-xl font-bold text-gray-800 mb-4">ماذا يعني هذا للواقع المعزز؟</h4>
+                                <ul class="list-disc pr-6 text-gray-700 space-y-3">
+                                    <li>أصبح AR <span class="font-bold text-purple-700">متاحًا للملايين</span> من المستخدمين</li>
+                                    <li>انخفضت التكلفة إلى <span class="font-bold">شبه معدومة</span> (لا حاجة لأجهزة إضافية)</li>
+                                    <li>أصبح الاستخدام <span class="font-bold">سهلًا ومباشرًا</span></li>
+                                    <li>إمكانية تحديث التطبيقات عن بعد</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="bg-gradient-to-r from-pink-50 to-purple-50 p-5 rounded-xl border border-pink-200">
+                                <h4 class="font-bold text-gray-800 mb-3">الأثر الاقتصادي:</h4>
+                                <p class="text-gray-700">
+                                    أصبح تطوير تطبيقات AR <span class="font-bold">مجديًا اقتصاديًا</span> لأول مرة، مما دفع الشركات للاستثمار فيه.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-star text-yellow-500 ml-2"></i>
+                            تطبيقات مشهورة في هذه المرحلة
+                        </h3>
+                        
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="era-card bg-white rounded-xl shadow-md p-5 border-r-yellow-400">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center ml-3">
+                                        <i class="fab fa-google text-yellow-600"></i>
+                                    </div>
+                                    <h4 class="font-bold text-gray-800">Google Sky Map</h4>
+                                </div>
+                                <p class="text-gray-700 text-sm">
+                                    تطبيق يستخدم الكاميرا والGPS لتحديد النجوم والكواكب في السماء. كان أحد أوائل تطبيقات AR الشعبية.
+                                </p>
+                            </div>
+                            
+                            <div class="era-card bg-white rounded-xl shadow-md p-5 border-r-blue-400">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center ml-3">
+                                        <i class="fas fa-graduation-cap text-blue-600"></i>
+                                    </div>
+                                    <h4 class="font-bold text-gray-800">تطبيقات تعليمية</h4>
+                                </div>
+                                <p class="text-gray-700 text-sm">
+                                    ظهور تطبيقات تعليمية تعرض نماذج ثلاثية الأبعاد للهياكل الجزيئية، التشريح البشري، وغيرها.
+                                </p>
+                            </div>
+                            
+                            <div class="era-card bg-white rounded-xl shadow-md p-5 border-r-green-400">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center ml-3">
+                                        <i class="fas fa-gamepad text-green-600"></i>
+                                    </div>
+                                    <h4 class="font-bold text-gray-800">ألعاب تعتمد على الكاميرا</h4>
+                                </div>
+                                <p class="text-gray-700 text-sm">
+                                    ألعاب بسيطة تستخدم كاميرا الهاتف لتحديد المواقع أو وضع شخصيات افتراضية في البيئة الحقيقية.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-bolt text-purple-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">الهاتف الذكي: المنصة المثالية للواقع المعزز</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 7: المرحلة الخامسة - الانتشار الجماهيري -->
+        <section id="slide7" class="slide bg-gradient-to-br from-red-50 to-pink-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-red-700">7</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">المرحلة الخامسة: الانتشار الجماهيري (2016–الآن)</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-fire text-red-600 ml-2"></i>
+                            Pokémon GO (2016) - الظاهرة العالمية
+                        </h3>
+                        
+                        <div class="grid md:grid-cols-2 gap-8 items-center">
+                            <div>
+                                <div class="bg-gradient-to-r from-red-100 to-pink-100 p-6 rounded-xl border border-red-200">
+                                    <h4 class="font-bold text-gray-800 mb-4">حقائق وأرقام:</h4>
+                                    <ul class="list-disc pr-6 text-gray-700 space-y-3">
+                                        <li>أول تطبيق واقع معزز يصل إلى <span class="font-bold text-red-700">مئات الملايين من المستخدمين</span></li>
+                                        <li>حقّق أكثر من <span class="font-bold">مليار دولار</span> في الإيرادات خلال أول عام</li>
+                                        <li>جعل AR <span class="font-bold">مفهومًا شائعًا</span> لعامة الناس</li>
+                                        <li>دمج بين GPS والكاميرا والعالم الحقيقي</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="bg-red-50 p-6 rounded-xl border border-red-300">
+                                    <h4 class="font-bold text-gray-800 mb-3">الأثر الثقافي:</h4>
+                                    <p class="text-gray-700 mb-4">
+                                        حوّلت اللعبة المتنزهات والشوارع إلى ساحات لعب، وجعلت الناس يخرجون من منازلهم للبحث عن البوكيمونات.
+                                    </p>
+                                    <div class="bg-white p-4 rounded-lg">
+                                        <p class="text-sm text-gray-800 font-medium">
+                                            <i class="fas fa-quote-left text-red-500 ml-1"></i>
+                                            Pokémon GO لم تكن مجرد لعبة، كانت <span class="font-bold text-red-600">ظاهرة ثقافية</span> أثبتت أن AR يمكن أن يكون جماهيريًا.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-building text-blue-600 ml-2"></i>
+                            دعم الشركات الكبرى
+                        </h3>
+                        
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="era-card bg-white rounded-xl shadow-md p-5 border-r-blue-400">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center ml-3">
+                                        <i class="fab fa-apple text-gray-800"></i>
+                                    </div>
+                                    <h4 class="font-bold text-gray-800">Apple → ARKit</h4>
+                                </div>
+                                <p class="text-gray-700 text-sm">
+                                    أطلقت أبل ARKit في 2017، مما جعل تطوير تطبيقات AR أسهل على نظام iOS.
+                                </p>
+                            </div>
+                            
+                            <div class="era-card bg-white rounded-xl shadow-md p-5 border-r-green-400">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center ml-3">
+                                        <i class="fab fa-google text-green-600"></i>
+                                    </div>
+                                    <h4 class="font-bold text-gray-800">Google → ARCore</h4>
+                                </div>
+                                <p class="text-gray-700 text-sm">
+                                    رد جوجل بإطلاق ARCore، منصة AR لنظام Android.
+                                </p>
+                            </div>
+                            
+                            <div class="era-card bg-white rounded-xl shadow-md p-5 border-r-purple-400">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center ml-3">
+                                        <i class="fab fa-microsoft text-purple-600"></i>
+                                    </div>
+                                    <h4 class="font-bold text-gray-800">Microsoft → HoloLens</h4>
+                                </div>
+                                <p class="text-gray-700 text-sm">
+                                    طورت مايكروسوفت نظارات HoloLens للواقع المختلط، موجهة للمؤسسات والشركات.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-th-large text-indigo-600 ml-2"></i>
+                            استخدامات AR الحالية في مختلف المجالات
+                        </h3>
+                        
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                            <div class="bg-indigo-50 p-4 rounded-lg text-center">
+                                <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center mx-auto mb-2">
+                                    <i class="fas fa-graduation-cap text-indigo-600"></i>
+                                </div>
+                                <p class="font-medium text-gray-800 text-sm">التعليم</p>
+                            </div>
+                            
+                            <div class="bg-blue-50 p-4 rounded-lg text-center">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-2">
+                                    <i class="fas fa-user-md text-blue-600"></i>
+                                </div>
+                                <p class="font-medium text-gray-800 text-sm">الطب</p>
+                            </div>
+                            
+                            <div class="bg-green-50 p-4 rounded-lg text-center">
+                                <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-2">
+                                    <i class="fas fa-shopping-cart text-green-600"></i>
+                                </div>
+                                <p class="font-medium text-gray-800 text-sm">التسويق</p>
+                            </div>
+                            
+                            <div class="bg-yellow-50 p-4 rounded-lg text-center">
+                                <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center mx-auto mb-2">
+                                    <i class="fas fa-industry text-yellow-600"></i>
+                                </div>
+                                <p class="font-medium text-gray-800 text-sm">الصناعة</p>
+                            </div>
+                            
+                            <div class="bg-purple-50 p-4 rounded-lg text-center">
+                                <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-2">
+                                    <i class="fas fa-gamepad text-purple-600"></i>
+                                </div>
+                                <p class="font-medium text-gray-800 text-sm">الترفيه</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-globe text-red-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">AR أصبح جزءاً من حياتنا اليومية</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 8: خط زمني تفاعلي -->
+        <section id="slide8" class="slide bg-gradient-to-br from-indigo-50 to-purple-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-indigo-700">8</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">خط زمني تفاعلي لتطور الواقع المعزز</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8">
+                    <div class="timeline-container">
+                        <!-- المرحلة 1 -->
+                        <div class="timeline-item">
+                            <div class="timeline-item::before" style="border-color: #f59e0b;"></div>
+                            <div class="timeline-item::after" style="background-color: #f59e0b;"></div>
+                            <div class="bg-amber-50 p-5 rounded-xl border border-amber-200">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h4 class="text-xl font-bold text-gray-800">البدايات النظرية</h4>
+                                    <span class="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-sm font-medium">1968</span>
+                                </div>
+                                <p class="text-gray-700 mb-3">
+                                    إيفان ساذرلاند يقدم "سيفورد العظيم" - أول نموذج للواقع المعزز.
+                                </p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs">أجهزة ضخمة</span>
+                                    <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs">أبحاث أكاديمية</span>
+                                    <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs">نظارات ثقيلة</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- المرحلة 2 -->
+                        <div class="timeline-item">
+                            <div class="timeline-item::before" style="border-color: #10b981;"></div>
+                            <div class="timeline-item::after" style="background-color: #10b981;"></div>
+                            <div class="bg-green-50 p-5 rounded-xl border border-green-200">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h4 class="text-xl font-bold text-gray-800">البحث والتجارب الصناعية</h4>
+                                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">1992</span>
+                                </div>
+                                <p class="text-gray-700 mb-3">
+                                    توم كوديل يستخدم مصطلح "Augmented Reality" في شركة بوينغ لمساعدة العمال في تجميع الأسلاك.
+                                </p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs">تطبيقات صناعية</span>
+                                    <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs">تكلفة عالية</span>
+                                    <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs">أجهزة خاصة</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- المرحلة 3 -->
+                        <div class="timeline-item">
+                            <div class="timeline-item::before" style="border-color: #06b6d4;"></div>
+                            <div class="timeline-item::after" style="background-color: #06b6d4;"></div>
+                            <div class="bg-cyan-50 p-5 rounded-xl border border-cyan-200">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h4 class="text-xl font-bold text-gray-800">بداية التحول الرقمي</h4>
+                                    <span class="px-3 py-1 bg-cyan-100 text-cyan-800 rounded-full text-sm font-medium">2000</span>
+                                </div>
+                                <p class="text-gray-700 mb-3">
+                                    انتشار الإنترنت والكاميرات الرقمية، ظهور مكتبات الرؤية الحاسوبية مثل OpenCV.
+                                </p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs">حواسيب محمولة</span>
+                                    <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs">متاحف تفاعلية</span>
+                                    <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs">تطبيقات تعليمية</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- المرحلة 4 -->
+                        <div class="timeline-item">
+                            <div class="timeline-item::before" style="border-color: #8b5cf6;"></div>
+                            <div class="timeline-item::after" style="background-color: #8b5cf6;"></div>
+                            <div class="bg-purple-50 p-5 rounded-xl border border-purple-200">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h4 class="text-xl font-bold text-gray-800">ثورة الهواتف الذكية</h4>
+                                    <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium">2010</span>
+                                </div>
+                                <p class="text-gray-700 mb-3">
+                                    انتشار الهواتف الذكية مع كاميرات، GPS، جيروسكوب ومعالجات قوية تجعل AR في متناول الجميع.
+                                </p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs">Google Sky Map</span>
+                                    <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs">تطبيقات تعليمية</span>
+                                    <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs">ألعاب AR</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- المرحلة 5 -->
+                        <div class="timeline-item">
+                            <div class="timeline-item::before" style="border-color: #ef4444;"></div>
+                            <div class="timeline-item::after" style="background-color: #ef4444;"></div>
+                            <div class="bg-red-50 p-5 rounded-xl border border-red-200">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h4 class="text-xl font-bold text-gray-800">الانتشار الجماهيري</h4>
+                                    <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">2016</span>
+                                </div>
+                                <p class="text-gray-700 mb-3">
+                                    Pokémon GO تحقق انتشارًا عالميًا، تليها منصات ARKit وARCore من أبل وجوجل.
+                                </p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs">Pokémon GO</span>
+                                    <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs">ARKit & ARCore</span>
+                                    <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs">HoloLens</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-10 text-center">
+                        <button id="quizToggle" class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full font-medium hover:shadow-lg transition-shadow">
+                            <i class="fas fa-question-circle ml-2"></i>
+                            اختبر معرفتك بالخط الزمني
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="hidden mt-6" id="timelineQuiz">
+                    <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">اختبار الخط الزمني</h3>
+                        
+                        <div class="space-y-6">
+                            <div>
+                                <p class="text-lg text-gray-800 mb-4">ما الحدث الذي حدث في عام 1968؟</p>
+                                <div class="space-y-3">
+                                    <div class="quiz-option p-4 border border-gray-300 rounded-lg">
+                                        <div class="flex items-center">
+                                            <div class="w-6 h-6 rounded-full border border-gray-400 flex items-center justify-center ml-3">
+                                                <span class="text-sm">1</span>
+                                            </div>
+                                            <span>إطلاق أول هاتف ذكي</span>
+                                        </div>
+                                    </div>
+                                    <div class="quiz-option p-4 border border-gray-300 rounded-lg">
+                                        <div class="flex items-center">
+                                            <div class="w-6 h-6 rounded-full border border-gray-400 flex items-center justify-center ml-3">
+                                                <span class="text-sm">2</span>
+                                            </div>
+                                            <span>إيفان ساذرلاند يقدم أول نموذج للواقع المعزز</span>
+                                        </div>
+                                    </div>
+                                    <div class="quiz-option p-4 border border-gray-300 rounded-lg">
+                                        <div class="flex items-center">
+                                            <div class="w-6 h-6 rounded-full border border-gray-400 flex items-center justify-center ml-3">
+                                                <span class="text-sm">3</span>
+                                            </div>
+                                            <span>إطلاق تطبيق Pokémon GO</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center">
+                                <button id="checkQuiz" class="px-6 py-2 bg-green-600 text-white rounded-full font-medium">
+                                    تحقق من الإجابات
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 9: عوامل النجاح والتحديات -->
+        <section id="slide9" class="slide bg-gradient-to-br from-teal-50 to-emerald-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-teal-700">9</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">عوامل النجاح والتحديات</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <div class="grid md:grid-cols-2 gap-8 mb-10">
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                                <i class="fas fa-check-circle text-green-600 ml-2"></i>
+                                عوامل نجاح انتشار AR
+                            </h3>
+                            
+                            <div class="space-y-6">
+                                <div class="bg-green-50 p-5 rounded-xl border border-green-200">
+                                    <h4 class="font-bold text-green-800 mb-3">تطور العتاد (Hardware)</h4>
+                                    <p class="text-gray-700">
+                                        تحسّن المعالجات، الكاميرات، المستشعرات، والشاشات جعل AR أسرع وأكثر دقة.
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-blue-50 p-5 rounded-xl border border-blue-200">
+                                    <h4 class="font-bold text-blue-800 mb-3">البنية التحتية الرقمية</h4>
+                                    <p class="text-gray-700">
+                                        الإنترنت السريع، خدمات السحابة، والتخزين السحابي مكنت من تطبيقات AR معقدة.
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-purple-50 p-5 rounded-xl border border-purple-200">
+                                    <h4 class="font-bold text-purple-800 mb-3">المنصات المفتوحة</h4>
+                                    <p class="text-gray-700">
+                                        ARKit وARCore وOpenCV وفرت أدوات للمطورين لإنشاء تطبيقات AR بسهولة.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                                <i class="fas fa-exclamation-triangle text-red-600 ml-2"></i>
+                                التحديات التي لا تزال تواجه AR
+                            </h3>
+                            
+                            <div class="space-y-6">
+                                <div class="bg-red-50 p-5 rounded-xl border border-red-200">
+                                    <h4 class="font-bold text-red-800 mb-3">تحديات تقنية</h4>
+                                    <p class="text-gray-700">
+                                        استهلاك البطارية، دقة التتبع في ظروف إضاءة مختلفة، والتأخر في المعالجة.
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-yellow-50 p-5 rounded-xl border border-yellow-200">
+                                    <h4 class="font-bold text-yellow-800 mb-3">تحديات تصميمية</h4>
+                                    <p class="text-gray-700">
+                                        صعوبة تصميم تجارب مستخدم طبيعية وغير مزعجة في بيئات مختلفة.
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-indigo-50 p-5 rounded-xl border border-indigo-200">
+                                    <h4 class="font-bold text-indigo-800 mb-3">تحديات اقتصادية واجتماعية</h4>
+                                    <p class="text-gray-700">
+                                        التكلفة، الخصوصية، القبول الاجتماعي، والتأثير على التفاعل الإنساني.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-teal-100 to-emerald-100 p-6 rounded-2xl">
+                        <h4 class="text-xl font-bold text-gray-800 mb-4 text-center">الدروس المستفادة من تاريخ AR</h4>
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="bg-white p-5 rounded-xl">
+                                <h5 class="font-bold text-gray-800 mb-3">1. أهمية التوقيت</h5>
+                                <p class="text-gray-700 text-sm">التقنيات تحتاج إلى البيئة المناسبة لتنمو وتنتشر.</p>
+                            </div>
+                            
+                            <div class="bg-white p-5 rounded-xl">
+                                <h5 class="font-bold text-gray-800 mb-3">2. دور العتاد</h5>
+                                <p class="text-gray-700 text-sm">تطور البرمجيات مرتبط ارتباطاً وثيقاً بتطور العتاد.</p>
+                            </div>
+                            
+                            <div class="bg-white p-5 rounded-xl">
+                                <h5 class="font-bold text-gray-800 mb-3">3. الحاجة إلى حالات استخدام مقنعة</h5>
+                                <p class="text-gray-700 text-sm">التقنيات تنتشر عندما تحل مشاكل حقيقية للمستخدمين.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-balance-scale text-teal-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">التوازن بين الفرص والتحديات هو مفتاح الاستمرارية</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 10: مستقبل الواقع المعزز -->
+        <section id="slide10" class="slide bg-gradient-to-br from-sky-50 to-blue-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-sky-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-sky-700">10</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">مستقبل الواقع المعزز: التوقعات والاتجاهات</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">الاتجاهات المستقبلية المتوقعة</h3>
+                        
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="era-card bg-white rounded-xl shadow-md p-5 border-r-sky-400">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-12 h-12 rounded-full bg-sky-100 flex items-center justify-center ml-3">
+                                        <i class="fas fa-glasses text-sky-600"></i>
+                                    </div>
+                                    <h4 class="font-bold text-gray-800">نظارات AR خفيفة</h4>
+                                </div>
+                                <p class="text-gray-700 text-sm">
+                                    تطوير نظارات AR خفيفة الوزن ومريحة للارتداء اليومي، تشبه النظارات العادية.
+                                </p>
+                            </div>
+                            
+                            <div class="era-card bg-white rounded-xl shadow-md p-5 border-r-purple-400">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center ml-3">
+                                        <i class="fas fa-brain text-purple-600"></i>
+                                    </div>
+                                    <h4 class="font-bold text-gray-800">الذكاء الاصطناعي</h4>
+                                </div>
+                                <p class="text-gray-700 text-sm">
+                                    دمج AR مع الذكاء الاصطناعي لفهم المشهد بشكل أفضل وتقديم محتوى أكثر ذكاءً.
+                                </p>
+                            </div>
+                            
+                            <div class="era-card bg-white rounded-xl shadow-md p-5 border-r-green-400">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center ml-3">
+                                        <i class="fas fa-network-wired text-green-600"></i>
+                                    </div>
+                                    <h4 class="font-bold text-gray-800">الجيل الخامس 5G</h4>
+                                </div>
+                                <p class="text-gray-700 text-sm">
+                                    شبكات 5G ستوفر السرعة والقدرة اللازمة لتطبيقات AR معقدة تعمل في الوقت الفعلي.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-industry text-indigo-600 ml-2"></i>
+                            مجالات جديدة للواقع المعزز
+                        </h3>
+                        
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="bg-indigo-50 p-4 rounded-lg text-center">
+                                <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center mx-auto mb-2">
+                                    <i class="fas fa-home text-indigo-600"></i>
+                                </div>
+                                <p class="font-medium text-gray-800 text-sm">المنزل الذكي</p>
+                            </div>
+                            
+                            <div class="bg-blue-50 p-4 rounded-lg text-center">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-2">
+                                    <i class="fas fa-car text-blue-600"></i>
+                                </div>
+                                <p class="font-medium text-gray-800 text-sm">السيارات الذكية</p>
+                            </div>
+                            
+                            <div class="bg-green-50 p-4 rounded-lg text-center">
+                                <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-2">
+                                    <i class="fas fa-shopping-bag text-green-600"></i>
+                                </div>
+                                <p class="font-medium text-gray-800 text-sm">التسوق الافتراضي</p>
+                            </div>
+                            
+                            <div class="bg-red-50 p-4 rounded-lg text-center">
+                                <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-2">
+                                    <i class="fas fa-heart text-red-600"></i>
+                                </div>
+                                <p class="font-medium text-gray-800 text-sm">الرعاية الصحية</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-sky-100 to-blue-100 p-6 rounded-2xl">
+                        <h4 class="text-xl font-bold text-gray-800 mb-4 text-center">توقعات الخبراء</h4>
+                        <div class="flex flex-col md:flex-row items-center gap-6">
+                            <div class="text-center">
+                                <div class="text-4xl font-bold text-sky-700 mb-2">$100B+</div>
+                                <p class="text-gray-700 text-sm">سوق AR بحلول 2025</p>
+                            </div>
+                            
+                            <div class="text-center">
+                                <div class="text-4xl font-bold text-blue-700 mb-2">1B+</div>
+                                <p class="text-gray-700 text-sm">مستخدم AR بحلول 2030</p>
+                            </div>
+                            
+                            <div class="text-center">
+                                <div class="text-4xl font-bold text-purple-700 mb-2">50%</div>
+                                <p class="text-gray-700 text-sm">من الشركات ستعتمد AR بحلول 2027</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-crystal-ball text-sky-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">الواقع المعزز ليس مجرد تقنية، بل هو منصة جديدة للتفاعل مع العالم</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 11: اختبار قصير -->
+        <section id="slide11" class="slide bg-gradient-to-br from-orange-50 to-amber-50">
+            <div class="max-w-4xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-orange-700">11</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">اختبار قصير</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-8">
+                    <div class="text-center mb-10">
+                        <div class="inline-block p-4 bg-gradient-to-r from-orange-100 to-amber-100 rounded-full mb-6">
+                            <i class="fas fa-question-circle text-4xl text-orange-600"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold text-gray-800 mb-6">أسئلة تقييمية سريعة</h3>
+                        <p class="text-lg text-gray-700">
+                            <i class="fas fa-clock ml-1"></i>
+                            زمن الاختبار: 5 دقائق
+                        </p>
+                    </div>
+                    
+                    <!-- السؤال 1 -->
+                    <div class="mb-10">
+                        <div class="flex items-center mb-4">
+                            <div class="w-8 h-8 rounded-full bg-orange-600 text-white flex items-center justify-center ml-2 font-bold">
+                                1
+                            </div>
+                            <h4 class="text-xl font-bold text-gray-800">من هو أول باحث ارتبط اسمه ببدايات الواقع المعزز؟</h4>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="quiz-option p-4 border border-gray-300 rounded-lg" data-correct="false">
+                                <div class="flex items-center">
+                                    <div class="w-6 h-6 rounded-full border border-gray-400 flex items-center justify-center ml-3">
+                                        <span class="text-sm">أ</span>
+                                    </div>
+                                    <span>توم كوديل</span>
+                                </div>
+                            </div>
+                            
+                            <div class="quiz-option p-4 border border-gray-300 rounded-lg" data-correct="true">
+                                <div class="flex items-center">
+                                    <div class="w-6 h-6 rounded-full border border-gray-400 flex items-center justify-center ml-3">
+                                        <span class="text-sm">ب</span>
+                                    </div>
+                                    <span>إيفان ساذرلاند</span>
+                                </div>
+                            </div>
+                            
+                            <div class="quiz-option p-4 border border-gray-300 rounded-lg" data-correct="false">
+                                <div class="flex items-center">
+                                    <div class="w-6 h-6 rounded-full border border-gray-400 flex items-center justify-center ml-3">
+                                        <span class="text-sm">ج</span>
+                                    </div>
+                                    <span>ستيف جوبز</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- السؤال 2 -->
+                    <div class="mb-10">
+                        <div class="flex items-center mb-4">
+                            <div class="w-8 h-8 rounded-full bg-amber-600 text-white flex items-center justify-center ml-2 font-bold">
+                                2
+                            </div>
+                            <h4 class="text-xl font-bold text-gray-800">في أي مجال استُخدم مصطلح AR لأول مرة عمليًا؟</h4>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="quiz-option p-4 border border-gray-300 rounded-lg" data-correct="false">
+                                <div class="flex items-center">
+                                    <div class="w-6 h-6 rounded-full border border-gray-400 flex items-center justify-center ml-3">
+                                        <span class="text-sm">أ</span>
+                                    </div>
+                                    <span>التعليم</span>
+                                </div>
+                            </div>
+                            
+                            <div class="quiz-option p-4 border border-gray-300 rounded-lg" data-correct="true">
+                                <div class="flex items-center">
+                                    <div class="w-6 h-6 rounded-full border border-gray-400 flex items-center justify-center ml-3">
+                                        <span class="text-sm">ب</span>
+                                    </div>
+                                    <span>الصناعة (شركة Boeing)</span>
+                                </div>
+                            </div>
+                            
+                            <div class="quiz-option p-4 border border-gray-300 rounded-lg" data-correct="false">
+                                <div class="flex items-center">
+                                    <div class="w-6 h-6 rounded-full border border-gray-400 flex items-center justify-center ml-3">
+                                        <span class="text-sm">ج</span>
+                                    </div>
+                                    <span>الطب</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- السؤال 3 -->
+                    <div class="mb-10">
+                        <div class="flex items-center mb-4">
+                            <div class="w-8 h-8 rounded-full bg-yellow-600 text-white flex items-center justify-center ml-2 font-bold">
+                                3
+                            </div>
+                            <h4 class="text-xl font-bold text-gray-800">ما العامل الرئيسي الذي ساهم في انتشار AR بعد 2010؟</h4>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="quiz-option p-4 border border-gray-300 rounded-lg" data-correct="true">
+                                <div class="flex items-center">
+                                    <div class="w-6 h-6 rounded-full border border-gray-400 flex items-center justify-center ml-3">
+                                        <span class="text-sm">أ</span>
+                                    </div>
+                                    <span>انتشار الهواتف الذكية وتطور المستشعرات</span>
+                                </div>
+                            </div>
+                            
+                            <div class="quiz-option p-4 border border-gray-300 rounded-lg" data-correct="false">
+                                <div class="flex items-center">
+                                    <div class="w-6 h-6 rounded-full border border-gray-400 flex items-center justify-center ml-3">
+                                        <span class="text-sm">ب</span>
+                                    </div>
+                                    <span>انخفاض أسعار الحواسيب المكتبية</span>
+                                </div>
+                            </div>
+                            
+                            <div class="quiz-option p-4 border border-gray-300 rounded-lg" data-correct="false">
+                                <div class="flex items-center">
+                                    <div class="w-6 h-6 rounded-full border border-gray-400 flex items-center justify-center ml-3">
+                                        <span class="text-sm">ج</span>
+                                    </div>
+                                    <span>ظهور الإنترنت</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-12">
+                        <button id="checkAnswers" class="px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-600 text-white rounded-full font-medium hover:shadow-lg transition-shadow">
+                            <i class="fas fa-check-circle ml-2"></i>
+                            تحقق من الإجابات
+                        </button>
+                        
+                        <button id="resetQuiz" class="px-6 py-3 bg-gray-200 text-gray-800 rounded-full font-medium hover:bg-gray-300 mr-4">
+                            <i class="fas fa-redo ml-2"></i>
+                            إعادة المحاولة
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="quizResults" class="hidden bg-green-50 border border-green-200 rounded-2xl p-6 mb-8">
+                    <h4 class="text-xl font-bold text-gray-800 mb-4 text-center">نتيجة الاختبار</h4>
+                    <div class="text-center mb-6">
+                        <div class="text-5xl font-bold text-green-600 mb-2" id="score">0/3</div>
+                        <p class="text-gray-700" id="resultMessage"></p>
+                    </div>
+                    
+                    <div class="bg-white p-5 rounded-xl">
+                        <h5 class="font-bold text-gray-800 mb-3">الإجابات النموذجية:</h5>
+                        <ol class="list-decimal pr-6 space-y-3 text-gray-700">
+                            <li><span class="font-bold">إيفان ساذرلاند</span> - قدم أول نموذج للواقع المعزز عام 1968.</li>
+                            <li><span class="font-bold">الصناعة (شركة Boeing)</span> - استخدم توم كوديل المصطلح لأول مرة عمليًا عام 1992.</li>
+                            <li><span class="font-bold">انتشار الهواتف الذكية وتطور المستشعرات</span> - جعلت AR في متناول الملايين.</li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-clipboard-check text-orange-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">التقييم الذاتي يساعد في ترسيخ المعلومات</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 12: واجب منزلي -->
+        <section id="slide12" class="slide bg-gradient-to-br from-green-50 to-emerald-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-green-700">12</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">واجب منزلي</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-10">
+                    <div class="text-center mb-10">
+                        <div class="inline-block p-4 bg-gradient-to-r from-green-100 to-emerald-100 rounded-full mb-6">
+                            <i class="fas fa-home text-4xl text-green-600"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold text-gray-800 mb-6">واجب كتابي تحليلي</h3>
+                        <p class="text-lg text-gray-700 max-w-2xl mx-auto">
+                            (300 كلمة تقريباً)
+                        </p>
+                    </div>
+                    
+                    <div class="mb-12">
+                        <h4 class="text-2xl font-bold text-gray-800 mb-6 text-center">المهمة:</h4>
+                        <div class="bg-green-50 p-6 rounded-2xl border border-green-200">
+                            <p class="text-lg text-gray-800 mb-6 text-center">
+                                <span class="font-bold text-green-700">اختر مرحلة واحدة من تاريخ الواقع المعزز</span>، واشرح:
+                            </p>
+                            
+                            <div class="grid md:grid-cols-3 gap-6 mb-8">
+                                <div class="bg-white p-5 rounded-xl shadow-sm">
+                                    <div class="flex items-center mb-3">
+                                        <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center ml-3">
+                                            <span class="font-bold text-green-700">1</span>
+                                        </div>
+                                        <h5 class="font-bold text-gray-800">ما الذي ميز هذه المرحلة؟</h5>
+                                    </div>
+                                    <p class="text-gray-700 text-sm">
+                                        ما هي الابتكارات أو التطورات الرئيسية التي حدثت في هذه المرحلة؟
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-white p-5 rounded-xl shadow-sm">
+                                    <div class="flex items-center mb-3">
+                                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center ml-3">
+                                            <span class="font-bold text-blue-700">2</span>
+                                        </div>
+                                        <h5 class="font-bold text-gray-800">لماذا نجحت أو فشلت؟</h5>
+                                    </div>
+                                    <p class="text-gray-700 text-sm">
+                                        ما العوامل التي ساعدت على نجاح هذه المرحلة أو تسبب في فشلها؟
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-white p-5 rounded-xl shadow-sm">
+                                    <div class="flex items-center mb-3">
+                                        <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center ml-3">
+                                            <span class="font-bold text-purple-700">3</span>
+                                        </div>
+                                        <h5 class="font-bold text-gray-800">كيف أثرت على تطور AR الحالي؟</h5>
+                                    </div>
+                                    <p class="text-gray-700 text-sm">
+                                        ما الإرث الذي تركته هذه المرحلة للواقع المعزز اليوم؟
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-green-100 to-emerald-100 p-6 rounded-2xl">
+                        <h4 class="text-xl font-bold text-gray-800 mb-6 text-center">نصائح للكتابة</h4>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="bg-white p-5 rounded-xl">
+                                <h5 class="font-bold text-gray-800 mb-3">المحتوى</h5>
+                                <ul class="list-disc pr-6 text-gray-700 text-sm space-y-2">
+                                    <li>ركز على الحقائق والتواريخ المهمة</li>
+                                    <li>استشهد بأمثلة محددة من المحاضرة</li>
+                                    <li>قدم تحليلاً شخصياً مدعوماً بالأدلة</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="bg-white p-5 rounded-xl">
+                                <h5 class="font-bold text-gray-800 mb-3">التنسيق</h5>
+                                <ul class="list-disc pr-6 text-gray-700 text-sm space-y-2">
+                                    <li>اكتب مقدمة وخاتمة واضحتين</li>
+                                    <li>قسّم المقال إلى فقرات منطقية</li>
+                                    <li>راجع الأخطاء الإملائية والنحوية</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-calendar-alt text-green-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">موعد التسليم: المحاضرة القادمة</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 13: مصادر ومراجع -->
+        <section id="slide13" class="slide bg-gradient-to-br from-blue-50 to-indigo-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-blue-700">13</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">مصادر ومراجع</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-10">
+                    <div class="text-center mb-10">
+                        <div class="inline-block p-4 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full mb-6">
+                            <i class="fas fa-book-reader text-4xl text-blue-600"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold text-gray-800 mb-6">موارد للتعمق في تاريخ AR</h3>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-8 mb-12">
+                        <div>
+                            <h4 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                                <i class="fas fa-video text-red-500 ml-2"></i>
+                                فيديوهات TED المقترحة
+                            </h4>
+                            <div class="space-y-6">
+                                <div class="bg-red-50 p-5 rounded-xl border border-red-200">
+                                    <h5 class="font-bold text-gray-800 mb-2">David Shapira</h5>
+                                    <p class="text-sm text-gray-700 mb-3">
+                                        <strong>"Augmented Reality: A Supportive Technology to Human Existence"</strong>
+                                    </p>
+                                    <p class="text-sm text-gray-700 mb-3">
+                                        يربط بين تطور التقنية وتأثيرها على حياة الإنسان - مناسب لكسر الجانب التاريخي النظري.
+                                    </p>
+                                    <div class="bg-white p-3 rounded-lg mt-3">
+                                        <p class="text-sm text-gray-800 font-medium">المطلوب:</p>
+                                        <p class="text-sm text-gray-700">تلخيص الفكرة الرئيسية في فقرة واحدة</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-blue-50 p-5 rounded-xl border border-blue-200">
+                                    <h5 class="font-bold text-gray-800 mb-2">أفلام وثائقية</h5>
+                                    <ul class="list-disc pr-6 text-gray-700 text-sm space-y-2">
+                                        <li>"Augmented Reality: The Next Frontier" - National Geographic</li>
+                                        <li>"The History of AR & VR" - YouTube Documentary Series</li>
+                                        <li>"How Augmented Reality Will Change The World" - BBC</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                                <i class="fas fa-book text-green-600 ml-2"></i>
+                                كتب ومراجع أكاديمية
+                            </h4>
+                            <div class="space-y-6">
+                                <div class="bg-green-50 p-5 rounded-xl border border-green-200">
+                                    <h5 class="font-bold text-gray-800 mb-2">كتب أساسية</h5>
+                                    <ul class="list-disc pr-6 text-gray-700 text-sm space-y-3">
+                                        <li>
+                                            <strong>"Augmented Reality: Principles and Practice"</strong><br>
+                                            Dieter Schmalstieg & Tobias Höllerer - مرجع أكاديمي شامل
+                                        </li>
+                                        <li>
+                                            <strong>"Understanding Augmented Reality"</strong><br>
+                                            Alan B. Craig - يغطي المفاهيم والتطبيقات والتاريخ
+                                        </li>
+                                        <li>
+                                            <strong>"The Fourth Transformation"</strong><br>
+                                            Robert Scoble & Shel Israel - يركز على المستقبل والتأثير الاجتماعي
+                                        </li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="bg-purple-50 p-5 rounded-xl border border-purple-200">
+                                    <h5 class="font-bold text-gray-800 mb-2">مواقع إلكترونية</h5>
+                                    <ul class="list-disc pr-6 text-gray-700 text-sm space-y-2">
+                                        <li>IEEE Xplore - أبحاث أكاديمية عن تاريخ AR</li>
+                                        <li>ACM Digital Library - أوراق بحثية تاريخية</li>
+                                        <li>Augmented Reality.org - موارد شاملة عن تاريخ AR</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-blue-100 to-indigo-100 p-6 rounded-2xl">
+                        <h4 class="text-xl font-bold text-gray-800 mb-6 text-center">كيفية البحث الفعّال</h4>
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="bg-white p-5 rounded-xl">
+                                <h5 class="font-bold text-gray-800 mb-3">الكلمات المفتاحية</h5>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">History of AR</span>
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">Ivan Sutherland</span>
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">AR evolution timeline</span>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white p-5 rounded-xl">
+                                <h5 class="font-bold text-gray-800 mb-3">المكتبات الرقمية</h5>
+                                <ul class="list-disc pr-6 text-gray-700 text-sm space-y-1">
+                                    <li>Google Scholar</li>
+                                    <li>IEEE Xplore</li>
+                                    <li>ResearchGate</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="bg-white p-5 rounded-xl">
+                                <h5 class="font-bold text-gray-800 mb-3">تقييم المصادر</h5>
+                                <p class="text-gray-700 text-sm">تحقق من تاريخ النشر، مؤلف المصدر، ومؤسسة النشر لتقييم المصداقية.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 14: خاتمة المحاضرة -->
+        <section id="slide14" class="slide bg-gradient-to-br from-purple-50 to-pink-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-purple-700">14</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">خاتمة المحاضرة</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-10">
+                    <div class="text-center mb-10">
+                        <div class="inline-block p-4 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full mb-6">
+                            <i class="fas fa-flag-checkered text-4xl text-purple-600"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold text-gray-800 mb-6">الخلاصة والتكامل</h3>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-8 mb-10">
+                        <div class="bg-gradient-to-br from-purple-50 to-white p-6 rounded-2xl border border-purple-200 shadow-md">
+                            <h4 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                <i class="fas fa-check-circle text-green-500 ml-2"></i>
+                                ما تعلمناه اليوم
+                            </h4>
+                            <ul class="space-y-3 text-gray-700">
+                                <li class="flex items-start">
+                                    <i class="fas fa-star text-yellow-500 mt-1 ml-2"></i>
+                                    <span>الواقع المعزز ليس تقنية جديدة - فكرته تعود إلى 1968</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-star text-yellow-500 mt-1 ml-2"></i>
+                                    <span>لكنه تقنية نضجت متأخرًا - احتاجت إلى بيئة تقنية مناسبة</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-star text-yellow-500 mt-1 ml-2"></i>
+                                    <span>تطوره مرتبط مباشرة بتطور الأجهزة والإنترنت</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-star text-yellow-500 mt-1 ml-2"></i>
+                                    <span>مر بخمس مراحل تاريخية رئيسية من النظرية إلى الانتشار الجماهيري</span>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-pink-50 to-white p-6 rounded-2xl border border-pink-200 shadow-md">
+                            <h4 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                <i class="fas fa-eye text-blue-500 ml-2"></i>
+                                التوقعات للمحاضرة القادمة
+                            </h4>
+                            <p class="text-gray-700 mb-4">
+                                في المحاضرة القادمة سننتقل من التاريخ إلى الجانب التقني العميق:
+                            </p>
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <p class="text-gray-800 font-medium mb-2">الموضوع:</p>
+                                <p class="text-gray-700">
+                                    <span class="font-bold text-blue-600">الفروق التقنية بين AR و VR و MR</span> بشكل أعمق، مع تفاصيل تقنية ومقارنات عملية.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-purple-100 to-pink-100 p-6 rounded-2xl">
+                        <h4 class="text-xl font-bold text-gray-800 mb-6 text-center">الدروس المستفادة من تاريخ AR</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-white p-5 rounded-xl text-center">
+                                <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+                                    <i class="fas fa-clock text-green-600"></i>
+                                </div>
+                                <h5 class="font-bold text-gray-800 mb-2">التوقيت مهم</h5>
+                                <p class="text-gray-700 text-sm">التقنيات تحتاج إلى الوقت والظروف المناسبة لتزدهر</p>
+                            </div>
+                            
+                            <div class="bg-white p-5 rounded-xl text-center">
+                                <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
+                                    <i class="fas fa-microchip text-blue-600"></i>
+                                </div>
+                                <h5 class="font-bold text-gray-800 mb-2">تطور مترابط</h5>
+                                <p class="text-gray-700 text-sm">البرمجيات تتقدم مع تقدم العتاد والبنية التحتية</p>
+                            </div>
+                            
+                            <div class="bg-white p-5 rounded-xl text-center">
+                                <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-4">
+                                    <i class="fas fa-users text-purple-600"></i>
+                                </div>
+                                <h5 class="font-bold text-gray-800 mb-2">الحاجة للإنسان</h5>
+                                <p class="text-gray-700 text-sm">التقنيات تنجح عندما تخدم احتياجات إنسانية حقيقية</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-history text-purple-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">فهم الماضي يساعدنا على استشراف المستقبل</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <script>
+        // عناصر التحكم
+        const slidesContainer = document.getElementById('slidesContainer');
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const menuBtn = document.getElementById('menuBtn');
+        const closeMenuBtn = document.getElementById('closeMenuBtn');
+        const slideMenu = document.getElementById('slideMenu');
+        const slideMenuItems = document.querySelectorAll('.slide-menu-item');
+        const progressFill = document.getElementById('progressFill');
+        const currentSlideElement = document.getElementById('currentSlide');
+        const quizToggle = document.getElementById('quizToggle');
+        const timelineQuiz = document.getElementById('timelineQuiz');
+        const quizOptions = document.querySelectorAll('.quiz-option');
+        const checkQuizBtn = document.getElementById('checkQuiz');
+        const checkAnswersBtn = document.getElementById('checkAnswers');
+        const resetQuizBtn = document.getElementById('resetQuiz');
+        const quizResults = document.getElementById('quizResults');
+        const scoreElement = document.getElementById('score');
+        const resultMessage = document.getElementById('resultMessage');
+        
+        let currentSlideIndex = 0;
+        const totalSlides = slides.length;
+        
+        // تحديث شريط التقدم
+        function updateProgress() {
+            const progress = ((currentSlideIndex + 1) / totalSlides) * 100;
+            progressFill.style.width = `${progress}%`;
+            currentSlideElement.textContent = currentSlideIndex + 1;
+        }
+        
+        // عرض شريحة محددة
+        function showSlide(index) {
+            if (index < 0) index = 0;
+            if (index >= totalSlides) index = totalSlides - 1;
+            
+            slides.forEach(slide => {
+                slide.classList.remove('active');
+            });
+            
+            slides[index].classList.add('active');
+            currentSlideIndex = index;
+            
+            prevBtn.disabled = index === 0;
+            nextBtn.disabled = index === totalSlides - 1;
+            
+            updateProgress();
+            window.scrollTo(0, 0);
+            slideMenu.classList.add('hidden');
+            
+            // إخفاء اختبار الخط الزمني إذا كان مفتوحاً
+            if (timelineQuiz) {
+                timelineQuiz.classList.add('hidden');
+            }
+        }
+        
+        // الشريحة التالية
+        function nextSlide() {
+            showSlide(currentSlideIndex + 1);
+        }
+        
+        // الشريحة السابقة
+        function prevSlide() {
+            showSlide(currentSlideIndex - 1);
+        }
+        
+        // تفعيل اختبار الخط الزمني
+        function toggleTimelineQuiz() {
+            timelineQuiz.classList.toggle('hidden');
+        }
+        
+        // تفعيل اختيارات الاختبار
+        function setupQuizOptions() {
+            quizOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // إزالة التحديد من جميع الخيارات في نفس السؤال
+                    const parent = this.parentElement;
+                    parent.querySelectorAll('.quiz-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    
+                    // تحديد الخيار الحالي
+                    this.classList.add('selected');
+                });
+            });
+        }
+        
+        // التحقق من إجابات اختبار الخط الزمني
+        function checkTimelineQuiz() {
+            const selectedOption = document.querySelector('.quiz-option.selected');
+            
+            if (!selectedOption) {
+                alert('يرجى اختيار إجابة أولاً');
+                return;
+            }
+            
+            const isCorrect = selectedOption.getAttribute('data-correct') === 'true';
+            
+            // إظهار النتيجة
+            if (isCorrect) {
+                selectedOption.classList.add('correct');
+                setTimeout(() => {
+                    alert('إجابة صحيحة! ✓\n\nإيفان ساذرلاند قدم أول نموذج للواقع المعزز عام 1968.');
+                }, 300);
+            } else {
+                selectedOption.classList.add('incorrect');
+                setTimeout(() => {
+                    alert('إجابة غير صحيحة. حاول مرة أخرى!');
+                }, 300);
+                
+                // إضافة خيار إعادة المحاولة
+                setTimeout(() => {
+                    selectedOption.classList.remove('incorrect', 'selected');
+                }, 1500);
+            }
+        }
+        
+        // التحقق من إجابات الاختبار الرئيسي
+        function checkMainQuiz() {
+            let correctCount = 0;
+            let totalQuestions = 3;
+            
+            // الحصول على جميع أسئلة الاختبار
+            const questionContainers = document.querySelectorAll('.space-y-3');
+            
+            questionContainers.forEach((container, index) => {
+                const selectedOption = container.querySelector('.quiz-option.selected');
+                
+                if (selectedOption) {
+                    const isCorrect = selectedOption.getAttribute('data-correct') === 'true';
+                    
+                    if (isCorrect) {
+                        selectedOption.classList.add('correct');
+                        correctCount++;
+                    } else {
+                        selectedOption.classList.add('incorrect');
+                        
+                        // إظهار الإجابة الصحيحة
+                        const correctOption = container.querySelector('.quiz-option[data-correct="true"]');
+                        if (correctOption) {
+                            correctOption.classList.add('correct');
+                        }
+                    }
+                }
+            });
+            
+            // حساب النتيجة
+            const score = `${correctCount}/${totalQuestions}`;
+            scoreElement.textContent = score;
+            
+            // عرض رسالة النتيجة
+            let message = '';
+            if (correctCount === totalQuestions) {
+                message = 'ممتاز! جميع إجاباتك صحيحة. 👍';
+            } else if (correctCount >= totalQuestions / 2) {
+                message = 'جيد! لكن يمكنك التحسين. راجع الإجابات الصحيحة. 💪';
+            } else {
+                message = 'تحتاج للمراجعة. راجع محتوى المحاضرة ثم حاول مرة أخرى. 📚';
+            }
+            
+            resultMessage.textContent = message;
+            
+            // إظهار نتائج الاختبار
+            quizResults.classList.remove('hidden');
+            
+            // التمرير إلى نتائج الاختبار
+            quizResults.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // إعادة تعيين الاختبار
+        function resetQuiz() {
+            // إزالة جميع التحديدات والنتائج
+            quizOptions.forEach(option => {
+                option.classList.remove('selected', 'correct', 'incorrect');
+            });
+            
+            // إخفاء نتائج الاختبار
+            quizResults.classList.add('hidden');
+        }
+        
+        // التعامل مع مفاتيح لوحة المفاتيح
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowRight' || event.key === 'PageUp') {
+                prevSlide();
+            } else if (event.key === 'ArrowLeft' || event.key === 'PageDown' || event.key === ' ') {
+                nextSlide();
+            }
+        });
+        
+        // تهيئة الأحداث
+        function init() {
+            // أحداث أزرار التنقل
+            prevBtn.addEventListener('click', prevSlide);
+            nextBtn.addEventListener('click', nextSlide);
+            
+            // أحداث القائمة
+            menuBtn.addEventListener('click', () => {
+                slideMenu.classList.remove('hidden');
+            });
+            
+            closeMenuBtn.addEventListener('click', () => {
+                slideMenu.classList.add('hidden');
+            });
+            
+            // أحداث عناصر القائمة
+            slideMenuItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const slideIndex = parseInt(item.dataset.slide) - 1;
+                    showSlide(slideIndex);
+                });
+            });
+            
+            // أحداث اختبار الخط الزمني
+            if (quizToggle) {
+                quizToggle.addEventListener('click', toggleTimelineQuiz);
+            }
+            
+            if (checkQuizBtn) {
+                checkQuizBtn.addEventListener('click', checkTimelineQuiz);
+            }
+            
+            // أحداث الاختبار الرئيسي
+            if (checkAnswersBtn) {
+                checkAnswersBtn.addEventListener('click', checkMainQuiz);
+            }
+            
+            if (resetQuizBtn) {
+                resetQuizBtn.addEventListener('click', resetQuiz);
+            }
+            
+            // إغلاق القائمة بالنقر خارجها
+            slideMenu.addEventListener('click', (event) => {
+                if (event.target === slideMenu) {
+                    slideMenu.classList.add('hidden');
+                }
+            });
+            
+            // تهيئة اختيارات الاختبار
+            setupQuizOptions();
+            
+            // تهيئة الشريحة الأولى
+            showSlide(0);
+        }
+        
+        // تهيئة الصفحة عند التحميل
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

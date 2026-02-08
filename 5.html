@@ -1,0 +1,2543 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المحاضرة السادسة: الرؤية الحاسوبية في الواقع المعزز</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Cairo', sans-serif;
+        }
+        
+        .slide {
+            min-height: 100vh;
+            padding: 2rem;
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .slide.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .tech-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-top: 4px solid;
+        }
+        
+        .tech-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .ar-type-card {
+            border-right: 5px solid;
+            transition: all 0.3s ease;
+        }
+        
+        .ar-type-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .comparison-table th, .comparison-table td {
+            padding: 12px 16px;
+            text-align: center;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .comparison-table tr:hover {
+            background-color: #f9fafb;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background-color: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #4F46E5, #7C3AED);
+            transition: width 0.5s ease;
+        }
+        
+        .quiz-option {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .quiz-option:hover {
+            background-color: #f3f4f6;
+            transform: scale(1.02);
+        }
+        
+        .quiz-option.selected {
+            border-color: #4F46E5;
+            background-color: #eef2ff;
+        }
+        
+        .quiz-option.correct {
+            border-color: #10b981;
+            background-color: #d1fae5;
+        }
+        
+        .quiz-option.incorrect {
+            border-color: #ef4444;
+            background-color: #fee2e2;
+        }
+        
+        .cv-visual {
+            background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+            height: 40px;
+            border-radius: 20px;
+            position: relative;
+            margin: 2rem 0;
+        }
+        
+        .cv-point {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        
+        .task-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin: 0 auto 15px;
+        }
+        
+        .glitch {
+            animation: glitch 0.5s infinite;
+        }
+        
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <!-- شريط التقدم -->
+    <div class="fixed top-0 left-0 right-0 z-50">
+        <div class="progress-bar">
+            <div id="progressFill" class="progress-fill" style="width: 7.14%"></div>
+        </div>
+    </div>
+    
+    <!-- شريط التنقل -->
+    <nav class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg z-40 p-2 flex items-center space-x-2 space-x-reverse">
+        <button id="prevBtn" class="p-3 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+        <div class="px-4 py-2 text-sm font-medium text-gray-700">
+            <span id="currentSlide">1</span> / 14
+        </div>
+        <button id="nextBtn" class="p-3 rounded-full bg-purple-600 hover:bg-purple-700 text-white">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button id="menuBtn" class="p-3 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700">
+            <i class="fas fa-bars"></i>
+        </button>
+    </nav>
+    
+    <!-- قائمة الشرائح -->
+    <div id="slideMenu" class="fixed inset-0 bg-black/70 z-50 hidden items-center justify-center">
+        <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4 max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-800">قائمة الشرائح</h3>
+                <button id="closeMenuBtn" class="p-2 rounded-full hover:bg-gray-100">
+                    <i class="fas fa-times text-gray-600"></i>
+                </button>
+            </div>
+            <div class="space-y-2">
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="1">
+                    <span class="font-medium text-gray-700">1. العنوان والأهداف</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="2">
+                    <span class="font-medium text-gray-700">2. مقدمة المحاضرة</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="3">
+                    <span class="font-medium text-gray-700">3. الأهداف التعليمية</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="4">
+                    <span class="font-medium text-gray-700">4. ما هي الرؤية الحاسوبية؟</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="5">
+                    <span class="font-medium text-gray-700">5. أهمية الرؤية الحاسوبية</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="6">
+                    <span class="font-medium text-gray-700">6. المهام الأساسية (1)</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="7">
+                    <span class="font-medium text-gray-700">7. المهام الأساسية (2)</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="8">
+                    <span class="font-medium text-gray-700">8. كيف تعمل الرؤية الحاسوبية؟</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="9">
+                    <span class="font-medium text-gray-700">9. العلاقة مع التتبع</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="10">
+                    <span class="font-medium text-gray-700">10. التحديات</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="11">
+                    <span class="font-medium text-gray-700">11. فيديو TED</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="12">
+                    <span class="font-medium text-gray-700">12. أسئلة نقاش</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="13">
+                    <span class="font-medium text-gray-700">13. نشاط صفي</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="14">
+                    <span class="font-medium text-gray-700">14. خاتمة وواجب</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- الشرائح -->
+    <div id="slidesContainer">
+        <!-- الشريحة 1: العنوان والأهداف -->
+        <section id="slide1" class="slide active bg-gradient-to-br from-blue-50 to-indigo-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="text-center mb-12">
+                    <span class="inline-block px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold mb-4">المحاضرة السادسة</span>
+                    <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                        الرؤية الحاسوبية في الواقع المعزز
+                    </h1>
+                    <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                        Computer Vision in Augmented Reality – Conceptual Overview
+                    </p>
+                </div>
+                
+                <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 border-r-4 border-blue-500 pr-4">
+                        <i class="fas fa-bullseye text-blue-600 ml-2"></i>
+                        رحلة داخل عقل الواقع المعزز
+                    </h2>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-gradient-to-r from-blue-50 to-white p-6 rounded-xl border border-blue-100">
+                            <div class="flex items-center mb-4">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center ml-3">
+                                    <i class="fas fa-eye text-blue-600"></i>
+                                </div>
+                                <h3 class="text-lg font-bold text-gray-800">العين الرقمية</h3>
+                            </div>
+                            <p class="text-gray-700">كيف "يرى" الواقع المعزز العالم من حولنا؟</p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-r from-indigo-50 to-white p-6 rounded-xl border border-indigo-100">
+                            <div class="flex items-center mb-4">
+                                <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center ml-3">
+                                    <i class="fas fa-brain text-indigo-600"></i>
+                                </div>
+                                <h3 class="text-lg font-bold text-gray-800">العقل البصري</h3>
+                            </div>
+                            <p class="text-gray-700">كيف "يفهم" ما تراه الكاميرا؟</p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-r from-purple-50 to-white p-6 rounded-xl border border-purple-100">
+                            <div class="flex items-center mb-4">
+                                <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center ml-3">
+                                    <i class="fas fa-cogs text-purple-600"></i>
+                                </div>
+                                <h3 class="text-lg font-bold text-gray-800">بدون تعقيدات</h3>
+                            </div>
+                            <p class="text-gray-700">شرح المفاهيم بدون خوارزميات أو برمجة</p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-r from-violet-50 to-white p-6 rounded-xl border border-violet-100">
+                            <div class="flex items-center mb-4">
+                                <div class="w-10 h-10 rounded-full bg-violet-100 flex items-center justify-center ml-3">
+                                    <i class="fas fa-lightbulb text-violet-600"></i>
+                                </div>
+                                <h3 class="text-lg font-bold text-gray-800">الإجابة على سؤال محوري</h3>
+                            </div>
+                            <p class="text-gray-700">كيف يستطيع نظام AR فهم ما تلتقطه الكاميرا؟</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-12">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-question-circle text-blue-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">هذه المحاضرة تجيب عن: كيف "يفهم" الواقع المعزز العالم من حولنا؟</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 2: مقدمة المحاضرة -->
+        <section id="slide2" class="slide bg-gradient-to-br from-amber-50 to-orange-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-amber-700">2</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">مقدمة المحاضرة: العقل الخفي خلف الواقع المعزز</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-8">
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                            <i class="fas fa-link text-amber-600 ml-2"></i>
+                            الحقيقة الخفية عن الواقع المعزز
+                        </h3>
+                        
+                        <div class="bg-amber-50 p-6 rounded-xl border border-amber-200 mb-8">
+                            <div class="flex items-center justify-center mb-6">
+                                <div class="text-center">
+                                    <div class="text-5xl mb-4">🤖</div>
+                                    <p class="text-xl text-gray-800">
+                                        الواقع المعزز لا <span class="font-bold text-amber-700">"يرى"</span> العالم كما يراه الإنسان
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <p class="text-lg text-gray-800 mb-6 text-center">
+                                بل يفهمه بصريًا عبر <span class="font-bold text-amber-700">الرؤية الحاسوبية</span>
+                            </p>
+                            
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div class="bg-white p-5 rounded-xl text-center">
+                                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
+                                        <i class="fas fa-camera text-blue-600"></i>
+                                    </div>
+                                    <h4 class="font-bold text-gray-800 mb-2">ما تراه الكاميرا</h4>
+                                    <p class="text-gray-700 text-sm">مجرد بكسلات وألوان وأشكال</p>
+                                </div>
+                                
+                                <div class="bg-white p-5 rounded-xl text-center">
+                                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+                                        <i class="fas fa-brain text-green-600"></i>
+                                    </div>
+                                    <h4 class="font-bold text-gray-800 mb-2">ما يفهمه النظام</h4>
+                                    <p class="text-gray-700 text-sm">أسطح، أجسام، مسافات، حركات</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gradient-to-r from-orange-50 to-amber-50 p-6 rounded-2xl border border-orange-200">
+                            <h4 class="text-xl font-bold text-gray-800 mb-4 text-center">السؤال المحوري للمحاضرة</h4>
+                            <div class="flex items-center justify-center">
+                                <div class="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center ml-6 flex-shrink-0">
+                                    <i class="fas fa-question text-2xl text-orange-600"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xl text-gray-800 font-medium">
+                                        كيف يستطيع نظام الواقع المعزز فهم ما تلتقطه الكاميرا؟
+                                    </p>
+                                    <p class="text-gray-700 mt-2">
+                                        سنشرح المفاهيم الأساسية للرؤية الحاسوبية <span class="font-bold">بدون خوارزميات، بدون معادلات، وبدون برمجة</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                            <i class="fas fa-road text-blue-600 ml-2"></i>
+                            نهج المحاضرة: التبسيط دون التسطيح
+                        </h3>
+                        
+                        <div class="relative">
+                            <!-- خط المسار -->
+                            <div class="hidden md:block absolute right-1/2 transform translate-x-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-400 to-purple-500"></div>
+                            
+                            <div class="grid md:grid-cols-3 gap-8">
+                                <div class="text-center relative z-10">
+                                    <div class="w-16 h-16 rounded-full bg-blue-600 text-white flex items-center justify-center mx-auto mb-4 text-xl font-bold">
+                                        <i class="fas fa-ban"></i>
+                                    </div>
+                                    <h4 class="font-bold text-gray-800 mb-2">لا خوارزميات</h4>
+                                    <p class="text-gray-700 text-sm">لا معادلات رياضية معقدة</p>
+                                </div>
+                                
+                                <div class="text-center relative z-10">
+                                    <div class="w-16 h-16 rounded-full bg-purple-600 text-white flex items-center justify-center mx-auto mb-4 text-xl font-bold">
+                                        <i class="fas fa-ban"></i>
+                                    </div>
+                                    <h4 class="font-bold text-gray-800 mb-2">لا برمجة</h4>
+                                    <p class="text-gray-700 text-sm">لا أكواد برمجية متخصصة</p>
+                                </div>
+                                
+                                <div class="text-center relative z-10">
+                                    <div class="w-16 h-16 rounded-full bg-green-600 text-white flex items-center justify-center mx-auto mb-4 text-xl font-bold">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    <h4 class="font-bold text-gray-800 mb-2">مفاهيم مبسطة</h4>
+                                    <p class="text-gray-700 text-sm">فهم الآلية دون التعقيد التقني</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-10">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-graduation-cap text-amber-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">من العرض البصري إلى الفهم البصري: رحلة داخل عقل AR</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 3: الأهداف التعليمية -->
+        <section id="slide3" class="slide bg-gradient-to-br from-teal-50 to-cyan-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-teal-700">3</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">الأهداف التعليمية للمحاضرة</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-bullseye text-teal-600 ml-2"></i>
+                            بنهاية هذه المحاضرة ستكون قادرًا على:
+                        </h3>
+                        
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <!-- الهدف 1 -->
+                            <div class="bg-gradient-to-r from-blue-50 to-white p-5 rounded-xl border border-blue-200">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center ml-3">
+                                        <span class="font-bold text-blue-600">١</span>
+                                    </div>
+                                    <h4 class="text-lg font-bold text-gray-800">فهم مفهوم الرؤية الحاسوبية</h4>
+                                </div>
+                                <p class="text-gray-700">
+                                    فهم مفهوم الرؤية الحاسوبية ودورها الأساسي في أنظمة الواقع المعزز
+                                </p>
+                            </div>
+                            
+                            <!-- الهدف 2 -->
+                            <div class="bg-gradient-to-r from-purple-50 to-white p-5 rounded-xl border border-purple-200">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center ml-3">
+                                        <span class="font-bold text-purple-600">٢</span>
+                                    </div>
+                                    <h4 class="text-lg font-bold text-gray-800">التمييز بين "الرؤية" و"الفهم البصري"</h4>
+                                </div>
+                                <p class="text-gray-700">
+                                    التمييز بوضوح بين مجرد عرض الصور وفهم محتواها بصريًا
+                                </p>
+                            </div>
+                            
+                            <!-- الهدف 3 -->
+                            <div class="bg-gradient-to-r from-green-50 to-white p-5 rounded-xl border border-green-200">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center ml-3">
+                                        <span class="font-bold text-green-600">٣</span>
+                                    </div>
+                                    <h4 class="text-lg font-bold text-gray-800">التعرف على المهام البصرية</h4>
+                                </div>
+                                <p class="text-gray-700">
+                                    التعرف على أهم المهام البصرية التي تقوم بها الرؤية الحاسوبية في AR
+                                </p>
+                            </div>
+                            
+                            <!-- الهدف 4 -->
+                            <div class="bg-gradient-to-r from-yellow-50 to-white p-5 rounded-xl border border-yellow-200">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center ml-3">
+                                        <span class="font-bold text-yellow-600">٤</span>
+                                    </div>
+                                    <h4 class="text-lg font-bold text-gray-800">فهم العلاقة مع التتبع</h4>
+                                </div>
+                                <p class="text-gray-700">
+                                    فهم العلاقة التكاملية بين الرؤية الحاسوبية والتتبع (Tracking)
+                                </p>
+                            </div>
+                            
+                            <!-- الهدف 5 -->
+                            <div class="bg-gradient-to-r from-red-50 to-white p-5 rounded-xl border border-red-200">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center ml-3">
+                                        <span class="font-bold text-red-600">٥</span>
+                                    </div>
+                                    <h4 class="text-lg font-bold text-gray-800">إدراك تأثيرها على AR</h4>
+                                </div>
+                                <p class="text-gray-700">
+                                    إدراك تأثير الرؤية الحاسوبية على دقة وواقعية تجارب الواقع المعزز
+                                </p>
+                            </div>
+                            
+                            <!-- الهدف 6 -->
+                            <div class="bg-gradient-to-r from-indigo-50 to-white p-5 rounded-xl border border-indigo-200">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center ml-3">
+                                        <span class="font-bold text-indigo-600">٦</span>
+                                    </div>
+                                    <h4 class="text-lg font-bold text-gray-800">تقييم التحديات</h4>
+                                </div>
+                                <p class="text-gray-700">
+                                    فهم التحديات التي تواجه الرؤية الحاسوبية في بيئات مختلفة
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-teal-100 to-cyan-100 p-6 rounded-2xl">
+                        <h4 class="text-xl font-bold text-gray-800 mb-4 text-center">
+                            <i class="fas fa-chart-line text-teal-700 ml-2"></i>
+                            المعرفة التراكمية: من الميكانيكا إلى الذكاء
+                        </h4>
+                        
+                        <div class="flex items-center justify-center">
+                            <div class="text-center ml-8">
+                                <div class="w-16 h-16 rounded-full bg-teal-600 text-white flex items-center justify-center mx-auto mb-2 text-xl font-bold">
+                                    AR
+                                </div>
+                                <p class="font-bold text-gray-800">ما هو؟</p>
+                                <p class="text-sm text-gray-600">(المحاضرات الأولى)</p>
+                            </div>
+                            
+                            <i class="fas fa-arrow-left text-2xl text-teal-600 mx-4"></i>
+                            
+                            <div class="text-center">
+                                <div class="w-16 h-16 rounded-full bg-blue-600 text-white flex items-center justify-center mx-auto mb-2 text-xl font-bold">
+                                    كيف؟
+                                </div>
+                                <p class="font-bold text-gray-800">كيف يعمل؟</p>
+                                <p class="text-sm text-gray-600">(المحاضرة الخامسة)</p>
+                            </div>
+                            
+                            <i class="fas fa-arrow-left text-2xl text-teal-600 mx-4"></i>
+                            
+                            <div class="text-center mr-8">
+                                <div class="w-16 h-16 rounded-full bg-purple-600 text-white flex items-center justify-center mx-auto mb-2 text-xl font-bold">
+                                    يفهم
+                                </div>
+                                <p class="font-bold text-gray-800">كيف يفهم؟</p>
+                                <p class="text-sm text-gray-600">(هذه المحاضرة)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-umbrella text-teal-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">من الأدوات الميكانيكية إلى الذكاء البصري: رحلة فهم AR</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 4: ما هي الرؤية الحاسوبية؟ -->
+        <section id="slide4" class="slide bg-gradient-to-br from-purple-50 to-pink-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-purple-700">4</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">ما هي الرؤية الحاسوبية؟ تعريف مبسّط</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                            <i class="fas fa-eye text-purple-600 ml-2"></i>
+                            التعريف البسيط
+                        </h3>
+                        
+                        <div class="bg-purple-50 p-6 rounded-xl border border-purple-200 mb-8">
+                            <p class="text-lg text-gray-800 mb-6 text-center">
+                                الرؤية الحاسوبية هي مجال يهدف إلى:
+                            </p>
+                            
+                            <div class="bg-white p-5 rounded-xl mb-6">
+                                <div class="text-3xl text-center text-purple-600 mb-4">
+                                    <i class="fas fa-brain"></i>
+                                </div>
+                                <p class="text-xl text-gray-800 text-center font-bold">
+                                    تمكين الحاسوب من <span class="text-purple-700">فهم</span> الصور والفيديوهات
+                                    <br>
+                                    وليس مجرد <span class="text-blue-600">عرضها</span>
+                                </p>
+                            </div>
+                            
+                            <div class="grid md:grid-cols-3 gap-4 mb-6">
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-camera text-blue-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">الصورة المدخلة</p>
+                                    <p class="text-gray-600 text-xs">بكسلات، ألوان، أشكال</p>
+                                </div>
+                                
+                                <i class="fas fa-arrow-left text-2xl text-purple-600 flex items-center justify-center"></i>
+                                
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-cogs text-green-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">الرؤية الحاسوبية</p>
+                                    <p class="text-gray-600 text-xs">تحليل وفهم</p>
+                                </div>
+                                
+                                <i class="fas fa-arrow-left text-2xl text-purple-600 flex items-center justify-center"></i>
+                                
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-lightbulb text-red-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">المعلومات الخارجية</p>
+                                    <p class="text-gray-600 text-xs">معاني، سياق، قرارات</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                            <i class="fas fa-random text-blue-600 ml-2"></i>
+                            عملية التحويل في الواقع المعزز
+                        </h3>
+                        
+                        <div class="bg-blue-50 p-6 rounded-xl border border-blue-200">
+                            <div class="text-center mb-6">
+                                <div class="text-3xl">📷 → 📊 → 🧠 → 🧩</div>
+                            </div>
+                            
+                            <div class="grid md:grid-cols-4 gap-4">
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="text-4xl mb-3">📷</div>
+                                    <h4 class="font-bold text-gray-800 mb-2">صورة</h4>
+                                    <p class="text-gray-700 text-sm">الكاميرا تلتقط المشهد</p>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="text-4xl mb-3">📊</div>
+                                    <h4 class="font-bold text-gray-800 mb-2">معلومات</h4>
+                                    <p class="text-gray-700 text-sm">تحليل الصورة إلى بيانات</p>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="text-4xl mb-3">🧠</div>
+                                    <h4 class="font-bold text-gray-800 mb-2">قرار</h4>
+                                    <p class="text-gray-700 text-sm">اتخاذ قرار بناء على البيانات</p>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="text-4xl mb-3">🧩</div>
+                                    <h4 class="font-bold text-gray-800 mb-2">عنصر رقمي</h4>
+                                    <p class="text-gray-700 text-sm">إضافة المحتوى المناسب</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-purple-100 to-pink-100 p-6 rounded-2xl">
+                        <h4 class="text-xl font-bold text-gray-800 mb-4 text-center">
+                            <i class="fas fa-balance-scale text-purple-700 ml-2"></i>
+                            الفرق بين الرؤية البشرية ورؤية الحاسوب
+                        </h4>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="comparison-table w-full">
+                                <thead>
+                                    <tr class="bg-purple-100">
+                                        <th class="font-bold text-gray-800">المعيار</th>
+                                        <th class="font-bold text-gray-800">الإنسان</th>
+                                        <th class="font-bold text-gray-800">الحاسوب</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="font-bold text-gray-800">فهم المشهد</td>
+                                        <td><span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">تلقائيًا</span></td>
+                                        <td><span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">يحتاج تحليل</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-bold text-gray-800">التعرف على الأجسام</td>
+                                        <td><span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">بسهولة</span></td>
+                                        <td><span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">يعتمد على البيانات</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-bold text-gray-800">العوامل المؤثرة</td>
+                                        <td><span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">الخبرة، السياق</span></td>
+                                        <td><span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">الجودة، الدقة</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-bold text-gray-800">التعلم</td>
+                                        <td><span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">من تجارب قليلة</span></td>
+                                        <td><span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">من آلاف الأمثلة</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-puzzle-piece text-purple-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">الرؤية الحاسوبية: تحويل البكسل إلى فهم، والشكل إلى معنى</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 5: أهمية الرؤية الحاسوبية -->
+        <section id="slide5" class="slide bg-gradient-to-br from-indigo-50 to-blue-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-indigo-700">5</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">لماذا الرؤية الحاسوبية أساسية في الواقع المعزز؟</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                            <i class="fas fa-exclamation-circle text-indigo-600 ml-2"></i>
+                            الواقع المعزز بدون رؤية حاسوبية
+                        </h3>
+                        
+                        <div class="bg-red-50 p-6 rounded-xl border border-red-200 mb-8">
+                            <p class="text-lg text-gray-800 mb-6 text-center">
+                                <span class="font-bold text-red-700">بدون الرؤية الحاسوبية</span>، سيكون الواقع المعزز مجرد عرض صور وفيديوهات بدون ذكاء أو تفاعل حقيقي
+                            </p>
+                            
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div class="bg-white p-5 rounded-xl">
+                                    <h4 class="font-bold text-red-800 mb-3 flex items-center">
+                                        <i class="fas fa-times-circle text-red-600 ml-2"></i>
+                                        لا يمكن التعرف على الأسطح
+                                    </h4>
+                                    <p class="text-gray-700 text-sm">
+                                        لن يعرف النظام أين توجد الأرضيات، الجدران، أو الأسطح لوضع العناصر الرقمية.
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-white p-5 rounded-xl">
+                                    <h4 class="font-bold text-red-800 mb-3 flex items-center">
+                                        <i class="fas fa-times-circle text-red-600 ml-2"></i>
+                                        لا يمكن تتبع الحركة بدقة
+                                    </h4>
+                                    <p class="text-gray-700 text-sm">
+                                        العناصر الرقمية ستتحرك عشوائيًا أو تختفي عند تحريك الجهاز.
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-white p-5 rounded-xl">
+                                    <h4 class="font-bold text-red-800 mb-3 flex items-center">
+                                        <i class="fas fa-times-circle text-red-600 ml-2"></i>
+                                        لا يمكن تثبيت العناصر الرقمية
+                                    </h4>
+                                    <p class="text-gray-700 text-sm">
+                                        لن تبقى العناصر في مكانها الصحيح، بل ستطفو بشكل عشوائي.
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-white p-5 rounded-xl">
+                                    <h4 class="font-bold text-red-800 mb-3 flex items-center">
+                                        <i class="fas fa-times-circle text-red-600 ml-2"></i>
+                                        تجربة غير واقعية
+                                    </h4>
+                                    <p class="text-gray-700 text-sm">
+                                        ستفقد التجربة مصداقيتها وتصبح مزعجة وغير مفيدة.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                            <i class="fas fa-check-circle text-green-600 ml-2"></i>
+                            القيمة المضافة للرؤية الحاسوبية
+                        </h3>
+                        
+                        <div class="grid md:grid-cols-3 gap-6 mb-8">
+                            <div class="tech-card bg-white rounded-xl shadow-md p-6 border-t-blue-500">
+                                <div class="flex items-center mb-4">
+                                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center ml-3">
+                                        <i class="fas fa-eye text-blue-600"></i>
+                                    </div>
+                                    <h4 class="text-xl font-bold text-gray-800 mr-3">العين الرقمية<br><span class="text-lg text-blue-600">(الرؤية)</span></h4>
+                                </div>
+                                <p class="text-gray-700">
+                                    تحليل المشهد البصري والتعرف على العناصر والأنماط
+                                </p>
+                            </div>
+                            
+                            <div class="tech-card bg-white rounded-xl shadow-md p-6 border-t-purple-500">
+                                <div class="flex items-center mb-4">
+                                    <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center ml-3">
+                                        <i class="fas fa-brain text-purple-600"></i>
+                                    </div>
+                                    <h4 class="text-xl font-bold text-gray-800 mr-3">العقل البصري<br><span class="text-lg text-purple-600">(الفهم)</span></h4>
+                                </div>
+                                <p class="text-gray-700">
+                                    فهم معنى ما تراه الكاميرا واتخاذ القرارات المناسبة
+                                </p>
+                            </div>
+                            
+                            <div class="tech-card bg-white rounded-xl shadow-md p-6 border-t-green-500">
+                                <div class="flex items-center mb-4">
+                                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center ml-3">
+                                        <i class="fas fa-hands-helping text-green-600"></i>
+                                    </div>
+                                    <h4 class="text-xl font-bold text-gray-800 mr-3">التكامل<br><span class="text-lg text-green-600">(الربط)</span></h4>
+                                </div>
+                                <p class="text-gray-700">
+                                    ربط العالم الرقمي بالعالم الحقيقي بشكل ذكي وطبيعي
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-indigo-100 to-blue-100 p-6 rounded-2xl">
+                        <h4 class="text-xl font-bold text-gray-800 mb-4 text-center">
+                            <i class="fas fa-lightbulb text-indigo-700 ml-2"></i>
+                            تشبيه توضيحي: العين + العقل
+                        </h4>
+                        
+                        <div class="flex flex-col md:flex-row items-center justify-center">
+                            <div class="text-center md:ml-8 mb-6 md:mb-0">
+                                <div class="w-24 h-24 rounded-full bg-indigo-100 flex items-center justify-center mx-auto mb-4">
+                                    <i class="fas fa-eye text-indigo-600 text-4xl"></i>
+                                </div>
+                                <p class="font-bold text-gray-800">الكاميرا فقط</p>
+                                <p class="text-gray-600 text-sm">ترى لكن لا تفهم</p>
+                                <div class="mt-2">
+                                    <span class="inline-block px-3 py-1 bg-gray-200 text-gray-800 rounded-full text-sm">صورة</span>
+                                </div>
+                            </div>
+                            
+                            <div class="text-3xl text-indigo-600 mx-8">+</div>
+                            
+                            <div class="text-center mb-6 md:mb-0">
+                                <div class="w-24 h-24 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-4">
+                                    <i class="fas fa-brain text-purple-600 text-4xl"></i>
+                                </div>
+                                <p class="font-bold text-gray-800">الرؤية الحاسوبية</p>
+                                <p class="text-gray-600 text-sm">تفهم ما تراه</p>
+                                <div class="mt-2">
+                                    <span class="inline-block px-3 py-1 bg-purple-200 text-purple-800 rounded-full text-sm">فهم</span>
+                                </div>
+                            </div>
+                            
+                            <div class="text-3xl text-indigo-600 mx-8">=</div>
+                            
+                            <div class="text-center md:mr-8">
+                                <div class="w-24 h-24 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+                                    <i class="fas fa-robot text-green-600 text-4xl"></i>
+                                </div>
+                                <p class="font-bold text-gray-800">نظام AR ذكي</p>
+                                <p class="text-gray-600 text-sm">يرى ويفهم ويتفاعل</p>
+                                <div class="mt-2">
+                                    <span class="inline-block px-3 py-1 bg-green-200 text-green-800 rounded-full text-sm">تفاعل ذكي</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 text-center">
+                            <div class="inline-block bg-white p-4 rounded-xl">
+                                <p class="text-gray-800 font-bold">
+                                    📌 الرؤية الحاسوبية هي <span class="text-indigo-700">العين + العقل</span> في أنظمة الواقع المعزز
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-heartbeat text-indigo-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">بدون الرؤية الحاسوبية، AR مجرد عرض صور بدون ذكاء أو تفاعل حقيقي</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 6: المهام الأساسية (1) -->
+        <section id="slide6" class="slide bg-gradient-to-br from-yellow-50 to-amber-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-yellow-700">6</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">المهام الأساسية للرؤية الحاسوبية في AR (الجزء الأول)</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <!-- المهمة 1: اكتشاف الأسطح -->
+                    <div class="mb-12">
+                        <div class="flex items-center mb-6">
+                            <div class="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center ml-4">
+                                <i class="fas fa-layer-group text-2xl text-blue-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-800">١. اكتشاف الأسطح<br><span class="text-lg text-blue-600">(Surface / Plane Detection)</span></h3>
+                            </div>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <div class="bg-blue-50 p-5 rounded-xl border border-blue-200">
+                                    <h4 class="font-bold text-blue-800 mb-3">ما هي؟</h4>
+                                    <ul class="list-disc pr-6 text-gray-700 space-y-2">
+                                        <li>التعرف على <span class="font-bold">الأرضيات والجدران والطاولات</span></li>
+                                        <li>تمييز الأسطح <span class="font-bold">الأفقية والعمودية</span></li>
+                                        <li>تحليل <span class="font-bold">المساحات المسطحة</span> في البيئة</li>
+                                        <li><span class="font-bold">ضروري جدًا</span> لوضع العناصر الرقمية بشكل صحيح</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="mt-6 bg-white p-4 rounded-lg border border-blue-300">
+                                    <h5 class="font-bold text-gray-800 mb-2">مثال تطبيقي:</h5>
+                                    <p class="text-gray-700 text-sm">
+                                        وضع طاولة افتراضية على أرضية الغرفة - يجب أن يعرف النظام أين توجد الأرضية أولاً.
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="bg-gradient-to-r from-blue-50 to-white p-5 rounded-xl border border-blue-300">
+                                    <h4 class="font-bold text-gray-800 mb-3">كيف تعمل؟ (مبسّط)</h4>
+                                    
+                                    <div class="space-y-4">
+                                        <div class="flex items-start">
+                                            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center ml-3 mt-1 flex-shrink-0">
+                                                <span class="font-bold text-blue-600">١</span>
+                                            </div>
+                                            <div>
+                                                <p class="text-gray-700 text-sm">تحليل الصورة للبحث عن مناطق مستوية</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex items-start">
+                                            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center ml-3 mt-1 flex-shrink-0">
+                                                <span class="font-bold text-blue-600">٢</span>
+                                            </div>
+                                            <div>
+                                                <p class="text-gray-700 text-sm">تحديد اتجاه السطح (أفقي، رأسي، مائل)</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex items-start">
+                                            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center ml-3 mt-1 flex-shrink-0">
+                                                <span class="font-bold text-blue-600">٣</span>
+                                            </div>
+                                            <div>
+                                                <p class="text-gray-700 text-sm">تقدير حجم السطح وموقعه في الفضاء</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex items-start">
+                                            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center ml-3 mt-1 flex-shrink-0">
+                                                <span class="font-bold text-blue-600">٤</span>
+                                            </div>
+                                            <div>
+                                                <p class="text-gray-700 text-sm">تحديد إذا كان السطح مناسبًا لوضع العنصر الرقمي</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-6 bg-yellow-50 p-4 rounded-lg">
+                                        <h5 class="font-bold text-gray-800 mb-2">التحدي:</h5>
+                                        <p class="text-gray-700 text-sm">
+                                            الأسطح الزجاجية، اللامعة، أو المزركشة قد تكون صعبة الاكتشاف.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- المهمة 2: التعرف على الصور -->
+                    <div>
+                        <div class="flex items-center mb-6">
+                            <div class="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center ml-4">
+                                <i class="fas fa-image text-2xl text-green-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-800">٢. التعرف على الصور<br><span class="text-lg text-green-600">(Image Recognition)</span></h3>
+                            </div>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <div class="bg-green-50 p-5 rounded-xl border border-green-200">
+                                    <h4 class="font-bold text-green-800 mb-3">ما هي؟</h4>
+                                    <ul class="list-disc pr-6 text-gray-700 space-y-2">
+                                        <li>التعرف على <span class="font-bold">صور أو رموز معينة</span></li>
+                                        <li>أساس <span class="font-bold">Marker-based AR</span></li>
+                                        <li>مقارنة الصورة المدخلة مع <span class="font-bold">قاعدة بيانات</span> للصور المعروفة</li>
+                                        <li>عند التعرف، <span class="font-bold">يظهر المحتوى الرقمي</span> المرتبط</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="mt-6 bg-white p-4 rounded-lg border border-green-300">
+                                    <h5 class="font-bold text-gray-800 mb-2">مثال تطبيقي:</h5>
+                                    <p class="text-gray-700 text-sm">
+                                        توجيه الهاتف إلى صورة في كتاب → ظهور نموذج ثلاثي الأبعاد مرتبط بتلك الصورة.
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="bg-gradient-to-r from-green-50 to-white p-5 rounded-xl border border-green-300">
+                                    <h4 class="font-bold text-gray-800 mb-3">التطبيقات الشائعة:</h4>
+                                    
+                                    <div class="space-y-4">
+                                        <div class="bg-white p-4 rounded-lg">
+                                            <div class="flex items-center mb-2">
+                                                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center ml-3">
+                                                    <i class="fas fa-book text-blue-600"></i>
+                                                </div>
+                                                <h5 class="font-bold text-gray-800">الكتب التفاعلية</h5>
+                                            </div>
+                                            <p class="text-gray-700 text-sm">
+                                                صور في كتب تظهر نماذج ثلاثية الأبعاد أو فيديوهات توضيحية.
+                                            </p>
+                                        </div>
+                                        
+                                        <div class="bg-white p-4 rounded-lg">
+                                            <div class="flex items-center mb-2">
+                                                <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center ml-3">
+                                                    <i class="fas fa-qrcode text-purple-600"></i>
+                                                </div>
+                                                <h5 class="font-bold text-gray-800">رموز QR</h5>
+                                            </div>
+                                            <p class="text-gray-700 text-sm">
+                                                مسح الرمز الضوئي لعرض معلومات أو محتوى تفاعلي.
+                                            </p>
+                                        </div>
+                                        
+                                        <div class="bg-white p-4 rounded-lg">
+                                            <div class="flex items-center mb-2">
+                                                <div class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center ml-3">
+                                                    <i class="fas fa-landmark text-yellow-600"></i>
+                                                </div>
+                                                <h5 class="font-bold text-gray-800">المتاحف والمعارض</h5>
+                                            </div>
+                                            <p class="text-gray-700 text-sm">
+                                                صور أو لوحات فنية تظهر معلومات إضافية عند توجيه الكاميرا نحوها.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-dice-two text-yellow-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">اكتشاف الأسطح والتعرف على الصور: أساسيات التفاعل مع العالم الحقيقي</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 7: المهام الأساسية (2) -->
+        <section id="slide7" class="slide bg-gradient-to-br from-blue-50 to-cyan-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-blue-700">7</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">المهام الأساسية للرؤية الحاسوبية في AR (الجزء الثاني)</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <!-- المهمة 3: تتبع النقاط البصرية -->
+                    <div class="mb-12">
+                        <div class="flex items-center mb-6">
+                            <div class="w-14 h-14 rounded-full bg-purple-100 flex items-center justify-center ml-4">
+                                <i class="fas fa-dot-circle text-2xl text-purple-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-800">٣. تتبع النقاط البصرية<br><span class="text-lg text-purple-600">(Feature Tracking)</span></h3>
+                            </div>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <div class="bg-purple-50 p-5 rounded-xl border border-purple-200">
+                                    <h4 class="font-bold text-purple-800 mb-3">ما هي؟</h4>
+                                    <ul class="list-disc pr-6 text-gray-700 space-y-2">
+                                        <li>تتبع <span class="font-bold">نقاط مميزة</span> في المشهد</li>
+                                        <li>النقاط المميزة: <span class="font-bold">زوايا، حواف، أنماط</span> فريدة</li>
+                                        <li>يساعد على <span class="font-bold">تثبيت العناصر</span> أثناء الحركة</li>
+                                        <li>أساس <span class="font-bold">التتبع المستمر</span> للمشهد</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="mt-6 bg-white p-4 rounded-lg border border-purple-300">
+                                    <h5 class="font-bold text-gray-800 mb-2">مثال مرئي:</h5>
+                                    <p class="text-gray-700 text-sm">
+                                        تخيل نقاط ملونة صغيرة تظهر على الحواف والزوايا في المشهد، وتتحرك مع تحريك الكاميرا.
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="bg-gradient-to-r from-purple-50 to-white p-5 rounded-xl border border-purple-300">
+                                    <h4 class="font-bold text-gray-800 mb-3">دورها في تثبيت AR:</h4>
+                                    
+                                    <div class="space-y-4">
+                                        <div class="flex items-start">
+                                            <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center ml-3 mt-1 flex-shrink-0">
+                                                <i class="fas fa-thumbtack text-purple-600"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-gray-700 text-sm">توفير <span class="font-bold">نقاط مرجعية</span> في المشهد</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex items-start">
+                                            <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center ml-3 mt-1 flex-shrink-0">
+                                                <i class="fas fa-map-marker-alt text-purple-600"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-gray-700 text-sm">معرفة <span class="font-bold">كيف تحركت الكاميرا</span> بالنسبة لهذه النقاط</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex items-start">
+                                            <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center ml-3 mt-1 flex-shrink-0">
+                                                <i class="fas fa-sync-alt text-purple-600"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-gray-700 text-sm">ضبط <span class="font-bold">موضع العنصر الرقمي</span> بناءً على حركة النقاط</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex items-start">
+                                            <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center ml-3 mt-1 flex-shrink-0">
+                                                <i class="fas fa-shield-alt text-purple-600"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-gray-700 text-sm">منع <span class="font-bold">الانزلاق أو الاهتزاز</span> للعناصر الرقمية</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-6 bg-blue-50 p-4 rounded-lg">
+                                        <h5 class="font-bold text-gray-800 mb-2">معلومة تقنية:</h5>
+                                        <p class="text-gray-700 text-sm">
+                                            كلما زاد عدد النقاط المميزة وتم تتبعها بدقة، كلما تحسنت جربة AR واستقرار العناصر.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- المهمة 4: التعرف على الأجسام -->
+                    <div>
+                        <div class="flex items-center mb-6">
+                            <div class="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center ml-4">
+                                <i class="fas fa-cube text-2xl text-red-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-800">٤. التعرف على الأجسام<br><span class="text-lg text-red-600">(Object Recognition)</span></h3>
+                            </div>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <div class="bg-red-50 p-5 rounded-xl border border-red-200">
+                                    <h4 class="font-bold text-red-800 mb-3">ما هي؟</h4>
+                                    <ul class="list-disc pr-6 text-gray-700 space-y-2">
+                                        <li>التعرف على <span class="font-bold">كائنات حقيقية</span> محددة</li>
+                                        <li>عرض <span class="font-bold">معلومات رقمية</span> مرتبطة بها</li>
+                                        <li>يستخدم <span class="font-bold">الذكاء الاصطناعي</span> للتعرف</li>
+                                        <li>من <span class="font-bold">أكثر المهام تقدمًا</span> في AR</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="mt-6 bg-white p-4 rounded-lg border border-red-300">
+                                    <h5 class="font-bold text-gray-800 mb-2">مثال تطبيقي:</h5>
+                                    <p class="text-gray-700 text-sm">
+                                        التعرف على جهاز طبي → عرض تعليمات الصيانة أو طريقة الاستخدام.
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="bg-gradient-to-r from-red-50 to-white p-5 rounded-xl border border-red-300">
+                                    <h4 class="font-bold text-gray-800 mb-3">مجالات الاستخدام:</h4>
+                                    
+                                    <div class="space-y-4">
+                                        <div class="bg-white p-4 rounded-lg">
+                                            <div class="flex items-center mb-2">
+                                                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center ml-3">
+                                                    <i class="fas fa-tools text-blue-600"></i>
+                                                </div>
+                                                <h5 class="font-bold text-gray-800">الصيانة والإصلاح</h5>
+                                            </div>
+                                            <p class="text-gray-700 text-sm">
+                                                التعرف على أجزاء الآلات وعرض إرشادات الصيانة.
+                                            </p>
+                                        </div>
+                                        
+                                        <div class="bg-white p-4 rounded-lg">
+                                            <div class="flex items-center mb-2">
+                                                <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center ml-3">
+                                                    <i class="fas fa-user-md text-green-600"></i>
+                                                </div>
+                                                <h5 class="font-bold text-gray-800">الطب والرعاية الصحية</h5>
+                                            </div>
+                                            <p class="text-gray-700 text-sm">
+                                                التعرف على الأعضاء أو الأجهزة الطبية وعرض معلومات عنها.
+                                            </p>
+                                        </div>
+                                        
+                                        <div class="bg-white p-4 rounded-lg">
+                                            <div class="flex items-center mb-2">
+                                                <div class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center ml-3">
+                                                    <i class="fas fa-shopping-cart text-yellow-600"></i>
+                                                </div>
+                                                <h5 class="font-bold text-gray-800">التسوق والتجزئة</h5>
+                                            </div>
+                                            <p class="text-gray-700 text-sm">
+                                                التعرف على المنتجات وعرض معلومات أو عروض خاصة.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-layer-group text-blue-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">تتبع النقاط والتعرف على الأجسام: من التثبيت إلى الذكاء التفاعلي</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 8: كيف تعمل الرؤية الحاسوبية؟ -->
+        <section id="slide8" class="slide bg-gradient-to-br from-green-50 to-emerald-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-green-700">8</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">كيف تعمل الرؤية الحاسوبية؟ (نظرة مبسطة)</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                            <i class="fas fa-cogs text-green-600 ml-2"></i>
+                            العملية المبسطة: من الصورة إلى الفهم
+                        </h3>
+                        
+                        <div class="bg-green-50 p-6 rounded-xl border border-green-200 mb-8">
+                            <p class="text-lg text-gray-800 mb-6 text-center">
+                                سنشرح <span class="font-bold text-green-700">كيف تعمل الرؤية الحاسوبية في AR</span> بخطوات بسيطة <span class="font-bold">بدون الدخول في أي خوارزميات</span>.
+                            </p>
+                            
+                            <div class="cv-visual">
+                                <div class="cv-point" style="left: 10%; background-color: #3b82f6;">
+                                    📷
+                                </div>
+                                <div class="cv-point" style="left: 30%; background-color: #8b5cf6;">
+                                    🎨
+                                </div>
+                                <div class="cv-point" style="left: 50%; background-color: #a855f7;">
+                                    ⚡
+                                </div>
+                                <div class="cv-point" style="left: 70%; background-color: #d946ef;">
+                                    🗺️
+                                </div>
+                                <div class="cv-point" style="left: 90%; background-color: #ec4899;">
+                                    🎯
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-5 gap-4 mt-6">
+                                <div class="text-center">
+                                    <p class="font-bold text-gray-800">التقاط الصورة</p>
+                                    <p class="text-sm text-gray-600">(الكاميرا)</p>
+                                </div>
+                                <div class="text-center">
+                                    <p class="font-bold text-gray-800">تحليل الألوان والحواف</p>
+                                    <p class="text-sm text-gray-600">(المعالجة)</p>
+                                </div>
+                                <div class="text-center">
+                                    <p class="font-bold text-gray-800">اكتشاف النقاط المهمة</p>
+                                    <p class="text-sm text-gray-600">(الملامح)</p>
+                                </div>
+                                <div class="text-center">
+                                    <p class="font-bold text-gray-800">بناء خريطة المشهد</p>
+                                    <p class="text-sm text-gray-600">(التمثيل)</p>
+                                </div>
+                                <div class="text-center">
+                                    <p class="font-bold text-gray-800">التتبع والعرض</p>
+                                    <p class="text-sm text-gray-600">(التطبيق)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                            <i class="fas fa-list-ol text-blue-600 ml-2"></i>
+                            شرح تفصيلي للخطوات
+                        </h3>
+                        
+                        <div class="space-y-6">
+                            <!-- الخطوة 1 -->
+                            <div class="bg-gradient-to-r from-blue-50 to-white p-5 rounded-xl border border-blue-200">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center ml-3">
+                                        <span class="font-bold">١</span>
+                                    </div>
+                                    <h4 class="text-xl font-bold text-gray-800">الكاميرا تلتقط الصورة</h4>
+                                </div>
+                                <p class="text-gray-700">
+                                    تقوم الكاميرا بتسجيل المشهد الحقيقي كمجموعة من البكسلات (النقاط الملونة).
+                                </p>
+                                <div class="mt-3 flex items-center text-blue-600">
+                                    <i class="fas fa-camera ml-2"></i>
+                                    <span class="text-sm">المدخلات: فيديو أو صور متتالية من العالم الحقيقي</span>
+                                </div>
+                            </div>
+                            
+                            <!-- الخطوة 2 -->
+                            <div class="bg-gradient-to-r from-purple-50 to-white p-5 rounded-xl border border-purple-200">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-10 h-10 rounded-full bg-purple-600 text-white flex items-center justify-center ml-3">
+                                        <span class="font-bold">٢</span>
+                                    </div>
+                                    <h4 class="text-xl font-bold text-gray-800">النظام يحلل الألوان والحواف</h4>
+                                </div>
+                                <p class="text-gray-700">
+                                    يبحث النظام عن الأنماط، التغيرات في الألوان، والحواف بين المناطق المختلفة.
+                                </p>
+                                <div class="mt-3 flex items-center text-purple-600">
+                                    <i class="fas fa-palette ml-2"></i>
+                                    <span class="text-sm">معالجة الصورة: اكتشاف الأنماط والهياكل</span>
+                                </div>
+                            </div>
+                            
+                            <!-- الخطوة 3 -->
+                            <div class="bg-gradient-to-r from-green-50 to-white p-5 rounded-xl border border-green-200">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-10 h-10 rounded-full bg-green-600 text-white flex items-center justify-center ml-3">
+                                        <span class="font-bold">٣</span>
+                                    </div>
+                                    <h4 class="text-xl font-bold text-gray-800">يتم اكتشاف النقاط المهمة</h4>
+                                </div>
+                                <p class="text-gray-700">
+                                    يتم تحديد نقاط مميزة (زوايا، حواف، أنماط فريدة) يمكن تتبعها في الإطارات اللاحقة.
+                                </p>
+                                <div class="mt-3 flex items-center text-green-600">
+                                    <i class="fas fa-map-pin ml-2"></i>
+                                    <span class="text-sm">النقاط المميزة: مرجعيات بصرية للتتبع</span>
+                                </div>
+                            </div>
+                            
+                            <!-- الخطوة 4 -->
+                            <div class="bg-gradient-to-r from-yellow-50 to-white p-5 rounded-xl border border-yellow-200">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-10 h-10 rounded-full bg-yellow-600 text-white flex items-center justify-center ml-3">
+                                        <span class="font-bold">٤</span>
+                                    </div>
+                                    <h4 class="text-xl font-bold text-gray-800">تُبنى خريطة بسيطة للمشهد</h4>
+                                </div>
+                                <p class="text-gray-700">
+                                    يتم بناء تمثيل ثلاثي الأبعاد مبسط للبيئة باستخدام النقاط المميزة والعلاقات بينها.
+                                </p>
+                                <div class="mt-3 flex items-center text-yellow-600">
+                                    <i class="fas fa-map ml-2"></i>
+                                    <span class="text-sm">التمثيل المكاني: فهم هندسة البيئة</span>
+                                </div>
+                            </div>
+                            
+                            <!-- الخطوة 5 -->
+                            <div class="bg-gradient-to-r from-red-50 to-white p-5 rounded-xl border border-red-200">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-10 h-10 rounded-full bg-red-600 text-white flex items-center justify-center ml-3">
+                                        <span class="font-bold">٥</span>
+                                    </div>
+                                    <h4 class="text-xl font-bold text-gray-800">تُستخدم هذه الخريطة للتتبع والعرض</h4>
+                                </div>
+                                <p class="text-gray-700">
+                                    تستخدم الخريطة لتحديد مكان واتجاه الجهاز، وعرض العناصر الرقمية في الأماكن الصحيحة.
+                                </p>
+                                <div class="mt-3 flex items-center text-red-600">
+                                    <i class="fas fa-tv ml-2"></i>
+                                    <span class="text-sm">التطبيق: تثبيت وعرض المحتوى الرقمي</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-green-100 to-emerald-100 p-6 rounded-2xl">
+                        <h4 class="text-xl font-bold text-gray-800 mb-4 text-center">
+                            <i class="fas fa-exclamation-triangle text-green-700 ml-2"></i>
+                            تنبيه مهم: هذا شرح مبسط!
+                        </h4>
+                        
+                        <div class="flex items-start">
+                            <div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center ml-4 mt-1 flex-shrink-0">
+                                <i class="fas fa-info-circle text-yellow-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-lg text-gray-800 mb-3">
+                                    <span class="font-bold">❗ الواقع أكثر تعقيدًا، لكن الفكرة الأساسية تبقى كما هي</span>
+                                </p>
+                                <p class="text-gray-700">
+                                    في الخلفية، هناك عشرات الخوارزميات والملايين من العمليات الحسابية، لكننا نهتم <span class="font-bold">بفهم المبدأ العام</span> وليس التفاصيل التقنية المعقدة.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-cogs text-green-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">من البكسل إلى الفهم: رحلة تحويل البيانات البصرية إلى معلومات ذكية</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 9: العلاقة مع التتبع -->
+        <section id="slide9" class="slide bg-gradient-to-br from-orange-50 to-red-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-orange-700">9</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">العلاقة بين الرؤية الحاسوبية والتتبع</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                            <i class="fas fa-handshake text-orange-600 ml-2"></i>
+                            علاقة تكاملية وليست منفصلة
+                        </h3>
+                        
+                        <div class="bg-orange-50 p-6 rounded-xl border border-orange-200 mb-8">
+                            <p class="text-lg text-gray-800 mb-6 text-center">
+                                الرؤية الحاسوبية والتتبع <span class="font-bold text-orange-700">يعملان معًا</span> في أنظمة الواقع المعزز، كل منهما يكمل الآخر.
+                            </p>
+                            
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div class="bg-white p-5 rounded-xl text-center">
+                                    <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
+                                        <i class="fas fa-eye text-blue-600 text-2xl"></i>
+                                    </div>
+                                    <h4 class="font-bold text-gray-800 mb-2">الرؤية الحاسوبية</h4>
+                                    <p class="text-gray-700 text-sm">توفّر البيانات البصرية عن البيئة</p>
+                                    <div class="mt-3">
+                                        <span class="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">المدخلات</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white p-5 rounded-xl text-center">
+                                    <div class="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+                                        <i class="fas fa-search-location text-green-600 text-2xl"></i>
+                                    </div>
+                                    <h4 class="font-bold text-gray-800 mb-2">التتبع</h4>
+                                    <p class="text-gray-700 text-sm">يستخدم هذه البيانات لتحديد الموقع والحركة</p>
+                                    <div class="mt-3">
+                                        <span class="inline-block px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">المخرجات</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                            <i class="fas fa-exchange-alt text-blue-600 ml-2"></i>
+                            كيف يتكاملان؟
+                        </h3>
+                        
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <div class="bg-blue-50 p-5 rounded-xl border border-blue-200">
+                                    <h4 class="font-bold text-blue-800 mb-3">دور الرؤية الحاسوبية في التتبع:</h4>
+                                    <ul class="list-disc pr-6 text-gray-700 space-y-2">
+                                        <li>توفر <span class="font-bold">نقاط مرجعية</span> في المشهد</li>
+                                        <li>تكشف عن <span class="font-bold">الأسطح والهياكل</span></li>
+                                        <li>تحلل <span class="font-bold">التغيرات البصرية</span> بين الإطارات</li>
+                                        <li>تقدم <span class="font-bold">بيانات مكانية</span> عن البيئة</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="mt-6 bg-white p-4 rounded-lg border border-blue-300">
+                                    <h5 class="font-bold text-gray-800 mb-2">بدون الرؤية الحاسوبية:</h5>
+                                    <p class="text-gray-700 text-sm">
+                                        سيعتمد التتبع فقط على المستشعرات الداخلية (الجيروسكوب، مقياس التسارع) مما يقلل دقته بمرور الوقت.
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="bg-green-50 p-5 rounded-xl border border-green-200">
+                                    <h4 class="font-bold text-green-800 mb-3">دور التتبع في استفادة AR من الرؤية الحاسوبية:</h4>
+                                    <ul class="list-disc pr-6 text-gray-700 space-y-2">
+                                        <li>يترجم <span class="font-bold">البيانات البصرية</span> إلى موقع واتجاه</li>
+                                        <li>يحول <span class="font-bold">الفهم البصري</span> إلى تفاعل عملي</li>
+                                        <li>يستخدم <span class="font-bold">المعلومات المكانية</span> لتثبيت العناصر</li>
+                                        <li>يضمن <span class="font-bold">استمرارية التجربة</span> أثناء الحركة</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="mt-6 bg-white p-4 rounded-lg border border-green-300">
+                                    <h5 class="font-bold text-gray-800 mb-2">بدون التتبع:</h5>
+                                    <p class="text-gray-700 text-sm">
+                                        حتى مع فهم المشهد، لن تعرف العناصر الرقمية أين تظهر أو كيف تتحرك مع حركة المستخدم.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-orange-100 to-red-100 p-6 rounded-2xl">
+                        <h4 class="text-xl font-bold text-gray-800 mb-4 text-center">
+                            <i class="fas fa-venus-mars text-orange-700 ml-2"></i>
+                            تشبيه توضيحي: السائق والطريق
+                        </h4>
+                        
+                        <div class="flex flex-col md:flex-row items-center justify-center">
+                            <div class="text-center md:ml-8 mb-6 md:mb-0">
+                                <div class="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
+                                    <i class="fas fa-road text-blue-600 text-3xl"></i>
+                                </div>
+                                <p class="font-bold text-gray-800">الرؤية الحاسوبية</p>
+                                <p class="text-gray-600 text-sm">الطريق والعلامات</p>
+                                <p class="text-gray-700 text-sm mt-2">
+                                    ترى وتفهم البيئة المحيطة
+                                </p>
+                            </div>
+                            
+                            <div class="text-3xl text-orange-600 mx-8">+</div>
+                            
+                            <div class="text-center mb-6 md:mb-0">
+                                <div class="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+                                    <i class="fas fa-car text-green-600 text-3xl"></i>
+                                </div>
+                                <p class="font-bold text-gray-800">التتبع</p>
+                                <p class="text-gray-600 text-sm">السائق والقيادة</p>
+                                <p class="text-gray-700 text-sm mt-2">
+                                    يتحرك ويتنقل بناءً على فهم الطريق
+                                </p>
+                            </div>
+                            
+                            <div class="text-3xl text-orange-600 mx-8">=</div>
+                            
+                            <div class="text-center md:mr-8">
+                                <div class="w-20 h-20 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-4">
+                                    <i class="fas fa-route text-purple-600 text-3xl"></i>
+                                </div>
+                                <p class="font-bold text-gray-800">تجربة AR متكاملة</p>
+                                <p class="text-gray-600 text-sm">الرحلة الكاملة</p>
+                                <p class="text-gray-700 text-sm mt-2">
+                                    تفاعل ذكي وطبيعي مع البيئة
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 text-center">
+                            <div class="inline-block bg-white p-4 rounded-xl">
+                                <p class="text-gray-800 font-bold">
+                                    📌 العلاقة <span class="text-orange-700">تكاملية وليست منفصلة</span> - كل منهما ضروري للآخر
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-infinity text-orange-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">الرؤية الحاسوبية ترى، والتتبع يتحرك: شراكة تكاملية لخلق تجربة AR واقعية</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 10: التحديات -->
+        <section id="slide10" class="slide bg-gradient-to-br from-indigo-50 to-purple-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-indigo-700">10</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">التحديات في الرؤية الحاسوبية للواقع المعزز</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                            <i class="fas fa-exclamation-triangle text-indigo-600 ml-2"></i>
+                            لماذا قد تفشل الرؤية الحاسوبية أحيانًا؟
+                        </h3>
+                        
+                        <div class="bg-indigo-50 p-6 rounded-xl border border-indigo-200 mb-8">
+                            <p class="text-lg text-gray-800 mb-6 text-center">
+                                رغم التقدم الكبير، تظل هناك <span class="font-bold text-indigo-700">تحديات تقنية</span> تواجه الرؤية الحاسوبية وتؤثر على جودة تجربة الواقع المعزز.
+                            </p>
+                            
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div class="bg-white p-5 rounded-xl">
+                                    <div class="flex items-center mb-3">
+                                        <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center ml-3">
+                                            <i class="fas fa-lightbulb text-red-600"></i>
+                                        </div>
+                                        <h4 class="font-bold text-gray-800">الإضاءة الضعيفة</h4>
+                                    </div>
+                                    <p class="text-gray-700 text-sm">
+                                        في الظلام أو الإضاءة الخافتة، تصعب رؤية التفاصيل والتعرف على الأسطح.
+                                    </p>
+                                    <div class="mt-3">
+                                        <span class="inline-block px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm">تأثير كبير</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white p-5 rounded-xl">
+                                    <div class="flex items-center mb-3">
+                                        <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center ml-3">
+                                            <i class="fas fa-sun text-yellow-600"></i>
+                                        </div>
+                                        <h4 class="font-bold text-gray-800">الأسطح اللامعة</h4>
+                                    </div>
+                                    <p class="text-gray-700 text-sm">
+                                        الأسطح العاكسة أو الزجاجية تعكس الضوء مما يشوّش الصورة ويعقد التحليل.
+                                    </p>
+                                    <div class="mt-3">
+                                        <span class="inline-block px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">تأثير متوسط</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white p-5 rounded-xl">
+                                    <div class="flex items-center mb-3">
+                                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center ml-3">
+                                            <i class="fas fa-running text-blue-600"></i>
+                                        </div>
+                                        <h4 class="font-bold text-gray-800">الحركة السريعة</h4>
+                                    </div>
+                                    <p class="text-gray-700 text-sm">
+                                        عندما يتحرك المستخدم أو الجهاز بسرعة، قد لا تتمكن الكاميرا من التقاط تفاصيل كافية.
+                                    </p>
+                                    <div class="mt-3">
+                                        <span class="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">تأثير متوسط</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white p-5 rounded-xl">
+                                    <div class="flex items-center mb-3">
+                                        <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center ml-3">
+                                            <i class="fas fa-puzzle-piece text-purple-600"></i>
+                                        </div>
+                                        <h4 class="font-bold text-gray-800">البيئات المعقدة</h4>
+                                    </div>
+                                    <p class="text-gray-700 text-sm">
+                                        الأماكن المزدحمة أو المليئة بالتفاصيل تعقّد عملية اكتشاف الأسطح والنقاط المميزة.
+                                    </p>
+                                    <div class="mt-3">
+                                        <span class="inline-block px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">تأثير متفاوت</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                            <i class="fas fa-chart-line text-blue-600 ml-2"></i>
+                            تأثير التحديات على تجربة AR
+                        </h3>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="comparison-table w-full">
+                                <thead>
+                                    <tr class="bg-indigo-100">
+                                        <th class="font-bold text-gray-800">التحدي</th>
+                                        <th class="font-bold text-gray-800">تأثيره على الرؤية الحاسوبية</th>
+                                        <th class="font-bold text-gray-800">تأثيره على تجربة AR</th>
+                                        <th class="font-bold text-gray-800">حلول محتملة</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="font-bold text-red-700">الإضاءة الضعيفة</td>
+                                        <td>لا تستطيع رؤية التفاصيل</td>
+                                        <td>عناصر غير مستقرة أو مختفية</td>
+                                        <td>مستشعرات الأشعة تحت الحمراء، فلاش LED</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-bold text-yellow-700">الأسطح اللامعة</td>
+                                        <td>انعكاسات تشوّش الصورة</td>
+                                        <td>عناصر تظهر في أماكن خاطئة</td>
+                                        <td>فلتر الاستقطاب، معالجة الصورة</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-bold text-blue-700">الحركة السريعة</td>
+                                        <td>صور ضبابية، تفقد التفاصيل</td>
+                                        <td>تأخير، اهتزاز العناصر</td>
+                                        <td>مستشعرات الحركة، توقع الحركة</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-bold text-purple-700">البيئات المعقدة</td>
+                                        <td>صعوبة اكتشاف الأسطح</td>
+                                        <td>عناصر تطفو أو تختفي</td>
+                                        <td>خوارزميات متقدمة، تعلم الآلة</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-indigo-100 to-purple-100 p-6 rounded-2xl">
+                        <h4 class="text-xl font-bold text-gray-800 mb-4 text-center">
+                            <i class="fas fa-lightbulb text-indigo-700 ml-2"></i>
+                            الخلاصة: التحديات موجودة لكنها قابلة للحل
+                        </h4>
+                        
+                        <div class="text-center">
+                            <div class="inline-block bg-white p-6 rounded-xl shadow-md">
+                                <div class="text-2xl font-bold text-gray-800 mb-4">
+                                    كل هذه التحديات <span class="text-red-600">تؤثر على جودة AR</span>، لكن <span class="text-green-600">لا تمنع تطورها</span>
+                                </div>
+                                
+                                <div class="grid md:grid-cols-2 gap-4">
+                                    <div class="p-3 bg-red-50 rounded-lg">
+                                        <p class="font-bold text-red-800">التحديات الحالية</p>
+                                        <p class="text-gray-700 text-sm">(سبب مشاكل AR أحيانًا)</p>
+                                    </div>
+                                    
+                                    <div class="p-3 bg-green-50 rounded-lg">
+                                        <p class="font-bold text-green-800">التطورات المستقبلية</p>
+                                        <p class="text-gray-700 text-sm">(ستقلل من تأثير هذه التحديات)</p>
+                                    </div>
+                                </div>
+                                
+                                <p class="text-gray-600 mt-4 text-sm">
+                                    مع تطور تقنيات الرؤية الحاسوبية والذكاء الاصطناعي، ستتحسن قدرة AR على العمل في ظروف مختلفة
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-mountain text-indigo-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">التحديات موجودة، لكن التطور التقني المستمر يعمل على تجاوزها</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 11: فيديو TED -->
+        <section id="slide11" class="slide bg-gradient-to-br from-red-50 to-pink-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-red-700">11</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">فيديو TED / تجربة عالمية</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-10">
+                    <div class="text-center mb-10">
+                        <div class="inline-block p-4 bg-gradient-to-r from-red-100 to-pink-100 rounded-full mb-6">
+                            <i class="fas fa-video text-4xl text-red-600"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold text-gray-800 mb-6">فيديو TED: الرؤية الحاسوبية والذكاء الاصطناعي</h3>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-8 mb-12">
+                        <div>
+                            <div class="bg-gradient-to-r from-red-50 to-pink-50 p-6 rounded-2xl border border-red-200 h-full">
+                                <div class="flex items-center mb-4">
+                                    <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center ml-4">
+                                        <i class="fas fa-user-tie text-red-600 text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xl font-bold text-gray-800">Mustafa Suleyman</h4>
+                                        <p class="text-gray-600">مؤسس مشارك في DeepMind</p>
+                                    </div>
+                                </div>
+                                
+                                <h5 class="font-bold text-gray-800 mb-3">عنوان المحاضرة:</h5>
+                                <p class="text-lg text-gray-800 mb-4">
+                                    <strong>"The Dawn of the Age of AI"</strong>
+                                </p>
+                                
+                                <div class="bg-white p-4 rounded-lg mb-6">
+                                    <p class="text-gray-700">
+                                        يتحدث مصطفى سليمان عن كيف يعتمد الذكاء الاصطناعي على الرؤية الحاسوبية لفهم العالم من حولنا، وكيف سيغير هذا فهمنا للصور والفيديوهات.
+                                    </p>
+                                </div>
+                                
+                                <a href="https://www.ted.com/talks/mustafa_suleyman_what_is_artificial_intelligence" target="_blank" class="inline-flex items-center px-5 py-3 bg-red-600 text-white rounded-full font-medium hover:bg-red-700 transition-colors">
+                                    <i class="fas fa-external-link-alt ml-2"></i>
+                                    مشاهدة على TED.com
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border border-blue-200 h-full">
+                                <h4 class="text-xl font-bold text-gray-800 mb-6">لماذا هذا الفيديو مهم لهذه المحاضرة؟</h4>
+                                
+                                <div class="space-y-4">
+                                    <div class="flex items-start">
+                                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center ml-3 mt-1 flex-shrink-0">
+                                            <i class="fas fa-check text-blue-600"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="font-bold text-gray-800 mb-1">يربط الرؤية الحاسوبية بالذكاء الاصطناعي</h5>
+                                            <p class="text-gray-700 text-sm">يوضح كيف تعتمد الرؤية الحاسوبية الحديثة على تقنيات الذكاء الاصطناعي.</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex items-start">
+                                        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center ml-3 mt-1 flex-shrink-0">
+                                            <i class="fas fa-check text-green-600"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="font-bold text-gray-800 mb-1">يتحدث عن التطورات المستقبلية</h5>
+                                            <p class="text-gray-700 text-sm">يتنبأ بكيفية تطور قدرة الحواسيب على فهم الصور والفيديوهات.</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex items-start">
+                                        <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center ml-3 mt-1 flex-shrink-0">
+                                            <i class="fas fa-check text-purple-600"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="font-bold text-gray-800 mb-1">يحفز التفكير</h5>
+                                            <p class="text-gray-700 text-sm">يشجع على التفكير في تطبيقات جديدة للرؤية الحاسوبية في مختلف المجالات.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-8 bg-white p-4 rounded-lg">
+                                    <h5 class="font-bold text-gray-800 mb-2">مهمة المشاهدة:</h5>
+                                    <p class="text-gray-700 text-sm">
+                                        بعد مشاهدة الفيديو، فكر في: كيف يمكن للذكاء الاصطناعي أن يحسن من قدرة الرؤية الحاسوبية على فهم العالم في تطبيقات AR؟
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-red-100 to-pink-100 p-6 rounded-2xl">
+                        <h4 class="text-xl font-bold text-gray-800 mb-6 text-center">💡 مفيد لفهم كيف تعتمد الرؤية الحاسوبية على الذكاء الاصطناعي في فهم الصور</h4>
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="bg-white p-5 rounded-xl">
+                                <h5 class="font-bold text-gray-800 mb-3">التعلم العميق</h5>
+                                <p class="text-gray-700 text-sm">
+                                    استخدام الشبكات العصبية لتعليم الحاسوب كيفية التعرف على الأنماط في الصور.
+                                </p>
+                            </div>
+                            
+                            <div class="bg-white p-5 rounded-xl">
+                                <h5 class="font-bold text-gray-800 mb-3">تحسين الدقة</h5>
+                                <p class="text-gray-700 text-sm">
+                                    الذكاء الاصطناعي يحسن من دقة الرؤية الحاسوبية في التعرف على الأجسام والأنماط.
+                                </p>
+                            </div>
+                            
+                            <div class="bg-white p-5 rounded-xl">
+                                <h5 class="font-bold text-gray-800 mb-3">التكيف مع الظروف</h5>
+                                <p class="text-gray-700 text-sm">
+                                    يساعد الذكاء الاصطناعي الرؤية الحاسوبية على العمل في ظروف إضاءة وبيئات مختلفة.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-globe-americas text-red-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">الرؤية الحاسوبية الحديثة تعتمد بشكل كبير على تقنيات الذكاء الاصطناعي والتعلم العميق</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 12: أسئلة نقاش -->
+        <section id="slide12" class="slide bg-gradient-to-br from-teal-50 to-emerald-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-teal-700">12</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">أسئلة نقاش داخل الصف</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-10">
+                    <div class="text-center mb-10">
+                        <div class="inline-block p-4 bg-gradient-to-r from-teal-100 to-emerald-100 rounded-full mb-6">
+                            <i class="fas fa-comments text-4xl text-teal-600"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold text-gray-800 mb-6">نقاش تفاعلي: تفكيك وتفكير</h3>
+                        <p class="text-lg text-gray-700 max-w-2xl mx-auto">
+                        أسئلة تحفز التفكير النقدي والتحليلي حول الرؤية الحاسوبية في الواقع المعزز
+                        </p>
+                    </div>
+                    
+                    <!-- السؤال 1 -->
+                    <div class="mb-8">
+                        <div class="bg-gray-100 p-5 rounded-xl mb-4">
+                            <div class="flex items-center mb-3">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center ml-3">
+                                    <span class="font-bold text-blue-600">١</span>
+                                </div>
+                                <h4 class="text-xl font-bold text-gray-800">لماذا يصعب على AR العمل في الظلام؟</h4>
+                            </div>
+                            <p class="text-gray-700">
+                                ناقش مع زملائك الأسباب التقنية التي تجعل أنظمة الواقع المعزز تواجه صعوبة في البيئات المظلمة أو ذات الإضاءة الضعيفة.
+                            </p>
+                        </div>
+                        
+                        <div class="bg-blue-50 p-5 rounded-xl">
+                            <h5 class="font-bold text-gray-800 mb-3">نقاط للنقاش:</h5>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div class="bg-white p-4 rounded-lg">
+                                    <h6 class="font-bold text-gray-800 mb-2">من ناحية الرؤية الحاسوبية:</h6>
+                                    <ul class="list-disc pr-6 text-gray-700 text-sm space-y-1">
+                                        <li>نقص التفاصيل البصرية</li>
+                                        <li>صعوبة اكتشاف الحواف والأنماط</li>
+                                        <li>عدم القدرة على تمييز الألوان</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-lg">
+                                    <h6 class="font-bold text-gray-800 mb-2">من ناحية الحلول التقنية:</h6>
+                                    <ul class="list-disc pr-6 text-gray-700 text-sm space-y-1">
+                                        <li>استخدام الأشعة تحت الحمراء</li>
+                                        <li>مستشعرات العمق الخاصة</li>
+                                        <li>تحسين خوارزميات الرؤية</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- السؤال 2 -->
+                    <div class="mb-8">
+                        <div class="bg-gray-100 p-5 rounded-xl mb-4">
+                            <div class="flex items-center mb-3">
+                                <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center ml-3">
+                                    <span class="font-bold text-green-600">٢</span>
+                                </div>
+                                <h4 class="text-xl font-bold text-gray-800">هل يمكن للرؤية الحاسوبية أن تخطئ؟</h4>
+                            </div>
+                            <p class="text-gray-700">
+                                ناقش مع زملائك حالات قد تخطئ فيها الرؤية الحاسوبية في فهم المشهد، وما العواقب المترتبة على ذلك في تطبيقات AR.
+                            </p>
+                        </div>
+                        
+                        <div class="bg-green-50 p-5 rounded-xl">
+                            <h5 class="font-bold text-gray-800 mb-3">سيناريوهات محتملة للخطأ:</h5>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div class="bg-white p-4 rounded-lg">
+                                    <h6 class="font-bold text-gray-800 mb-2">أخطاء في التعرف:</h6>
+                                    <ul class="list-disc pr-6 text-gray-700 text-sm space-y-1">
+                                        <li>التعرف على جسم خاطئ</li>
+                                        <li>عدم التعرف على جسم موجود</li>
+                                        <li>الخلط بين أجسام متشابهة</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-lg">
+                                    <h6 class="font-bold text-gray-800 mb-2">عواقب في تطبيقات AR:</h6>
+                                    <ul class="list-disc pr-6 text-gray-700 text-sm space-y-1">
+                                        <li>عرض معلومات خاطئة</li>
+                                        <li>وضع عناصر في أماكن غير مناسبة</li>
+                                        <li>تجربة مستخدم سيئة أو خطيرة</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- السؤال 3 -->
+                    <div class="mb-8">
+                        <div class="bg-gray-100 p-5 rounded-xl mb-4">
+                            <div class="flex items-center mb-3">
+                                <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center ml-3">
+                                    <span class="font-bold text-purple-600">٣</span>
+                                </div>
+                                <h4 class="text-xl font-bold text-gray-800">كيف تؤثر جودة الكاميرا على التجربة؟</h4>
+                            </div>
+                            <p class="text-gray-700">
+                                ناقش مع زملائك العلاقة بين جودة كاميرا الجهاز وجودة تجربة الواقع المعزز من حيث الرؤية الحاسوبية.
+                            </p>
+                        </div>
+                        
+                        <div class="bg-purple-50 p-5 rounded-xl">
+                            <h5 class="font-bold text-gray-800 mb-3">عوامل الجودة المؤثرة:</h5>
+                            <div class="grid md:grid-cols-3 gap-4">
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-2">
+                                        <i class="fas fa-camera-retro text-blue-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">الدقة</p>
+                                    <p class="text-gray-700 text-xs">(عدد البكسلات)</p>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-2">
+                                        <i class="fas fa-lightbulb text-green-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">حساسية الضوء</p>
+                                    <p class="text-gray-700 text-xs">(العمل في إضاءة منخفضة)</p>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center mx-auto mb-2">
+                                        <i class="fas fa-tachometer-alt text-yellow-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">سرعة التقاط الصور</p>
+                                    <p class="text-gray-700 text-xs">(الإطارات في الثانية)</p>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 bg-white p-4 rounded-lg">
+                                <h6 class="font-bold text-gray-800 mb-2">الخلاصة:</h6>
+                                <p class="text-gray-700 text-sm">
+                                    كاميرا أفضل = بيانات بصرية أفضل = رؤية حاسوبية أكثر دقة = تجربة AR أفضل
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-10">
+                        <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                            <i class="fas fa-brain text-teal-600 text-2xl"></i>
+                            <p class="text-lg text-gray-800 font-medium">النقاش التفاعلي يساعد على ترسيخ المفاهيم وفهم التحديات بعمق</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 13: نشاط صفي -->
+        <section id="slide13" class="slide bg-gradient-to-br from-purple-50 to-indigo-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-purple-700">13</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">نشاط صفي (اختياري)</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-10">
+                    <div class="text-center mb-10">
+                        <div class="inline-block p-4 bg-gradient-to-r from-purple-100 to-indigo-100 rounded-full mb-6">
+                            <i class="fas fa-hands-helping text-4xl text-purple-600"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold text-gray-800 mb-6">نشاط عملي: اكتشاف تحديات الرؤية الحاسوبية</h3>
+                        <p class="text-lg text-gray-700 max-w-2xl mx-auto">
+                        نشاط عملي بسيط لفهم تحديات الرؤية الحاسوبية في بيئات مختلفة
+                        </p>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-8 mb-10">
+                        <div class="bg-gradient-to-br from-purple-50 to-white p-6 rounded-2xl border border-purple-200 shadow-md">
+                            <h4 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                <i class="fas fa-tasks text-blue-500 ml-2"></i>
+                                النشاط: اختبار بيئات مختلفة
+                            </h4>
+                            
+                            <div class="space-y-4">
+                                <div class="flex items-start">
+                                    <div class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center ml-3 mt-1 flex-shrink-0">
+                                        <span class="font-bold text-blue-600">١</span>
+                                    </div>
+                                    <div>
+                                        <h5 class="font-bold text-gray-800 mb-1">التحضير</h5>
+                                        <p class="text-gray-700 text-sm">
+                                            قسم الطلاب إلى مجموعات (3-4 طلاب لكل مجموعة).
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                    <div class="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center ml-3 mt-1 flex-shrink-0">
+                                        <span class="font-bold text-green-600">٢</span>
+                                    </div>
+                                    <div>
+                                        <h5 class="font-bold text-gray-800 mb-1">المهمة</h5>
+                                        <p class="text-gray-700 text-sm">
+                                            استخدم تطبيق AR (مثل IKEA Place أو أي تطبيق AR بسيط) في بيئات مختلفة.
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                    <div class="w-6 h-6 rounded-full bg-yellow-100 flex items-center justify-center ml-3 mt-1 flex-shrink-0">
+                                        <span class="font-bold text-yellow-600">٣</span>
+                                    </div>
+                                    <div>
+                                        <h5 class="font-bold text-gray-800 mb-1">الملاحظة</h5>
+                                        <p class="text-gray-700 text-sm">
+                                            لاحظ كيف يتفاعل التطبيق مع كل بيئة وسجل ملاحظاتك.
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                    <div class="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center ml-3 mt-1 flex-shrink-0">
+                                        <span class="font-bold text-red-600">٤</span>
+                                    </div>
+                                    <div>
+                                        <h5 class="font-bold text-gray-800 mb-1">التحليل</h5>
+                                        <p class="text-gray-700 text-sm">
+                                            حلل نتائجك واربطها بمفاهيم الرؤية الحاسوبية التي تعلمتها.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-indigo-50 to-white p-6 rounded-2xl border border-indigo-200 shadow-md">
+                            <h4 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                <i class="fas fa-clipboard-list text-green-500 ml-2"></i>
+                                قائمة الاختبارات المقترحة
+                            </h4>
+                            
+                            <div class="space-y-3">
+                                <div class="bg-white p-3 rounded-lg">
+                                    <h5 class="font-bold text-gray-800 mb-1">١. بيئة جيدة الإضاءة</h5>
+                                    <p class="text-gray-700 text-xs">
+                                        غرفة مضاءة جيدًا، أسطح واضحة، ألوان متنوعة
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-white p-3 rounded-lg">
+                                    <h5 class="font-bold text-gray-800 mb-1">٢. بيئة إضاءة ضعيفة</h5>
+                                    <p class="text-gray-700 text-xs">
+                                        غرفة مظلمة أو بإضاءة خافتة جدًا
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-white p-3 rounded-lg">
+                                    <h5 class="font-bold text-gray-800 mb-1">٣. أسطح عاكسة</h5>
+                                    <p class="text-gray-700 text-xs">
+                                        بالقرب من النوافذ، المرايا، أو الأسطح اللامعة
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-white p-3 rounded-lg">
+                                    <h5 class="font-bold text-gray-800 mb-1">٤. بيئة بسيطة مقابل معقدة</h5>
+                                    <p class="text-gray-700 text-xs">
+                                        جدار أملس مقابل جدار به لوحات فنية أو رفوف
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-10">
+                        <h4 class="text-xl font-bold text-gray-800 mb-6 text-center">
+                            <i class="fas fa-chart-bar text-blue-600 ml-2"></i>
+                            نموذج تسجيل النتائج
+                        </h4>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="comparison-table w-full">
+                                <thead>
+                                    <tr class="bg-blue-100">
+                                        <th class="font-bold text-gray-800">البيئة</th>
+                                        <th class="font-bold text-gray-800">سرعة التعرف على الأسطح</th>
+                                        <th class="font-bold text-gray-800">دقة وضع العناصر</th>
+                                        <th class="font-bold text-gray-800">استقرار العناصر</th>
+                                        <th class="font-bold text-gray-800">التحليل (ربط بالمحاضرة)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="font-bold text-gray-800">إضاءة جيدة</td>
+                                        <td><span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">سريع</span></td>
+                                        <td><span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">دقيق</span></td>
+                                        <td><span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">مستقر</span></td>
+                                        <td class="text-sm text-gray-700">الرؤية الحاسوبية تعمل بشكل مثالي</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-bold text-gray-800">إضاءة ضعيفة</td>
+                                        <td><span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm">بطيء</span></td>
+                                        <td><span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">متوسط</span></td>
+                                        <td><span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm">غير مستقر</span></td>
+                                        <td class="text-sm text-gray-700">نقص البيانات البصرية يؤثر على التحليل</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-bold text-gray-800">أسطح عاكسة</td>
+                                        <td><span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">متوسط</span></td>
+                                        <td><span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm">غير دقيق</span></td>
+                                        <td><span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">متذبذب</span></td>
+                                        <td class="text-sm text-gray-700">الانعكاسات تشوّش عملية التحليل</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-purple-100 to-indigo-100 p-6 rounded-2xl">
+                        <h4 class="text-xl font-bold text-gray-800 mb-4 text-center">
+                            <i class="fas fa-lightbulb text-purple-700 ml-2"></i>
+                            أهداف النشاط التعليمية
+                        </h4>
+                        
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="bg-white p-5 rounded-xl">
+                                <h5 class="font-bold text-gray-800 mb-3">الأهداف المباشرة:</h5>
+                                <ul class="list-disc pr-6 text-gray-700 text-sm space-y-2">
+                                    <li>ربط النظرية بالتطبيق العملي</li>
+                                    <li>ملاحظة تأثير بيئات مختلفة على AR</li>
+                                    <li>فهم تحديات الرؤية الحاسوبية عمليًا</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="bg-white p-5 rounded-xl">
+                                <h5 class="font-bold text-gray-800 mb-3">المهارات المكتسبة:</h5>
+                                <ul class="list-disc pr-6 text-gray-700 text-sm space-y-2">
+                                    <li>الملاحظة والتحليل العلمي</li>
+                                    <li>العمل الجماعي والتعاون</li>
+                                    <li>التفكير النقدي والتحليلي</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-flask text-purple-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">التعلم بالتجربة: من النظرية إلى الملاحظة العملية</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 14: خاتمة وواجب -->
+        <section id="slide14" class="slide bg-gradient-to-br from-gray-50 to-slate-100">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-gray-700">14</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">خاتمة المحاضرة وواجب منزلي</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-10">
+                    <div class="text-center mb-10">
+                        <div class="inline-block p-4 bg-gradient-to-r from-gray-100 to-blue-100 rounded-full mb-6">
+                            <i class="fas fa-flag-checkered text-4xl text-blue-600"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold text-gray-800 mb-6">الخلاصة والتكامل</h3>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-8 mb-10">
+                        <div class="bg-gradient-to-br from-gray-50 to-white p-6 rounded-2xl border border-gray-200 shadow-md">
+                            <h4 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                <i class="fas fa-check-circle text-green-500 ml-2"></i>
+                                ما تعلمناه اليوم
+                            </h4>
+                            <ul class="space-y-3 text-gray-700">
+                                <li class="flex items-start">
+                                    <i class="fas fa-star text-yellow-500 mt-1 ml-2"></i>
+                                    <span>الرؤية الحاسوبية هي قدرة الحاسوب على فهم الصور وليس مجرد عرضها</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-star text-yellow-500 mt-1 ml-2"></i>
+                                    <span>الرؤية الحاسوبية هي العين + العقل في أنظمة الواقع المعزز</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-star text-yellow-500 mt-1 ml-2"></i>
+                                    <span>لها مهام أساسية: اكتشاف الأسطح، تتبع النقاط، التعرف على الصور والأجسام</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-star text-yellow-500 mt-1 ml-2"></i>
+                                    <span>تعمل بتكامل مع التتبع (Tracking) لخلق تجربة AR متكاملة</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-star text-yellow-500 mt-1 ml-2"></i>
+                                    <span>تواجه تحديات في الإضاءة الضعيفة، الأسطح اللامعة، والحركة السريعة</span>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-blue-50 to-white p-6 rounded-2xl border border-blue-200 shadow-md">
+                            <h4 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                <i class="fas fa-eye text-blue-500 ml-2"></i>
+                                الجدول الزمني للمقرر
+                            </h4>
+                            <p class="text-gray-700 mb-4">
+                                بعد فهم كيفية "رؤية" و"فهم" الواقع المعزز للعالم، سننتقل إلى:
+                            </p>
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <p class="text-gray-800 font-medium mb-2">المحاضرة القادمة:</p>
+                                <p class="text-gray-700">
+                                    <span class="font-bold text-blue-600">تطوير تطبيقات AR: الأدوات والمهارات الأساسية</span> - كيف نبدأ في بناء تطبيقات الواقع المعزز عمليًا.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-gray-100 to-blue-100 p-6 rounded-2xl mb-10">
+                        <h4 class="text-xl font-bold text-gray-800 mb-6 text-center">واجب منزلي</h4>
+                        
+                        <div class="bg-white p-6 rounded-xl">
+                            <h5 class="font-bold text-gray-800 mb-4">المهمة:</h5>
+                            <p class="text-gray-700 mb-6">
+                                قم بتحليل تطبيق AR تستخدمه من ناحية الرؤية الحاسوبية، وركز على كيف "يفهم" التطبيق البيئة المحيطة بناءً على ما تعلمته في هذه المحاضرة.
+                            </p>
+                            
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <h6 class="font-bold text-gray-800 mb-3">عناصر التحليل:</h6>
+                                    <ul class="list-disc pr-6 text-gray-700 text-sm space-y-2">
+                                        <li>ما المهام البصرية التي يقوم بها التطبيق؟</li>
+                                        <li>كيف يؤثر نوع البيئة على أداء التطبيق؟</li>
+                                        <li>ما هي نقاط القوة والضعف في نظام الرؤية الحاسوبية؟</li>
+                                        <li>كيف يمكن تحسين نظام الرؤية في هذا التطبيق؟</li>
+                                    </ul>
+                                </div>
+                                
+                                <div>
+                                    <h6 class="font-bold text-gray-800 mb-3">المخرجات المطلوبة:</h6>
+                                    <ul class="list-disc pr-6 text-gray-700 text-sm space-y-2">
+                                        <li>تقرير تحليلي (400-500 كلمة)</li>
+                                        <li>تحديد مهام الرؤية الحاسوبية المستخدمة</li>
+                                        <li>ربط الملاحظات بمفاهيم المحاضرة</li>
+                                        <li>تقديم مقترحات تطويرية</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                                <p class="text-gray-800 font-medium mb-2">نصائح:</p>
+                                <p class="text-gray-700 text-sm">
+                                    اختر تطبيقًا تستخدمه بالفعل (مثل فلاتر الكاميرا، تطبيقات الأثاث الافتراضي، ألعاب AR) لتكون الملاحظة أكثر واقعية.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                            <i class="fas fa-graduation-cap text-gray-600 text-2xl"></i>
+                            <p class="text-lg text-gray-800 font-medium">الآن فهمنا كيف "يفكر" الواقع المعزز، استعدوا لتعلم كيف "نبرمجه"!</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-rocket text-blue-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">محاضرة قادمة: تطوير تطبيقات AR: الأدوات والمهارات الأساسية</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <script>
+        // التحكم في الشرائح
+        const slidesContainer = document.getElementById('slidesContainer');
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const menuBtn = document.getElementById('menuBtn');
+        const closeMenuBtn = document.getElementById('closeMenuBtn');
+        const slideMenu = document.getElementById('slideMenu');
+        const slideMenuItems = document.querySelectorAll('.slide-menu-item');
+        const progressFill = document.getElementById('progressFill');
+        const currentSlideElement = document.getElementById('currentSlide');
+        
+        let currentSlide = 1;
+        const totalSlides = slides.length;
+        
+        // تهيئة العرض
+        function initSlides() {
+            showSlide(currentSlide);
+            updateProgressBar();
+            updateNavigationButtons();
+        }
+        
+        // عرض شريحة معينة
+        function showSlide(slideNumber) {
+            // إخفاء جميع الشرائح
+            slides.forEach(slide => {
+                slide.classList.remove('active');
+            });
+            
+            // عرض الشريحة المطلوبة
+            const targetSlide = document.getElementById(`slide${slideNumber}`);
+            if (targetSlide) {
+                targetSlide.classList.add('active');
+                currentSlide = slideNumber;
+                currentSlideElement.textContent = currentSlide;
+                updateProgressBar();
+                updateNavigationButtons();
+            }
+        }
+        
+        // تحديث شريط التقدم
+        function updateProgressBar() {
+            const progressPercentage = (currentSlide / totalSlides) * 100;
+            progressFill.style.width = `${progressPercentage}%`;
+        }
+        
+        // تحديث أزرار التنقل
+        function updateNavigationButtons() {
+            prevBtn.disabled = currentSlide === 1;
+            nextBtn.disabled = currentSlide === totalSlides;
+            
+            if (currentSlide === totalSlides) {
+                nextBtn.innerHTML = '<i class="fas fa-check"></i>';
+                nextBtn.classList.remove('bg-purple-600', 'hover:bg-purple-700');
+                nextBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+            } else {
+                nextBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+                nextBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                nextBtn.classList.add('bg-purple-600', 'hover:bg-purple-700');
+            }
+        }
+        
+        // الانتقال للشريحة التالية
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                showSlide(currentSlide + 1);
+            }
+        }
+        
+        // الانتقال للشريحة السابقة
+        function prevSlide() {
+            if (currentSlide > 1) {
+                showSlide(currentSlide - 1);
+            }
+        }
+        
+        // فتح/إغلاق قائمة الشرائح
+        function toggleSlideMenu() {
+            slideMenu.classList.toggle('hidden');
+            slideMenu.classList.toggle('flex');
+        }
+        
+        // أحداث المستخدم
+        prevBtn.addEventListener('click', prevSlide);
+        nextBtn.addEventListener('click', nextSlide);
+        menuBtn.addEventListener('click', toggleSlideMenu);
+        closeMenuBtn.addEventListener('click', toggleSlideMenu);
+        
+        // إغلاق القائمة عند النقر خارجها
+        slideMenu.addEventListener('click', function(e) {
+            if (e.target === slideMenu) {
+                toggleSlideMenu();
+            }
+        });
+        
+        // التنقل من القائمة
+        slideMenuItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const slideNumber = parseInt(this.dataset.slide);
+                showSlide(slideNumber);
+                toggleSlideMenu();
+            });
+        });
+        
+        // التنقل بالسهمين في لوحة المفاتيح
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                prevSlide();
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                nextSlide();
+            } else if (e.key === 'Escape') {
+                slideMenu.classList.add('hidden');
+                slideMenu.classList.remove('flex');
+            }
+        });
+        
+        // بدء العرض
+        initSlides();
+        
+        // إضافة تأثيرات إضافية
+        document.addEventListener('DOMContentLoaded', function() {
+            // إضافة تأثيرات للبطاقات عند التمرير
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+            
+            // مراقبة العناصر لإضافة تأثيرات
+            document.querySelectorAll('.tech-card, .ar-type-card').forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                observer.observe(card);
+            });
+            
+            // إضافة تأثير Glitch لبعض العناصر في الشريحة 10
+            const glitchElements = document.querySelectorAll('.glitch');
+            glitchElements.forEach(el => {
+                setInterval(() => {
+                    el.classList.toggle('glitch');
+                }, 3000);
+            });
+        });
+    </script>
+</body>
+</html>

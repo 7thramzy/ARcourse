@@ -1,0 +1,2225 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المحاضرة الثالثة: بيئات الواقع الممتد وأنواع الواقع المعزز</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Cairo', sans-serif;
+        }
+        
+        .slide {
+            min-height: 100vh;
+            padding: 2rem;
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .slide.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .tech-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-top: 4px solid;
+        }
+        
+        .tech-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .ar-type-card {
+            border-right: 5px solid;
+            transition: all 0.3s ease;
+        }
+        
+        .ar-type-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .comparison-table th, .comparison-table td {
+            padding: 12px 16px;
+            text-align: center;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .comparison-table tr:hover {
+            background-color: #f9fafb;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background-color: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #4F46E5, #7C3AED);
+            transition: width 0.5s ease;
+        }
+        
+        .quiz-option {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .quiz-option:hover {
+            background-color: #f3f4f6;
+            transform: scale(1.02);
+        }
+        
+        .quiz-option.selected {
+            border-color: #4F46E5;
+            background-color: #eef2ff;
+        }
+        
+        .quiz-option.correct {
+            border-color: #10b981;
+            background-color: #d1fae5;
+        }
+        
+        .quiz-option.incorrect {
+            border-color: #ef4444;
+            background-color: #fee2e2;
+        }
+        
+        .xr-spectrum {
+            background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+            height: 40px;
+            border-radius: 20px;
+            position: relative;
+            margin: 2rem 0;
+        }
+        
+        .xr-point {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <!-- شريط التقدم -->
+    <div class="fixed top-0 left-0 right-0 z-50">
+        <div class="progress-bar">
+            <div id="progressFill" class="progress-fill" style="width: 7.14%"></div>
+        </div>
+    </div>
+    
+    <!-- شريط التنقل -->
+    <nav class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg z-40 p-2 flex items-center space-x-2 space-x-reverse">
+        <button id="prevBtn" class="p-3 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+        <div class="px-4 py-2 text-sm font-medium text-gray-700">
+            <span id="currentSlide">1</span> / 14
+        </div>
+        <button id="nextBtn" class="p-3 rounded-full bg-purple-600 hover:bg-purple-700 text-white">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button id="menuBtn" class="p-3 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700">
+            <i class="fas fa-bars"></i>
+        </button>
+    </nav>
+    
+    <!-- قائمة الشرائح -->
+    <div id="slideMenu" class="fixed inset-0 bg-black/70 z-50 hidden items-center justify-center">
+        <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4 max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-800">قائمة الشرائح</h3>
+                <button id="closeMenuBtn" class="p-2 rounded-full hover:bg-gray-100">
+                    <i class="fas fa-times text-gray-600"></i>
+                </button>
+            </div>
+            <div class="space-y-2">
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="1">
+                    <span class="font-medium text-gray-700">1. العنوان والأهداف</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="2">
+                    <span class="font-medium text-gray-700">2. مقدمة المحاضرة</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="3">
+                    <span class="font-medium text-gray-700">3. الواقع الممتد (XR)</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="4">
+                    <span class="font-medium text-gray-700">4. الفرق بين AR و VR و MR</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="5">
+                    <span class="font-medium text-gray-700">5. مقارنة تفصيلية</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="6">
+                    <span class="font-medium text-gray-700">6. أنواع AR: المعتمد على العلامات</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="7">
+                    <span class="font-medium text-gray-700">7. أنواع AR: غير المعتمد على العلامات</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="8">
+                    <span class="font-medium text-gray-700">8. أنواع AR: القائم على الموقع</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="9">
+                    <span class="font-medium text-gray-700">9. أنواع AR: القائم على الإسقاط</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="10">
+                    <span class="font-medium text-gray-700">10. أنواع AR: التعرف على الأجسام</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="11">
+                    <span class="font-medium text-gray-700">11. ملخص الأنواع</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="12">
+                    <span class="font-medium text-gray-700">12. نشاط تفاعلي</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="13">
+                    <span class="font-medium text-gray-700">13. فيديو TED</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="14">
+                    <span class="font-medium text-gray-700">14. خاتمة وواجب</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- الشرائح -->
+    <div id="slidesContainer">
+        <!-- الشريحة 1: العنوان والأهداف -->
+        <section id="slide1" class="slide active bg-gradient-to-br from-blue-50 to-indigo-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="text-center mb-12">
+                    <span class="inline-block px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold mb-4">المحاضرة الثالثة</span>
+                    <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                        بيئات الواقع الممتد وأنواع الواقع المعزز
+                    </h1>
+                    <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                        Extended Reality & Types of Augmented Reality
+                    </p>
+                </div>
+                
+                <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 border-r-4 border-blue-500 pr-4">
+                        <i class="fas fa-bullseye text-blue-600 ml-2"></i>
+                        الأهداف التعليمية
+                    </h2>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-gradient-to-r from-blue-50 to-white p-6 rounded-xl border border-blue-100">
+                            <div class="flex items-center mb-4">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center ml-3">
+                                    <i class="fas fa-sitemap text-blue-600"></i>
+                                </div>
+                                <h3 class="text-lg font-bold text-gray-800">فهم الواقع الممتد (XR)</h3>
+                            </div>
+                            <p class="text-gray-700">فهم مفهوم الواقع الممتد (XR) ومكان AR داخله</p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-r from-indigo-50 to-white p-6 rounded-xl border border-indigo-100">
+                            <div class="flex items-center mb-4">
+                                <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center ml-3">
+                                    <i class="fas fa-difference text-indigo-600"></i>
+                                </div>
+                                <h3 class="text-lg font-bold text-gray-800">التمييز بين AR و VR و MR</h3>
+                            </div>
+                            <p class="text-gray-700">التمييز بوضوح بين AR و VR و MR</p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-r from-purple-50 to-white p-6 rounded-xl border border-purple-100">
+                            <div class="flex items-center mb-4">
+                                <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center ml-3">
+                                    <i class="fas fa-layer-group text-purple-600"></i>
+                                </div>
+                                <h3 class="text-lg font-bold text-gray-800">تصنيف أنواع AR</h3>
+                            </div>
+                            <p class="text-gray-700">تصنيف أنواع الواقع المعزز حسب طريقة العمل</p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-r from-violet-50 to-white p-6 rounded-xl border border-violet-100">
+                            <div class="flex items-center mb-4">
+                                <div class="w-10 h-10 rounded-full bg-violet-100 flex items-center justify-center ml-3">
+                                    <i class="fas fa-link text-violet-600"></i>
+                                </div>
+                                <h3 class="text-lg font-bold text-gray-800">ربط بالتطبيقات</h3>
+                            </div>
+                            <p class="text-gray-700">ربط كل نوع بتطبيقات واقعية في الحياة اليومية</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-12">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-question-circle text-blue-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">هذه المحاضرة تجيب عن: لماذا تختلف تجارب الواقع المعزز من تطبيق لآخر؟</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 2: مقدمة المحاضرة -->
+        <section id="slide2" class="slide bg-gradient-to-br from-amber-50 to-orange-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-amber-700">2</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">مقدمة المحاضرة</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-8">
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                            <i class="fas fa-link text-amber-600 ml-2"></i>
+                            أهمية هذه المحاضرة
+                        </h3>
+                        
+                        <div class="bg-amber-50 p-6 rounded-xl border border-amber-200 mb-8">
+                            <p class="text-lg text-gray-800 mb-6 text-center">
+                                تُعد هذه المحاضرة من <span class="font-bold text-amber-700">أهم المحاضرات التأسيسية</span> في المقرر، لأنها تربط بين:
+                            </p>
+                            
+                            <div class="grid md:grid-cols-3 gap-6">
+                                <div class="bg-white p-5 rounded-xl text-center">
+                                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
+                                        <i class="fas fa-expand text-blue-600"></i>
+                                    </div>
+                                    <h4 class="font-bold text-gray-800 mb-2">فهم الواقع الممتد (XR)</h4>
+                                    <p class="text-gray-700 text-sm">كإطار عام يضم جميع تقنيات الواقع</p>
+                                </div>
+                                
+                                <div class="bg-white p-5 rounded-xl text-center">
+                                    <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-4">
+                                        <i class="fas fa-difference text-purple-600"></i>
+                                    </div>
+                                    <h4 class="font-bold text-gray-800 mb-2">التمييز العلمي</h4>
+                                    <p class="text-gray-700 text-sm">بين AR و VR و MR بشكل دقيق</p>
+                                </div>
+                                
+                                <div class="bg-white p-5 rounded-xl text-center">
+                                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+                                        <i class="fas fa-tags text-green-600"></i>
+                                    </div>
+                                    <h4 class="font-bold text-gray-800 mb-2">التعرف على أنواع AR</h4>
+                                    <p class="text-gray-700 text-sm">وكيفية اختلافها تقنيًا وتطبيقيًا</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gradient-to-r from-orange-50 to-amber-50 p-6 rounded-2xl border border-orange-200">
+                            <h4 class="text-xl font-bold text-gray-800 mb-4 text-center">السؤال المحوري للمحاضرة</h4>
+                            <div class="flex items-center justify-center">
+                                <div class="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center ml-6 flex-shrink-0">
+                                    <i class="fas fa-question text-2xl text-orange-600"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xl text-gray-800 font-medium">
+                                        لماذا تختلف تجارب الواقع المعزز من تطبيق لآخر؟
+                                    </p>
+                                    <p class="text-gray-700 mt-2">
+                                        الإجابة تكمن في فهم أنواع AR المختلفة وآلية عمل كل منها
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                            <i class="fas fa-road text-blue-600 ml-2"></i>
+                            مسار المحاضرة
+                        </h3>
+                        
+                        <div class="relative">
+                            <!-- خط المسار -->
+                            <div class="hidden md:block absolute right-1/2 transform translate-x-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-400 to-purple-500"></div>
+                            
+                            <div class="grid md:grid-cols-3 gap-8">
+                                <div class="text-center relative z-10">
+                                    <div class="w-16 h-16 rounded-full bg-blue-600 text-white flex items-center justify-center mx-auto mb-4 text-xl font-bold">
+                                        ١
+                                    </div>
+                                    <h4 class="font-bold text-gray-800 mb-2">الواقع الممتد (XR)</h4>
+                                    <p class="text-gray-700 text-sm">الإطار العام الذي يضم جميع تقنيات الواقع</p>
+                                </div>
+                                
+                                <div class="text-center relative z-10">
+                                    <div class="w-16 h-16 rounded-full bg-purple-600 text-white flex items-center justify-center mx-auto mb-4 text-xl font-bold">
+                                        ٢
+                                    </div>
+                                    <h4 class="font-bold text-gray-800 mb-2">الفرق بين AR, VR, MR</h4>
+                                    <p class="text-gray-700 text-sm">التمييز الدقيق بين أنواع التقنيات</p>
+                                </div>
+                                
+                                <div class="text-center relative z-10">
+                                    <div class="w-16 h-16 rounded-full bg-green-600 text-white flex items-center justify-center mx-auto mb-4 text-xl font-bold">
+                                        ٣
+                                    </div>
+                                    <h4 class="font-bold text-gray-800 mb-2">أنواع الواقع المعزز</h4>
+                                    <p class="text-gray-700 text-sm">5 أنواع رئيسية لكل منها خصائص مختلفة</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-10">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-graduation-cap text-amber-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">أسس مفاهيمية قبل الانتقال للجوانب التقنية</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 3: الواقع الممتد (XR) -->
+        <section id="slide3" class="slide bg-gradient-to-br from-teal-50 to-cyan-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-teal-700">3</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">المحور الأول: الواقع الممتد (Extended Reality - XR)</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-expand text-teal-600 ml-2"></i>
+                            ما هو الواقع الممتد (XR)؟
+                        </h3>
+                        
+                        <div class="bg-teal-50 p-6 rounded-xl border border-teal-200 mb-8">
+                            <p class="text-lg text-gray-800 mb-6">
+                                <span class="font-bold text-teal-700">الواقع الممتد (XR)</span> هو مصطلح شامل يضم جميع التقنيات التي تدمج أو تستبدل أو تعزز الواقع الحقيقي باستخدام محتوى رقمي.
+                            </p>
+                            
+                            <div class="grid md:grid-cols-3 gap-6">
+                                <div class="bg-white p-5 rounded-xl text-center">
+                                    <div class="text-3xl text-blue-600 mb-3">
+                                        <i class="fas fa-plus"></i>
+                                    </div>
+                                    <h4 class="font-bold text-gray-800 mb-2">يشمل</h4>
+                                    <p class="text-gray-700 text-sm">جميع أشكال تقنيات الواقع</p>
+                                </div>
+                                
+                                <div class="bg-white p-5 rounded-xl text-center">
+                                    <div class="text-3xl text-purple-600 mb-3">
+                                        <i class="fas fa-blend"></i>
+                                    </div>
+                                    <h4 class="font-bold text-gray-800 mb-2">يدمج</h4>
+                                    <p class="text-gray-700 text-sm">بين العالم الحقيقي والرقمي</p>
+                                </div>
+                                
+                                <div class="bg-white p-5 rounded-xl text-center">
+                                    <div class="text-3xl text-green-600 mb-3">
+                                        <i class="fas fa-universal-access"></i>
+                                    </div>
+                                    <h4 class="font-bold text-gray-800 mb-2">مظلة</h4>
+                                    <p class="text-gray-700 text-sm">لجميع تجارب الواقع المختلفة</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                            <i class="fas fa-sitemap text-blue-600 ml-2"></i>
+                            مكونات الواقع الممتد (XR)
+                        </h3>
+                        
+                        <div class="grid md:grid-cols-3 gap-6 mb-8">
+                            <div class="tech-card bg-white rounded-xl shadow-md p-6 border-t-blue-500">
+                                <div class="flex items-center mb-4">
+                                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center ml-3">
+                                        <i class="fab fa-vuejs text-blue-600"></i>
+                                    </div>
+                                    <h4 class="text-xl font-bold text-gray-800 mr-3">الواقع الافتراضي<br><span class="text-lg text-blue-600">(VR)</span></h4>
+                                </div>
+                                <p class="text-gray-700">
+                                    بيئة رقمية كاملة تعزل المستخدم عن العالم الحقيقي
+                                </p>
+                            </div>
+                            
+                            <div class="tech-card bg-white rounded-xl shadow-md p-6 border-t-purple-500">
+                                <div class="flex items-center mb-4">
+                                    <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center ml-3">
+                                        <i class="fas fa-plus-circle text-purple-600"></i>
+                                    </div>
+                                    <h4 class="text-xl font-bold text-gray-800 mr-3">الواقع المعزز<br><span class="text-lg text-purple-600">(AR)</span></h4>
+                                </div>
+                                <p class="text-gray-700">
+                                    إضافة عناصر رقمية إلى العالم الحقيقي دون عزله
+                                </p>
+                            </div>
+                            
+                            <div class="tech-card bg-white rounded-xl shadow-md p-6 border-t-green-500">
+                                <div class="flex items-center mb-4">
+                                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center ml-3">
+                                        <i class="fas fa-blender-phone text-green-600"></i>
+                                    </div>
+                                    <h4 class="text-xl font-bold text-gray-800 mr-3">الواقع المختلط<br><span class="text-lg text-green-600">(MR)</span></h4>
+                                </div>
+                                <p class="text-gray-700">
+                                    دمج متقدم مع تفاعل بين العناصر الرقمية والواقعية
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-teal-100 to-cyan-100 p-6 rounded-2xl">
+                        <h4 class="text-xl font-bold text-gray-800 mb-4 text-center">
+                            <i class="fas fa-chart-line text-teal-700 ml-2"></i>
+                            طيف الواقع الممتد (XR Spectrum)
+                        </h4>
+                        
+                        <div class="xr-spectrum">
+                            <div class="xr-point" style="left: 5%; background-color: #3b82f6;">
+                                VR
+                            </div>
+                            <div class="xr-point" style="left: 35%; background-color: #8b5cf6;">
+                                AR
+                            </div>
+                            <div class="xr-point" style="left: 65%; background-color: #a855f7;">
+                                MR
+                            </div>
+                            <div class="xr-point" style="left: 95%; background-color: #ec4899;">
+                                Real World
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-4 gap-4 mt-6">
+                            <div class="text-center">
+                                <p class="font-bold text-gray-800">عالم افتراضي كامل</p>
+                                <p class="text-sm text-gray-600">(100% رقمي)</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="font-bold text-gray-800">عالم حقيقي معزز</p>
+                                <p class="text-sm text-gray-600">(إضافة رقمية)</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="font-bold text-gray-800">دمج متقدم</p>
+                                <p class="text-sm text-gray-600">(تفاعل كامل)</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="font-bold text-gray-800">عالم حقيقي</p>
+                                <p class="text-sm text-gray-600">(بدون إضافات)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-umbrella text-teal-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">XR هو المظلة الكبرى التي تضم جميع تقنيات الواقع</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 4: الفرق بين AR و VR و MR -->
+        <section id="slide4" class="slide bg-gradient-to-br from-purple-50 to-pink-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-purple-700">4</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">المحور الثاني: الفرق بين AR و VR و MR</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <!-- VR -->
+                    <div class="mb-12">
+                        <div class="flex items-center mb-6">
+                            <div class="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center ml-4">
+                                <span class="text-2xl font-bold text-blue-700">VR</span>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-800">الواقع الافتراضي (Virtual Reality - VR)</h3>
+                                <p class="text-gray-600">بيئة رقمية كاملة</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <div class="bg-blue-50 p-5 rounded-xl border border-blue-200">
+                                    <h4 class="font-bold text-blue-800 mb-3">الخصائص الرئيسية:</h4>
+                                    <ul class="list-disc pr-6 text-gray-700 space-y-2">
+                                        <li>ينقل المستخدم إلى <span class="font-bold">بيئة رقمية كاملة</span></li>
+                                        <li>يعزل المستخدم عن <span class="font-bold">العالم الحقيقي</span></li>
+                                        <li>يعتمد على <span class="font-bold">نظارات خاصة</span> (مثل Oculus Rift)</li>
+                                        <li>تجربة <span class="font-bold">مغمورة بالكامل</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="bg-gradient-to-r from-blue-50 to-white p-5 rounded-xl border border-blue-300">
+                                    <h4 class="font-bold text-gray-800 mb-3">أمثلة تطبيقية:</h4>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div class="bg-white p-3 rounded-lg text-center">
+                                            <i class="fas fa-gamepad text-blue-600 mb-2"></i>
+                                            <p class="text-sm font-medium text-gray-800">ألعاب VR</p>
+                                        </div>
+                                        <div class="bg-white p-3 rounded-lg text-center">
+                                            <i class="fas fa-plane text-blue-600 mb-2"></i>
+                                            <p class="text-sm font-medium text-gray-800">محاكاة الطيران</p>
+                                        </div>
+                                        <div class="bg-white p-3 rounded-lg text-center">
+                                            <i class="fas fa-shield-alt text-blue-600 mb-2"></i>
+                                            <p class="text-sm font-medium text-gray-800">التدريب العسكري</p>
+                                        </div>
+                                        <div class="bg-white p-3 rounded-lg text-center">
+                                            <i class="fas fa-graduation-cap text-blue-600 mb-2"></i>
+                                            <p class="text-sm font-medium text-gray-800">التعليم التفاعلي</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- AR -->
+                    <div class="mb-12">
+                        <div class="flex items-center mb-6">
+                            <div class="w-14 h-14 rounded-full bg-purple-100 flex items-center justify-center ml-4">
+                                <span class="text-2xl font-bold text-purple-700">AR</span>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-800">الواقع المعزز (Augmented Reality - AR)</h3>
+                                <p class="text-gray-600">إضافة عناصر رقمية إلى الواقع</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <div class="bg-purple-50 p-5 rounded-xl border border-purple-200">
+                                    <h4 class="font-bold text-purple-800 mb-3">الخصائص الرئيسية:</h4>
+                                    <ul class="list-disc pr-6 text-gray-700 space-y-2">
+                                        <li>يضيف <span class="font-bold">عناصر رقمية</span> إلى العالم الحقيقي</li>
+                                        <li>المستخدم يرى الواقع مع <span class="font-bold">تحسينات رقمية</span></li>
+                                        <li>يعمل عبر <span class="font-bold">الهاتف أو الأجهزة الذكية</span></li>
+                                        <li>لا يعزل عن العالم الحقيقي</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="bg-gradient-to-r from-purple-50 to-white p-5 rounded-xl border border-purple-300">
+                                    <h4 class="font-bold text-gray-800 mb-3">أمثلة تطبيقية:</h4>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div class="bg-white p-3 rounded-lg text-center">
+                                            <i class="fas fa-camera text-purple-600 mb-2"></i>
+                                            <p class="text-sm font-medium text-gray-800">فلاتر الكاميرا</p>
+                                        </div>
+                                        <div class="bg-white p-3 rounded-lg text-center">
+                                            <i class="fas fa-graduation-cap text-purple-600 mb-2"></i>
+                                            <p class="text-sm font-medium text-gray-800">تطبيقات التعليم</p>
+                                        </div>
+                                        <div class="bg-white p-3 rounded-lg text-center">
+                                            <i class="fas fa-cube text-purple-600 mb-2"></i>
+                                            <p class="text-sm font-medium text-gray-800">عرض المنتجات 3D</p>
+                                        </div>
+                                        <div class="bg-white p-3 rounded-lg text-center">
+                                            <i class="fas fa-map-marked-alt text-purple-600 mb-2"></i>
+                                            <p class="text-sm font-medium text-gray-800">التوجيه الملاحي</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- MR -->
+                    <div>
+                        <div class="flex items-center mb-6">
+                            <div class="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center ml-4">
+                                <span class="text-2xl font-bold text-green-700">MR</span>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-800">الواقع المختلط (Mixed Reality - MR)</h3>
+                                <p class="text-gray-600">دمج متقدم بين AR و VR</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <div class="bg-green-50 p-5 rounded-xl border border-green-200">
+                                    <h4 class="font-bold text-green-800 mb-3">الخصائص الرئيسية:</h4>
+                                    <ul class="list-disc pr-6 text-gray-700 space-y-2">
+                                        <li><span class="font-bold">دمج متقدم</span> بين AR و VR</li>
+                                        <li>تفاعل حقيقي بين <span class="font-bold">العناصر الرقمية والبيئة الواقعية</span></li>
+                                        <li>يستخدم أجهزة متقدمة مثل <span class="font-bold">HoloLens</span></li>
+                                        <li>العناصر الرقمية <span class="font-bold">تتفاعل مع العالم الحقيقي</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="bg-gradient-to-r from-green-50 to-white p-5 rounded-xl border border-green-300">
+                                    <h4 class="font-bold text-gray-800 mb-3">الاستخدامات:</h4>
+                                    <div class="bg-white p-4 rounded-lg">
+                                        <p class="text-gray-700 text-sm mb-3">
+                                            MR يمثل الجيل التالي من التقنيات حيث يمكن للعناصر الرقمية أن:
+                                        </p>
+                                        <ul class="list-disc pr-6 text-gray-700 text-sm space-y-2">
+                                            <li>تتظلل خلف الأشياء الحقيقية</li>
+                                            <li>تتفاعل مع الأسطح الواقعية</li>
+                                            <li>تستجيب للحركة واللمس في العالم الحقيقي</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-venus-mars text-purple-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">كل تقنية لها خصائصها واستخداماتها المميزة</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 5: مقارنة تفصيلية -->
+        <section id="slide5" class="slide bg-gradient-to-br from-indigo-50 to-blue-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-indigo-700">5</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">مقارنة تفصيلية بين AR و VR و MR</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                        <i class="fas fa-balance-scale text-indigo-600 ml-2"></i>
+                        مقارنة مختصرة وشاملة
+                    </h3>
+                    
+                    <div class="overflow-x-auto mb-10">
+                        <table class="comparison-table w-full">
+                            <thead>
+                                <tr class="bg-indigo-50">
+                                    <th class="font-bold text-gray-800">التقنية</th>
+                                    <th class="font-bold text-gray-800">العالم الحقيقي</th>
+                                    <th class="font-bold text-gray-800">العالم الرقمي</th>
+                                    <th class="font-bold text-gray-800">مستوى التفاعل</th>
+                                    <th class="font-bold text-gray-800">الأجهزة الشائعة</th>
+                                    <th class="font-bold text-gray-800">التكلفة التقريبية</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="font-bold text-blue-700">VR<br>(الواقع الافتراضي)</td>
+                                    <td><i class="fas fa-times text-red-500"></i><br>معزول</td>
+                                    <td><i class="fas fa-check text-green-500"></i><br>كامل (100%)</td>
+                                    <td><span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">عالٍ</span></td>
+                                    <td>نظارات VR (Oculus)</td>
+                                    <td>$$$</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-bold text-purple-700">AR<br>(الواقع المعزز)</td>
+                                    <td><i class="fas fa-check text-green-500"></i><br>مرئي</td>
+                                    <td><i class="fas fa-plus text-purple-500"></i><br>إضافة رقمية</td>
+                                    <td><span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">متوسط</span></td>
+                                    <td>الهواتف الذكية، نظارات AR</td>
+                                    <td>$ - $$</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-bold text-green-700">MR<br>(الواقع المختلط)</td>
+                                    <td><i class="fas fa-check text-green-500"></i><br>مرئي ومتفاعل</td>
+                                    <td><i class="fas fa-blender text-green-500"></i><br>تفاعل كامل</td>
+                                    <td><span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">عالٍ جدًا</span></td>
+                                    <td>HoloLens، نظارات MR</td>
+                                    <td>$$$$</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="bg-blue-50 p-5 rounded-xl">
+                            <h4 class="font-bold text-gray-800 mb-3 flex items-center">
+                                <i class="fas fa-user-slash text-blue-600 ml-2"></i>
+                                VR: العزلة
+                            </h4>
+                            <p class="text-gray-700 text-sm">
+                                في VR، المستخدم معزول تمامًا عن العالم الحقيقي. هذه العزلة تخلق تجربة غامرة لكنها قد تشكل خطرًا إذا تحرك المستخدم في المكان الحقيقي.
+                            </p>
+                        </div>
+                        
+                        <div class="bg-purple-50 p-5 rounded-xl">
+                            <h4 class="font-bold text-gray-800 mb-3 flex items-center">
+                                <i class="fas fa-layer-plus text-purple-600 ml-2"></i>
+                                AR: الطبقات
+                            </h4>
+                            <p class="text-gray-700 text-sm">
+                                AR يضيف طبقات رقمية فوق العالم الحقيقي. المستخدم يرى الواقع كما هو مع إضافات تفيد في الفهم أو الترفيه أو التوجيه.
+                            </p>
+                        </div>
+                        
+                        <div class="bg-green-50 p-5 rounded-xl">
+                            <h4 class="font-bold text-gray-800 mb-3 flex items-center">
+                                <i class="fas fa-handshake text-green-600 ml-2"></i>
+                                MR: التفاعل
+                            </h4>
+                            <p class="text-gray-700 text-sm">
+                                MR يجعل العناصر الرقمية تتفاعل مع العالم الحقيقي كما لو كانت جزءًا منه. يمكن للكائن الرقمي أن يختفي خلف كائن حقيقي أو يتفاعل معه.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-brain text-indigo-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">فهم الاختلافات يساعد في اختيار التقنية المناسبة لكل تطبيق</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 6: أنواع AR - المعتمد على العلامات -->
+        <section id="slide6" class="slide bg-gradient-to-br from-yellow-50 to-amber-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-yellow-700">6</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">أنواع الواقع المعزز (1): المعتمد على العلامات</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <div class="mb-10">
+                        <div class="flex items-center mb-6">
+                            <div class="w-14 h-14 rounded-full bg-yellow-100 flex items-center justify-center ml-4">
+                                <i class="fas fa-barcode text-2xl text-yellow-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-800">الواقع المعزز المعتمد على العلامات<br><span class="text-lg text-yellow-600">(Marker-based AR)</span></h3>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-yellow-50 p-6 rounded-xl border border-yellow-200 mb-8">
+                            <h4 class="font-bold text-yellow-800 mb-4">الفكرة الأساسية:</h4>
+                            <p class="text-lg text-gray-800 mb-6">
+                                يعتمد على وجود <span class="font-bold text-yellow-700">علامة مرئية</span> (صورة - QR - رمز) في العالم الحقيقي. عند التعرف على هذه العلامة، يظهر المحتوى الرقمي المرتبط بها.
+                            </p>
+                            
+                            <div class="grid md:grid-cols-3 gap-4 mb-6">
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-image text-yellow-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">صورة</p>
+                                </div>
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-qrcode text-yellow-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">QR Code</p>
+                                </div>
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-hashtag text-yellow-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">رمز</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="text-xl font-bold text-gray-800 mb-4">أمثلة تطبيقية:</h4>
+                            
+                            <div class="space-y-4">
+                                <div class="bg-white p-4 rounded-xl border border-yellow-200">
+                                    <div class="flex items-center mb-2">
+                                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center ml-3">
+                                            <i class="fas fa-book text-blue-600"></i>
+                                        </div>
+                                        <h5 class="font-bold text-gray-800">الكتب التفاعلية</h5>
+                                    </div>
+                                    <p class="text-gray-700 text-sm">
+                                        كتب تحتوي على صور خاصة، عند توجيه الكاميرا نحوها تظهر نماذج ثلاثية الأبعاد أو فيديوهات توضيحية.
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-xl border border-yellow-200">
+                                    <div class="flex items-center mb-2">
+                                        <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center ml-3">
+                                            <i class="fas fa-id-card text-purple-600"></i>
+                                        </div>
+                                        <h5 class="font-bold text-gray-800">البطاقات الذكية</h5>
+                                    </div>
+                                    <p class="text-gray-700 text-sm">
+                                        بطاقات عمل أو دعوات تحتوي على QR codes، عند مسحها تظهر معلومات تفاعلية أو عروض تقديمية.
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-xl border border-yellow-200">
+                                    <div class="flex items-center mb-2">
+                                        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center ml-3">
+                                            <i class="fas fa-landmark text-green-600"></i>
+                                        </div>
+                                        <h5 class="font-bold text-gray-800">المتاحف</h5>
+                                    </div>
+                                    <p class="text-gray-700 text-sm">
+                                        لوحات أو قطع أثرية مع علامات خاصة، تظهر معلومات إضافية أو إعادة بناء ثلاثية الأبعاد للقطع.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-xl font-bold text-gray-800 mb-4">المميزات والقيود:</h4>
+                            
+                            <div class="space-y-6">
+                                <div class="bg-green-50 p-4 rounded-xl border border-green-200">
+                                    <h5 class="font-bold text-green-800 mb-2 flex items-center">
+                                        <i class="fas fa-thumbs-up text-green-600 ml-2"></i>
+                                        المميزات
+                                    </h5>
+                                    <ul class="list-disc pr-6 text-gray-700 text-sm space-y-1">
+                                        <li><span class="font-bold">سهل الفهم</span> للمبتدئين</li>
+                                        <li><span class="font-bold">دقيق</span> في التعرف والتتبع</li>
+                                        <li><span class="font-bold">مناسب للمبتدئين</span> في تطوير AR</li>
+                                        <li>لا يحتاج لمعالجة معقدة للبيئة</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="bg-red-50 p-4 rounded-xl border border-red-200">
+                                    <h5 class="font-bold text-red-800 mb-2 flex items-center">
+                                        <i class="fas fa-thumbs-down text-red-600 ml-2"></i>
+                                        القيود
+                                    </h5>
+                                    <ul class="list-disc pr-6 text-gray-700 text-sm space-y-1">
+                                        <li>يحتاج إلى <span class="font-bold">علامة مادية</span> في المكان</li>
+                                        <li><span class="font-bold">تجربة محدودة</span> مقارنة بالأنواع الأخرى</li>
+                                        <li>العنصر الرقمي يختفي إذا اختفت العلامة</li>
+                                        <li>أقل مرونة في الاستخدام</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-bullseye text-yellow-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">أول وأبسط أنواع الواقع المعزز</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 7: أنواع AR - غير المعتمد على العلامات -->
+        <section id="slide7" class="slide bg-gradient-to-br from-blue-50 to-cyan-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-blue-700">7</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">أنواع الواقع المعزز (2): غير المعتمد على العلامات</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <div class="mb-10">
+                        <div class="flex items-center mb-6">
+                            <div class="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center ml-4">
+                                <i class="fas fa-expand-alt text-2xl text-blue-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-800">الواقع المعزز غير المعتمد على العلامات<br><span class="text-lg text-blue-600">(Markerless AR)</span></h3>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-blue-50 p-6 rounded-xl border border-blue-200 mb-8">
+                            <h4 class="font-bold text-blue-800 mb-4">الفكرة الأساسية:</h4>
+                            <p class="text-lg text-gray-800 mb-6">
+                                يعتمد على <span class="font-bold text-blue-700">تحليل البيئة</span> باستخدام الكاميرا والمستشعرات (مثل الجيروسكوب، التسارع، GPS) دون الحاجة إلى علامات مسبقة.
+                            </p>
+                            
+                            <div class="grid md:grid-cols-3 gap-4 mb-6">
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-camera text-blue-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">كاميرا ذكية</p>
+                                </div>
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-compass text-blue-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">مستشعرات</p>
+                                </div>
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-brain text-blue-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">تحليل بيئة</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="text-xl font-bold text-gray-800 mb-4">أمثلة تطبيقية:</h4>
+                            
+                            <div class="space-y-4">
+                                <div class="ar-type-card bg-white rounded-xl shadow-sm p-4 border-r-blue-400">
+                                    <div class="flex items-center mb-2">
+                                        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center ml-3">
+                                            <i class="fas fa-couch text-green-600"></i>
+                                        </div>
+                                        <h5 class="font-bold text-gray-800">وضع الأثاث افتراضيًا</h5>
+                                    </div>
+                                    <p class="text-gray-700 text-sm">
+                                        تطبيقات مثل IKEA Place التي تتيح وضع أثاث افتراضي في غرفتك الحقيقية لمعرفة كيف سيبدو.
+                                    </p>
+                                </div>
+                                
+                                <div class="ar-type-card bg-white rounded-xl shadow-sm p-4 border-r-purple-400">
+                                    <div class="flex items-center mb-2">
+                                        <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center ml-3">
+                                            <i class="fas fa-camera text-purple-600"></i>
+                                        </div>
+                                        <h5 class="font-bold text-gray-800">فلاتر الكاميرا</h5>
+                                    </div>
+                                    <p class="text-gray-700 text-sm">
+                                        فلاتر سناب شات وإنستغرام التي تضيف مؤثرات إلى وجهك أو البيئة المحيطة دون علامات.
+                                    </p>
+                                </div>
+                                
+                                <div class="ar-type-card bg-white rounded-xl shadow-sm p-4 border-r-yellow-400">
+                                    <div class="flex items-center mb-2">
+                                        <div class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center ml-3">
+                                            <i class="fas fa-gamepad text-yellow-600"></i>
+                                        </div>
+                                        <h5 class="font-bold text-gray-800">الألعاب</h5>
+                                    </div>
+                                    <p class="text-gray-700 text-sm">
+                                        ألعاب AR التي تضع شخصيات أو عناصر في بيئتك الحقيقية وتتفاعل معها.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-xl font-bold text-gray-800 mb-4">المميزات والقيود:</h4>
+                            
+                            <div class="space-y-6">
+                                <div class="bg-green-50 p-4 rounded-xl border border-green-200">
+                                    <h5 class="font-bold text-green-800 mb-2 flex items-center">
+                                        <i class="fas fa-thumbs-up text-green-600 ml-2"></i>
+                                        المميزات
+                                    </h5>
+                                    <ul class="list-disc pr-6 text-gray-700 text-sm space-y-1">
+                                        <li><span class="font-bold">واقعي</span> وطبيعي أكثر</li>
+                                        <li><span class="font-bold">مرن</span> يمكن استخدامه في أي مكان</li>
+                                        <li>لا يحتاج لعلامات أو إعدادات مسبقة</li>
+                                        <li>تجربة مستخدم أفضل وأكثر حرية</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="bg-red-50 p-4 rounded-xl border border-red-200">
+                                    <h5 class="font-bold text-red-800 mb-2 flex items-center">
+                                        <i class="fas fa-thumbs-down text-red-600 ml-2"></i>
+                                        القيود
+                                    </h5>
+                                    <ul class="list-disc pr-6 text-gray-700 text-sm space-y-1">
+                                        <li>يتطلب <span class="font-bold">أجهزة حديثة</span> وقوية</li>
+                                        <li><span class="font-bold">استهلاك طاقة أعلى</span> للكاميرا والمعالجة</li>
+                                        <li>قد يكون أقل دقة في بعض الأحيان</li>
+                                        <li>أكثر تعقيدًا في التطوير</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6 bg-gradient-to-r from-blue-100 to-cyan-100 p-4 rounded-xl">
+                                <h5 class="font-bold text-gray-800 mb-2">التكنولوجيا المستخدمة:</h5>
+                                <p class="text-gray-700 text-sm">
+                                    يستخدم تقنيات مثل SLAM (التعرف على المكان ورسم الخرائط في آن واحد) وDepth Sensing لتحليل البيئة ثلاثية الأبعاد.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-magic text-blue-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">أكثر أنواع AR انتشارًا وتطورًا في الوقت الحالي</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 8: أنواع AR - القائم على الموقع -->
+        <section id="slide8" class="slide bg-gradient-to-br from-green-50 to-emerald-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-green-700">8</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">أنواع الواقع المعزز (3): القائم على الموقع</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <div class="mb-10">
+                        <div class="flex items-center mb-6">
+                            <div class="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center ml-4">
+                                <i class="fas fa-map-marker-alt text-2xl text-green-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-800">الواقع المعزز القائم على الموقع<br><span class="text-lg text-green-600">(Location-based AR)</span></h3>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-green-50 p-6 rounded-xl border border-green-200 mb-8">
+                            <h4 class="font-bold text-green-800 mb-4">الفكرة الأساسية:</h4>
+                            <p class="text-lg text-gray-800 mb-6">
+                                يعتمد على <span class="font-bold text-green-700">الموقع الجغرافي</span> للمستخدم (GPS) لعرض محتوى رقمي مرتبط بموقع معين في العالم الحقيقي.
+                            </p>
+                            
+                            <div class="grid md:grid-cols-3 gap-4 mb-6">
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-satellite text-green-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">GPS</p>
+                                </div>
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-compass text-green-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">البوصلة</p>
+                                </div>
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-location-arrow text-green-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">تحديد الموقع</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="text-xl font-bold text-gray-800 mb-4">أمثلة تطبيقية:</h4>
+                            
+                            <div class="space-y-4">
+                                <div class="ar-type-card bg-white rounded-xl shadow-sm p-4 border-r-green-400">
+                                    <div class="flex items-center mb-2">
+                                        <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center ml-3">
+                                            <i class="fab fa-pagelines text-red-600"></i>
+                                        </div>
+                                        <h5 class="font-bold text-gray-800">Pokémon GO</h5>
+                                    </div>
+                                    <p class="text-gray-700 text-sm">
+                                        أشهر مثال، حيث تظهر البوكيمونات في مواقع جغرافية حقيقية، ويجب على اللاعب التنقل في العالم الحقيقي للعثور عليها.
+                                    </p>
+                                </div>
+                                
+                                <div class="ar-type-card bg-white rounded-xl shadow-sm p-4 border-r-blue-400">
+                                    <div class="flex items-center mb-2">
+                                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center ml-3">
+                                            <i class="fas fa-monument text-blue-600"></i>
+                                        </div>
+                                        <h5 class="font-bold text-gray-800">السياحة التفاعلية</h5>
+                                    </div>
+                                    <p class="text-gray-700 text-sm">
+                                        تطبيقات تقدم معلومات عن المعالم الأثرية أو التاريخية عندما يكون المستخدم قريبًا منها.
+                                    </p>
+                                </div>
+                                
+                                <div class="ar-type-card bg-white rounded-xl shadow-sm p-4 border-r-purple-400">
+                                    <div class="flex items-center mb-2">
+                                        <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center ml-3">
+                                            <i class="fas fa-city text-purple-600"></i>
+                                        </div>
+                                        <h5 class="font-bold text-gray-800">المدن الذكية</h5>
+                                    </div>
+                                    <p class="text-gray-700 text-sm">
+                                        عرض معلومات عن المحلات التجارية، المطاعم، أو الاتجاهات بناءً على موقع المستخدم الحالي.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-xl font-bold text-gray-800 mb-4">الخصائص والتقنيات:</h4>
+                            
+                            <div class="space-y-6">
+                                <div class="bg-blue-50 p-4 rounded-xl">
+                                    <h5 class="font-bold text-gray-800 mb-2">مزايا فريدة:</h5>
+                                    <ul class="list-disc pr-6 text-gray-700 text-sm space-y-1">
+                                        <li>يشجع على <span class="font-bold">الحركة والاستكشاف</span></li>
+                                        <li>يربط المحتوى الرقمي <span class="font-bold">بأماكن حقيقية</span></li>
+                                        <li>ينشئ تجارب <span class="font-bold">مشتركة</span> في أماكن محددة</li>
+                                        <li>مفيد للتعليم والترفيه الخارجي</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="bg-yellow-50 p-4 rounded-xl">
+                                    <h5 class="font-bold text-gray-800 mb-2">التحديات:</h5>
+                                    <ul class="list-disc pr-6 text-gray-700 text-sm space-y-1">
+                                        <li>دقة GPS قد <span class="font-bold">تتأثر بالمباني أو الطقس</span></li>
+                                        <li><span class="font-bold">استهلاك بطارية</span> عالٍ لتشغيل GPS باستمرار</li>
+                                        <li>يحتاج إلى <span class="font-bold">اتصال إنترنت</span> في معظم الأحيان</li>
+                                        <li>محتوى محدود للأماكن غير المطورة</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="bg-purple-50 p-4 rounded-xl">
+                                    <h5 class="font-bold text-gray-800 mb-2">تقنيات داعمة:</h5>
+                                    <p class="text-gray-700 text-sm">
+                                        غالبًا ما يتم دمج Location-based AR مع Markerless AR للحصول على تجارب أكثر دقة وتفاعلية.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-map-marked-alt text-green-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">ربط العالم الرقمي بالمواقع الجغرافية الحقيقية</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 9: أنواع AR - القائم على الإسقاط -->
+        <section id="slide9" class="slide bg-gradient-to-br from-orange-50 to-red-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-orange-700">9</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">أنواع الواقع المعزز (4): القائم على الإسقاط</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <div class="mb-10">
+                        <div class="flex items-center mb-6">
+                            <div class="w-14 h-14 rounded-full bg-orange-100 flex items-center justify-center ml-4">
+                                <i class="fas fa-project-diagram text-2xl text-orange-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-800">الواقع المعزز القائم على الإسقاط<br><span class="text-lg text-orange-600">(Projection-based AR)</span></h3>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-orange-50 p-6 rounded-xl border border-orange-200 mb-8">
+                            <h4 class="font-bold text-orange-800 mb-4">الفكرة الأساسية:</h4>
+                            <p class="text-lg text-gray-800 mb-6">
+                                <span class="font-bold text-orange-700">إسقاط المحتوى الرقمي</span> مباشرة على الأسطح الحقيقية باستخدام أجهزة إسقاط (Projectors)، مما يخلق وهمًا بأن المحتوى جزء من العالم الحقيقي.
+                            </p>
+                            
+                            <div class="grid md:grid-cols-3 gap-4 mb-6">
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-video text-orange-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">أجهزة إسقاط</p>
+                                </div>
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-lightbulb text-orange-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">إضاءة ذكية</p>
+                                </div>
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-hand-pointer text-orange-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">تفاعل مباشر</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="text-xl font-bold text-gray-800 mb-4">الاستخدامات الرئيسية:</h4>
+                            
+                            <div class="space-y-4">
+                                <div class="ar-type-card bg-white rounded-xl shadow-sm p-4 border-r-orange-400">
+                                    <div class="flex items-center mb-2">
+                                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center ml-3">
+                                            <i class="fas fa-industry text-blue-600"></i>
+                                        </div>
+                                        <h5 class="font-bold text-gray-800">الصناعة والتصنيع</h5>
+                                    </div>
+                                    <p class="text-gray-700 text-sm">
+                                        عرض مخططات التجميع أو تعليمات السلامة مباشرة على أسطح العمل أو المعدات.
+                                    </p>
+                                </div>
+                                
+                                <div class="ar-type-card bg-white rounded-xl shadow-sm p-4 border-r-green-400">
+                                    <div class="flex items-center mb-2">
+                                        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center ml-3">
+                                            <i class="fas fa-user-graduate text-green-600"></i>
+                                        </div>
+                                        <h5 class="font-bold text-gray-800">التدريب والتعليم</h5>
+                                    </div>
+                                    <p class="text-gray-700 text-sm">
+                                        عرض نماذج تشريحية على جسد الإنسان الافتراضي أو مخططات على أسطح التدريب.
+                                    </p>
+                                </div>
+                                
+                                <div class="ar-type-card bg-white rounded-xl shadow-sm p-4 border-r-purple-400">
+                                    <div class="flex items-center mb-2">
+                                        <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center ml-3">
+                                            <i class="fas fa-film text-purple-600"></i>
+                                        </div>
+                                        <h5 class="font-bold text-gray-800">العروض التفاعلية</h5>
+                                    </div>
+                                    <p class="text-gray-700 text-sm">
+                                        عروض فنية، متاحف تفاعلية، أو عروض ترفيهية تستخدم الإسقاط على الأسطح.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-xl font-bold text-gray-800 mb-4">الخصائص والتقنيات:</h4>
+                            
+                            <div class="space-y-6">
+                                <div class="bg-green-50 p-4 rounded-xl">
+                                    <h5 class="font-bold text-gray-800 mb-2">المزايا:</h5>
+                                    <ul class="list-disc pr-6 text-gray-700 text-sm space-y-1">
+                                        <li>لا يحتاج المستخدم إلى <span class="font-bold">أجهزة خاصة</span></li>
+                                        <li>يمكن مشاركته من قبل <span class="font-bold">عدة أشخاص</span> في نفس الوقت</li>
+                                        <li><span class="font-bold">تفاعل طبيعي</span> مع المحتوى المعروض</li>
+                                        <li>مثالي للعروض العامة والتدريب الجماعي</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="bg-red-50 p-4 rounded-xl">
+                                    <h5 class="font-bold text-gray-800 mb-2">التحديات:</h5>
+                                    <ul class="list-disc pr-6 text-gray-700 text-sm space-y-1">
+                                        <li>يتطلب <span class="font-bold">أجهزة إسقاط متخصصة</span></li>
+                                        <li><span class="font-bold">حساس للإضاءة المحيطة</span></li>
+                                        <li>صعوبة في <span class="font-bold">التحكم الدقيق</span> في التفاعل</li>
+                                        <li>تكلفة عالية نسبيًا</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="bg-blue-50 p-4 rounded-xl">
+                                    <h5 class="font-bold text-gray-800 mb-2">التطورات الحديثة:</h5>
+                                    <p class="text-gray-700 text-sm">
+                                        بعض الأنظمة المتقدمة تدمج كاميرات لتعقب حركة المستخدم وتعديل الإسقاط بناءً عليها، أو تسمح بالتفاعل مع المحتوى المعروض.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-broadcast-tower text-orange-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">تحويل الأسطح العادية إلى شاشات تفاعلية ذكية</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 10: أنواع AR - التعرف على الأجسام -->
+        <section id="slide10" class="slide bg-gradient-to-br from-indigo-50 to-purple-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-indigo-700">10</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">أنواع الواقع المعزز (5): التعرف على الأجسام</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <div class="mb-10">
+                        <div class="flex items-center mb-6">
+                            <div class="w-14 h-14 rounded-full bg-indigo-100 flex items-center justify-center ml-4">
+                                <i class="fas fa-eye text-2xl text-indigo-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-800">الواقع المعزز القائم على التعرّف على الأجسام<br><span class="text-lg text-indigo-600">(Object Recognition AR)</span></h3>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-indigo-50 p-6 rounded-xl border border-indigo-200 mb-8">
+                            <h4 class="font-bold text-indigo-800 mb-4">الفكرة الأساسية:</h4>
+                            <p class="text-lg text-gray-800 mb-6">
+                                <span class="font-bold text-indigo-700">التعرّف على كائنات حقيقية</span> محددة (مثل منتج، آلة، أو جزء تشريحي) باستخدام الذكاء الاصطناعي، ثم <span class="font-bold">عرض معلومات رقمية</span> مرتبطة بهذا الكائن.
+                            </p>
+                            
+                            <div class="grid md:grid-cols-3 gap-4 mb-6">
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-robot text-indigo-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">ذكاء اصطناعي</p>
+                                </div>
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-shapes text-indigo-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">تعرّف على الأشكال</p>
+                                </div>
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-info-circle text-indigo-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">معلومات تفاعلية</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="text-xl font-bold text-gray-800 mb-4">مجالات الاستخدام:</h4>
+                            
+                            <div class="space-y-4">
+                                <div class="ar-type-card bg-white rounded-xl shadow-sm p-4 border-r-indigo-400">
+                                    <div class="flex items-center mb-2">
+                                        <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center ml-3">
+                                            <i class="fas fa-user-md text-red-600"></i>
+                                        </div>
+                                        <h5 class="font-bold text-gray-800">الطب والرعاية الصحية</h5>
+                                    </div>
+                                    <p class="text-gray-700 text-sm">
+                                        التعرف على الأعضاء أو الأجهزة الطبية وعرض معلومات عن وظائفها، طريقة الاستخدام، أو إرشادات السلامة.
+                                    </p>
+                                </div>
+                                
+                                <div class="ar-type-card bg-white rounded-xl shadow-sm p-4 border-r-blue-400">
+                                    <div class="flex items-center mb-2">
+                                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center ml-3">
+                                            <i class="fas fa-tools text-blue-600"></i>
+                                        </div>
+                                        <h5 class="font-bold text-gray-800">الصيانة والإصلاح</h5>
+                                    </div>
+                                    <p class="text-gray-700 text-sm">
+                                        التعرف على أجزاء الآلات وعرض إرشادات الصيانة، مخططات التجميع، أو تحذيرات السلامة.
+                                    </p>
+                                </div>
+                                
+                                <div class="ar-type-card bg-white rounded-xl shadow-sm p-4 border-r-green-400">
+                                    <div class="flex items-center mb-2">
+                                        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center ml-3">
+                                            <i class="fas fa-shopping-cart text-green-600"></i>
+                                        </div>
+                                        <h5 class="font-bold text-gray-800">التسوق والتجزئة</h5>
+                                    </div>
+                                    <p class="text-gray-700 text-sm">
+                                        التعرف على المنتجات في المتجر وعرض معلومات عنها، عروض خاصة، أو تقييمات المستخدمين.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-xl font-bold text-gray-800 mb-4">الخصائص والتقنيات:</h4>
+                            
+                            <div class="space-y-6">
+                                <div class="bg-green-50 p-4 rounded-xl">
+                                    <h5 class="font-bold text-gray-800 mb-2">المزايا:</h5>
+                                    <ul class="list-disc pr-6 text-gray-700 text-sm space-y-1">
+                                        <li>معلومات <span class="font-bold">محددة وذات صلة</span> بالكائن الحقيقي</li>
+                                        <li><span class="font-bold">مفيد للغاية</span> في المجالات المتخصصة</li>
+                                        <li>يقلل الأخطاء في <span class="font-bold">المهام المعقدة</span></li>
+                                        <li>يسرع عملية التعلم والتدريب</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="bg-red-50 p-4 rounded-xl">
+                                    <h5 class="font-bold text-gray-800 mb-2">التحديات:</h5>
+                                    <ul class="list-disc pr-6 text-gray-700 text-sm space-y-1">
+                                        <li>يتطلب <span class="font-bold">قاعدة بيانات</span> للأجسام المعروفة</li>
+                                        <li><span class="font-bold">تدريب مسبق</span> لنماذج الذكاء الاصطناعي</li>
+                                        <li>صعوبة التعرف على الأجسام <span class="font-bold">المتشابهة</span></li>
+                                        <li>تأثر الدقة بجودة الصورة والإضاءة</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="bg-blue-50 p-4 rounded-xl">
+                                    <h5 class="font-bold text-gray-800 mb-2">التطورات المستقبلية:</h5>
+                                    <p class="text-gray-700 text-sm">
+                                        مع تطور تقنيات الرؤية الحاسوبية والذكاء الاصطناعي، ستصبح هذه التقنية أكثر دقة وقدرة على التعرف على عدد أكبر من الأجسام في ظروف متنوعة.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-brain text-indigo-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">دمج الذكاء الاصطناعي مع الواقع المعزز لفهم البيئة المحيطة</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 11: ملخص الأنواع -->
+        <section id="slide11" class="slide bg-gradient-to-br from-gray-50 to-slate-100">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-gray-700">11</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">ملخص بصري لأنواع الواقع المعزز</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                        <i class="fas fa-table text-blue-600 ml-2"></i>
+                        مقارنة شاملة لأنواع AR المختلفة
+                    </h3>
+                    
+                    <div class="overflow-x-auto mb-10">
+                        <table class="comparison-table w-full">
+                            <thead>
+                                <tr class="bg-blue-50">
+                                    <th class="font-bold text-gray-800">النوع</th>
+                                    <th class="font-bold text-gray-800">يحتاج علامة</th>
+                                    <th class="font-bold text-gray-800">يعتمد على الموقع</th>
+                                    <th class="font-bold text-gray-800">مستوى الواقعية</th>
+                                    <th class="font-bold text-gray-800">التعقيد التقني</th>
+                                    <th class="font-bold text-gray-800">أمثلة شائعة</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="font-bold text-yellow-700">Marker-based<br>(المعتمد على العلامات)</td>
+                                    <td><i class="fas fa-check text-green-500"></i><br>نعم</td>
+                                    <td><i class="fas fa-times text-red-500"></i><br>لا</td>
+                                    <td><span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">متوسط</span></td>
+                                    <td><span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">منخفض</span></td>
+                                    <td>الكتب التفاعلية</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-bold text-blue-700">Markerless<br>(غير المعتمد على العلامات)</td>
+                                    <td><i class="fas fa-times text-red-500"></i><br>لا</td>
+                                    <td><i class="fas fa-times text-red-500"></i><br>لا</td>
+                                    <td><span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">عالٍ</span></td>
+                                    <td><span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">متوسط</span></td>
+                                    <td>فلاتر الكاميرا</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-bold text-green-700">Location-based<br>(القائم على الموقع)</td>
+                                    <td><i class="fas fa-times text-red-500"></i><br>لا</td>
+                                    <td><i class="fas fa-check text-green-500"></i><br>نعم</td>
+                                    <td><span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">عالٍ</span></td>
+                                    <td><span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">متوسط</span></td>
+                                    <td>Pokémon GO</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-bold text-orange-700">Projection-based<br>(القائم على الإسقاط)</td>
+                                    <td><i class="fas fa-times text-red-500"></i><br>لا</td>
+                                    <td><i class="fas fa-times text-red-500"></i><br>لا</td>
+                                    <td><span class="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm">عالٍ</span></td>
+                                    <td><span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm">مرتفع</span></td>
+                                    <td>التدريب الصناعي</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-bold text-indigo-700">Object Recognition<br>(التعرف على الأجسام)</td>
+                                    <td><i class="fas fa-times text-red-500"></i><br>لا</td>
+                                    <td><i class="fas fa-times text-red-500"></i><br>لا</td>
+                                    <td><span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm">عالٍ جدًا</span></td>
+                                    <td><span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm">مرتفع جدًا</span></td>
+                                    <td>الصيانة الذكية</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="text-xl font-bold text-gray-800 mb-4">كيف تختار النوع المناسب؟</h4>
+                            
+                            <div class="space-y-4">
+                                <div class="bg-blue-50 p-4 rounded-xl">
+                                    <h5 class="font-bold text-gray-800 mb-2">للتعليم والمتاحف</h5>
+                                    <p class="text-gray-700 text-sm">
+                                        <span class="font-bold text-blue-700">Marker-based AR</span> مثالي لعرض معلومات إضافية عند النظر إلى علامات محددة.
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-purple-50 p-4 rounded-xl">
+                                    <h5 class="font-bold text-gray-800 mb-2">للتسوق والتجارة</h5>
+                                    <p class="text-gray-700 text-sm">
+                                        <span class="font-bold text-purple-700">Markerless AR</span> مناسب لتجربة المنتجات في بيئة المستخدم الحقيقية.
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-green-50 p-4 rounded-xl">
+                                    <h5 class="font-bold text-gray-800 mb-2">للترفيه الخارجي</h5>
+                                    <p class="text-gray-700 text-sm">
+                                        <span class="font-bold text-green-700">Location-based AR</span> هو الخيار الأفضل للألعاب والأنشطة الخارجية.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-xl font-bold text-gray-800 mb-4">اتجاهات تطور الأنواع</h4>
+                            
+                            <div class="bg-gradient-to-r from-gray-50 to-blue-50 p-5 rounded-xl border border-gray-200">
+                                <h5 class="font-bold text-gray-800 mb-3">الدمج بين الأنواع</h5>
+                                <p class="text-gray-700 text-sm mb-4">
+                                    معظم التطبيقات الحديثة لا تستخدم نوعًا واحدًا فقط، بل تدمج بين عدة أنواع للحصول على أفضل النتائج:
+                                </p>
+                                <ul class="list-disc pr-6 text-gray-700 text-sm space-y-2">
+                                    <li>تطبيق يمكنه استخدام <span class="font-bold">Location-based</span> للعثور على موقع، ثم <span class="font-bold">Object Recognition</span> للتعرف على كائن معين</li>
+                                    <li>لعبة تستخدم <span class="font-bold">Markerless AR</span> للوضع العام، و<span class="font-bold">Marker-based</span> لتفعيل عناصر خاصة</li>
+                                    <li>تطبيق تدريبي يدمج <span class="font-bold">Projection-based</span> مع <span class="font-bold">Object Recognition</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-puzzle-piece text-gray-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">كل نوع له مكانته واستخداماته المثالية</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 12: نشاط تفاعلي -->
+        <section id="slide12" class="slide bg-gradient-to-br from-teal-50 to-emerald-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-teal-700">12</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">نشاط تفاعلي: تصنيف التطبيقات</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-10">
+                    <div class="text-center mb-10">
+                        <div class="inline-block p-4 bg-gradient-to-r from-teal-100 to-emerald-100 rounded-full mb-6">
+                            <i class="fas fa-gamepad text-4xl text-teal-600"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold text-gray-800 mb-6">نشاط: تصنيف أنواع AR</h3>
+                        <p class="text-lg text-gray-700 max-w-2xl mx-auto">
+                            صنّف كل تطبيق إلى نوع AR المناسب له
+                        </p>
+                    </div>
+                    
+                    <!-- التطبيق 1 -->
+                    <div class="mb-8">
+                        <div class="bg-gray-100 p-5 rounded-xl mb-4">
+                            <h4 class="font-bold text-gray-800 mb-2">التطبيق 1: كتاب تعليمي تفاعلي</h4>
+                            <p class="text-gray-700">
+                                كتاب يحتوي على صور خاصة، عند توجيه الكاميرا نحوها تظهر نماذج ثلاثية الأبعاد للكواكب مع معلومات عنها.
+                            </p>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-5 gap-3">
+                            <button class="type-option p-3 border border-gray-300 rounded-lg text-center hover:bg-gray-50" data-correct="marker">
+                                <span class="font-medium text-gray-800">Marker-based</span>
+                            </button>
+                            <button class="type-option p-3 border border-gray-300 rounded-lg text-center hover:bg-gray-50" data-correct="false">
+                                <span class="font-medium text-gray-800">Markerless</span>
+                            </button>
+                            <button class="type-option p-3 border border-gray-300 rounded-lg text-center hover:bg-gray-50" data-correct="false">
+                                <span class="font-medium text-gray-800">Location-based</span>
+                            </button>
+                            <button class="type-option p-3 border border-gray-300 rounded-lg text-center hover:bg-gray-50" data-correct="false">
+                                <span class="font-medium text-gray-800">Projection-based</span>
+                            </button>
+                            <button class="type-option p-3 border border-gray-300 rounded-lg text-center hover:bg-gray-50" data-correct="false">
+                                <span class="font-medium text-gray-800">Object Recognition</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- التطبيق 2 -->
+                    <div class="mb-8">
+                        <div class="bg-gray-100 p-5 rounded-xl mb-4">
+                            <h4 class="font-bold text-gray-800 mb-2">التطبيق 2: لعبة Pokémon GO</h4>
+                            <p class="text-gray-700">
+                                لعبة تظهر فيها مخلوقات افتراضية في مواقع جغرافية حقيقية، يجب على اللاعب التنقل في العالم الحقيقي للعثور عليها.
+                            </p>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-5 gap-3">
+                            <button class="type-option p-3 border border-gray-300 rounded-lg text-center hover:bg-gray-50" data-correct="false">
+                                <span class="font-medium text-gray-800">Marker-based</span>
+                            </button>
+                            <button class="type-option p-3 border border-gray-300 rounded-lg text-center hover:bg-gray-50" data-correct="false">
+                                <span class="font-medium text-gray-800">Markerless</span>
+                            </button>
+                            <button class="type-option p-3 border border-gray-300 rounded-lg text-center hover:bg-gray-50" data-correct="location">
+                                <span class="font-medium text-gray-800">Location-based</span>
+                            </button>
+                            <button class="type-option p-3 border border-gray-300 rounded-lg text-center hover:bg-gray-50" data-correct="false">
+                                <span class="font-medium text-gray-800">Projection-based</span>
+                            </button>
+                            <button class="type-option p-3 border border-gray-300 rounded-lg text-center hover:bg-gray-50" data-correct="false">
+                                <span class="font-medium text-gray-800">Object Recognition</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- التطبيق 3 -->
+                    <div class="mb-8">
+                        <div class="bg-gray-100 p-5 rounded-xl mb-4">
+                            <h4 class="font-bold text-gray-800 mb-2">التطبيق 3: تطبيق أثاث IKEA Place</h4>
+                            <p class="text-gray-700">
+                                تطبيق يسمح بوضع أثاث افتراضي في غرفتك الحقيقية لمعرفة كيف سيبدو، دون الحاجة إلى أي علامات خاصة.
+                            </p>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-5 gap-3">
+                            <button class="type-option p-3 border border-gray-300 rounded-lg text-center hover:bg-gray-50" data-correct="false">
+                                <span class="font-medium text-gray-800">Marker-based</span>
+                            </button>
+                            <button class="type-option p-3 border border-gray-300 rounded-lg text-center hover:bg-gray-50" data-correct="markerless">
+                                <span class="font-medium text-gray-800">Markerless</span>
+                            </button>
+                            <button class="type-option p-3 border border-gray-300 rounded-lg text-center hover:bg-gray-50" data-correct="false">
+                                <span class="font-medium text-gray-800">Location-based</span>
+                            </button>
+                            <button class="type-option p-3 border border-gray-300 rounded-lg text-center hover:bg-gray-50" data-correct="false">
+                                <span class="font-medium text-gray-800">Projection-based</span>
+                            </button>
+                            <button class="type-option p-3 border border-gray-300 rounded-lg text-center hover:bg-gray-50" data-correct="false">
+                                <span class="font-medium text-gray-800">Object Recognition</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-10">
+                        <button id="checkActivity" class="px-6 py-3 bg-gradient-to-r from-teal-600 to-emerald-600 text-white rounded-full font-medium hover:shadow-lg transition-shadow">
+                            <i class="fas fa-check-circle ml-2"></i>
+                            تحقق من الإجابات
+                        </button>
+                        
+                        <button id="resetActivity" class="px-6 py-3 bg-gray-200 text-gray-800 rounded-full font-medium hover:bg-gray-300 mr-4">
+                            <i class="fas fa-redo ml-2"></i>
+                            إعادة المحاولة
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="activityResults" class="hidden bg-green-50 border border-green-200 rounded-2xl p-6 mb-8">
+                    <h4 class="text-xl font-bold text-gray-800 mb-4 text-center">نتيجة النشاط</h4>
+                    <div class="text-center mb-6">
+                        <div class="text-5xl font-bold text-green-600 mb-2" id="activityScore">0/3</div>
+                        <p class="text-gray-700" id="activityMessage"></p>
+                    </div>
+                    
+                    <div class="bg-white p-5 rounded-xl">
+                        <h5 class="font-bold text-gray-800 mb-3">الإجابات الصحيحة:</h5>
+                        <ol class="list-decimal pr-6 space-y-3 text-gray-700">
+                            <li><span class="font-bold">Marker-based AR</span> - لأن الكتاب يحتوي على صور خاصة (علامات) يتم التعرف عليها.</li>
+                            <li><span class="font-bold">Location-based AR</span> - لأن اللعبة تعتمد على الموقع الجغرافي للمستخدم (GPS).</li>
+                            <li><span class="font-bold">Markerless AR</span> - لأن التطبيق يحلل البيئة دون الحاجة إلى علامات.</li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-hands-helping text-teal-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">التطبيق العملي يساعد في ترسيخ المفاهيم</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 13: فيديو TED -->
+        <section id="slide13" class="slide bg-gradient-to-br from-red-50 to-pink-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-red-700">13</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">فيديو TED / تجربة عالمية</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-10">
+                    <div class="text-center mb-10">
+                        <div class="inline-block p-4 bg-gradient-to-r from-red-100 to-pink-100 rounded-full mb-6">
+                            <i class="fas fa-video text-4xl text-red-600"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold text-gray-800 mb-6">فيديو TED مقترح للمشاهدة</h3>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-8 mb-12">
+                        <div>
+                            <div class="bg-gradient-to-r from-red-50 to-pink-50 p-6 rounded-2xl border border-red-200 h-full">
+                                <div class="flex items-center mb-4">
+                                    <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center ml-4">
+                                        <i class="fas fa-user-tie text-red-600 text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xl font-bold text-gray-800">David Rose</h4>
+                                        <p class="text-gray-600">مخترع ومستثمر في التكنولوجيا</p>
+                                    </div>
+                                </div>
+                                
+                                <h5 class="font-bold text-gray-800 mb-3">عنوان المحاضرة:</h5>
+                                <p class="text-lg text-gray-800 mb-4">
+                                    <strong>"How Augmented Reality Will Change Everything We Do"</strong>
+                                </p>
+                                
+                                <div class="bg-white p-4 rounded-lg mb-6">
+                                    <p class="text-gray-700">
+                                        يتحدث ديفيد روز عن كيف سيغير الواقع المعزز طريقة تفاعلنا مع العالم من حولنا، وكيف سيكون حاضرًا في كل جانب من جوانب حياتنا اليومية.
+                                    </p>
+                                </div>
+                                
+                                <a href="https://www.ted.com/talks/david_rose_how_augmented_reality_will_change_everything_we_do" target="_blank" class="inline-flex items-center px-5 py-3 bg-red-600 text-white rounded-full font-medium hover:bg-red-700 transition-colors">
+                                    <i class="fas fa-external-link-alt ml-2"></i>
+                                    مشاهدة على TED.com
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border border-blue-200 h-full">
+                                <h4 class="text-xl font-bold text-gray-800 mb-6">لماذا هذا الفيديو مهم؟</h4>
+                                
+                                <div class="space-y-4">
+                                    <div class="flex items-start">
+                                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center ml-3 mt-1 flex-shrink-0">
+                                            <i class="fas fa-check text-blue-600"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="font-bold text-gray-800 mb-1">يربط النظرية بالواقع</h5>
+                                            <p class="text-gray-700 text-sm">يقدم أمثلة واقعية عن تطبيقات AR في الحياة اليومية.</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex items-start">
+                                        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center ml-3 mt-1 flex-shrink-0">
+                                            <i class="fas fa-check text-green-600"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="font-bold text-gray-800 mb-1">يتحدث عن المستقبل</h5>
+                                            <p class="text-gray-700 text-sm">يتنبأ بكيفية تأثير AR على مختلف المجالات والصناعات.</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex items-start">
+                                        <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center ml-3 mt-1 flex-shrink-0">
+                                            <i class="fas fa-check text-purple-600"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="font-bold text-gray-800 mb-1">يحفز التفكير</h5>
+                                            <p class="text-gray-700 text-sm">يشجع على التفكير في تطبيقات جديدة ومبتكرة للواقع المعزز.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-8 bg-white p-4 rounded-lg">
+                                    <h5 class="font-bold text-gray-800 mb-2">مهمة المشاهدة:</h5>
+                                    <p class="text-gray-700 text-sm">
+                                        بعد مشاهدة الفيديو، فكر في: كيف يمكن للواقع المعزز أن يغير مجال دراستك أو عملك المستقبلي؟
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-red-100 to-pink-100 p-6 rounded-2xl">
+                        <h4 class="text-xl font-bold text-gray-800 mb-6 text-center">تطبيقات عالمية ملهمة</h4>
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="bg-white p-5 rounded-xl">
+                                <h5 class="font-bold text-gray-800 mb-3">في الطب</h5>
+                                <p class="text-gray-700 text-sm">
+                                    AccuVein - جهاز يستخدم AR لعرض الأوردة تحت الجلد، مما يسهل عمليات سحب الدم.
+                                </p>
+                            </div>
+                            
+                            <div class="bg-white p-5 rounded-xl">
+                                <h5 class="font-bold text-gray-800 mb-3">في الصناعة</h5>
+                                <p class="text-gray-700 text-sm">
+                                    Boeing - استخدام AR لتوجيه العمال في تجميع الأسلاك داخل الطائرات، قلل الأخطاء بنسبة 40%.
+                                </p>
+                            </div>
+                            
+                            <div class="bg-white p-5 rounded-xl">
+                                <h5 class="font-bold text-gray-800 mb-3">في التعليم</h5>
+                                <p class="text-gray-700 text-sm">
+                                    Google Expeditions - تطبيق يعرض رحلات افتراضية ثلاثية الأبعاد للطلاب في الفصل الدراسي.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-globe-americas text-red-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">الواقع المعزز ليس مجرد تقنية، بل هو طريقة جديدة للتعامل مع العالم</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 14: خاتمة وواجب -->
+        <section id="slide14" class="slide bg-gradient-to-br from-purple-50 to-indigo-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-purple-700">14</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">خاتمة المحاضرة وواجب منزلي</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-10">
+                    <div class="text-center mb-10">
+                        <div class="inline-block p-4 bg-gradient-to-r from-purple-100 to-indigo-100 rounded-full mb-6">
+                            <i class="fas fa-flag-checkered text-4xl text-purple-600"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold text-gray-800 mb-6">الخلاصة والتكامل</h3>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-8 mb-10">
+                        <div class="bg-gradient-to-br from-purple-50 to-white p-6 rounded-2xl border border-purple-200 shadow-md">
+                            <h4 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                <i class="fas fa-check-circle text-green-500 ml-2"></i>
+                                ما تعلمناه اليوم
+                            </h4>
+                            <ul class="space-y-3 text-gray-700">
+                                <li class="flex items-start">
+                                    <i class="fas fa-star text-yellow-500 mt-1 ml-2"></i>
+                                    <span>الواقع الممتد (XR) هو المظلة الكبرى التي تضم AR, VR, MR</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-star text-yellow-500 mt-1 ml-2"></i>
+                                    <span>كل من AR و VR و MR له خصائصه واستخداماته المميزة</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-star text-yellow-500 mt-1 ml-2"></i>
+                                    <span>يوجد 5 أنواع رئيسية للواقع المعزز، لكل منها آلية عمل مختلفة</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-star text-yellow-500 mt-1 ml-2"></i>
+                                    <span>اختيار النوع المناسب يعتمد على احتياجات التطبيق والجمهور المستهدف</span>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-indigo-50 to-white p-6 rounded-2xl border border-indigo-200 shadow-md">
+                            <h4 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                <i class="fas fa-eye text-blue-500 ml-2"></i>
+                                الجدول الزمني للمقرر
+                            </h4>
+                            <p class="text-gray-700 mb-4">
+                                بعد هذه المحاضرة التأسيسية، سننتقل إلى:
+                            </p>
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <p class="text-gray-800 font-medium mb-2">المحاضرة القادمة:</p>
+                                <p class="text-gray-700">
+                                    <span class="font-bold text-blue-600">التقنيات الأساسية للواقع المعزز</span> - كيف تعمل AR من الناحية التقنية.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-purple-100 to-indigo-100 p-6 rounded-2xl mb-10">
+                        <h4 class="text-xl font-bold text-gray-800 mb-6 text-center">واجب منزلي</h4>
+                        
+                        <div class="bg-white p-6 rounded-xl">
+                            <h5 class="font-bold text-gray-800 mb-4">المهمة:</h5>
+                            <p class="text-gray-700 mb-6">
+                                ابحث عن تطبيق واقع معزز (AR) تستخدمه أو سمعت عنه، وقم بتحليله حسب ما تعلمته في هذه المحاضرة.
+                            </p>
+                            
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <h6 class="font-bold text-gray-800 mb-3">عناصر التحليل:</h6>
+                                    <ul class="list-disc pr-6 text-gray-700 text-sm space-y-2">
+                                        <li>ما نوع AR المستخدم في التطبيق؟</li>
+                                        <li>ما تقنية AR المحددة المستخدمة؟</li>
+                                        <li>ما الهدف من التطبيق؟</li>
+                                        <li>ما الجمهور المستهدف؟</li>
+                                    </ul>
+                                </div>
+                                
+                                <div>
+                                    <h6 class="font-bold text-gray-800 mb-3">المخرجات المطلوبة:</h6>
+                                    <ul class="list-disc pr-6 text-gray-700 text-sm space-y-2">
+                                        <li>تقرير قصير (250-300 كلمة)</li>
+                                        <li>تحديد نوع AR المستخدم</li>
+                                        <li>تقديم اقتراحات للتحسين</li>
+                                        <li>ربط بالواقع الممتد (XR)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                                <p class="text-gray-800 font-medium mb-2">نصائح:</p>
+                                <p class="text-gray-700 text-sm">
+                                    يمكنك اختيار تطبيق مشهور مثل Pokémon GO، أو تطبيق أقل شهرة ولكنك تجده مثيرًا للاهتمام.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                            <i class="fas fa-graduation-cap text-purple-600 text-2xl"></i>
+                            <p class="text-lg text-gray-800 font-medium">الأسس المفاهيمية تم بناؤها، استعدوا للجزء التقني!</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-rocket text-indigo-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">محاضرة قادمة: التقنيات الأساسية للواقع المعزز</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <script>
+        // عناصر التحكم
+        const slidesContainer = document.getElementById('slidesContainer');
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const menuBtn = document.getElementById('menuBtn');
+        const closeMenuBtn = document.getElementById('closeMenuBtn');
+        const slideMenu = document.getElementById('slideMenu');
+        const slideMenuItems = document.querySelectorAll('.slide-menu-item');
+        const progressFill = document.getElementById('progressFill');
+        const currentSlideElement = document.getElementById('currentSlide');
+        const typeOptions = document.querySelectorAll('.type-option');
+        const checkActivityBtn = document.getElementById('checkActivity');
+        const resetActivityBtn = document.getElementById('resetActivity');
+        const activityResults = document.getElementById('activityResults');
+        const activityScore = document.getElementById('activityScore');
+        const activityMessage = document.getElementById('activityMessage');
+        
+        let currentSlideIndex = 0;
+        const totalSlides = slides.length;
+        let activitySelections = {};
+        
+        // تحديث شريط التقدم
+        function updateProgress() {
+            const progress = ((currentSlideIndex + 1) / totalSlides) * 100;
+            progressFill.style.width = `${progress}%`;
+            currentSlideElement.textContent = currentSlideIndex + 1;
+        }
+        
+        // عرض شريحة محددة
+        function showSlide(index) {
+            if (index < 0) index = 0;
+            if (index >= totalSlides) index = totalSlides - 1;
+            
+            slides.forEach(slide => {
+                slide.classList.remove('active');
+            });
+            
+            slides[index].classList.add('active');
+            currentSlideIndex = index;
+            
+            prevBtn.disabled = index === 0;
+            nextBtn.disabled = index === totalSlides - 1;
+            
+            updateProgress();
+            window.scrollTo(0, 0);
+            slideMenu.classList.add('hidden');
+        }
+        
+        // الشريحة التالية
+        function nextSlide() {
+            showSlide(currentSlideIndex + 1);
+        }
+        
+        // الشريحة السابقة
+        function prevSlide() {
+            showSlide(currentSlideIndex - 1);
+        }
+        
+        // تفعيل اختيارات النشاط التفاعلي
+        function setupActivityOptions() {
+            typeOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // الحصول على رقم التطبيق (1، 2، أو 3)
+                    const appContainer = this.closest('.mb-8');
+                    const appNumber = Array.from(document.querySelectorAll('.mb-8')).indexOf(appContainer) + 1;
+                    
+                    // إزالة التحديد من جميع الخيارات في نفس التطبيق
+                    appContainer.querySelectorAll('.type-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                        opt.classList.remove('bg-blue-100', 'border-blue-400');
+                    });
+                    
+                    // تحديد الخيار الحالي
+                    this.classList.add('selected');
+                    this.classList.add('bg-blue-100', 'border-blue-400');
+                    
+                    // حفظ الاختيار
+                    activitySelections[`app${appNumber}`] = this.getAttribute('data-correct');
+                });
+            });
+        }
+        
+        // التحقق من إجابات النشاط
+        function checkActivity() {
+            let correctCount = 0;
+            const totalApps = 3;
+            
+            // التحقق من إجابات كل تطبيق
+            for (let i = 1; i <= totalApps; i++) {
+                const selectedOption = activitySelections[`app${i}`];
+                const appContainer = document.querySelectorAll('.mb-8')[i - 1];
+                
+                if (selectedOption) {
+                    const isCorrect = selectedOption !== 'false';
+                    
+                    if (isCorrect) {
+                        correctCount++;
+                        // تلوين الخيار الصحيح باللون الأخضر
+                        appContainer.querySelector(`.type-option[data-correct="${selectedOption}"]`).classList.add('bg-green-100', 'border-green-400');
+                    } else {
+                        // تلوين الخيار الخاطئ باللون الأحمر
+                        appContainer.querySelector('.type-option.selected').classList.add('bg-red-100', 'border-red-400');
+                        
+                        // إظهار الخيار الصحيح باللون الأخضر
+                        const correctOptions = appContainer.querySelectorAll('.type-option[data-correct!="false"]');
+                        correctOptions.forEach(opt => {
+                            opt.classList.add('bg-green-100', 'border-green-400');
+                        });
+                    }
+                }
+            }
+            
+            // حساب النتيجة
+            const score = `${correctCount}/${totalApps}`;
+            activityScore.textContent = score;
+            
+            // عرض رسالة النتيجة
+            let message = '';
+            if (correctCount === totalApps) {
+                message = 'ممتاز! جميع إجاباتك صحيحة. فهمت أنواع AR بشكل ممتاز! 👍';
+            } else if (correctCount >= totalApps / 2) {
+                message = 'جيد! لكن يمكنك التحسين. راجع الإجابات الصحيحة. 💪';
+            } else {
+                message = 'تحتاج للمراجعة. راجع محتوى المحاضرة ثم حاول مرة أخرى. 📚';
+            }
+            
+            activityMessage.textContent = message;
+            
+            // إظهار نتائج النشاط
+            activityResults.classList.remove('hidden');
+            
+            // التمرير إلى نتائج النشاط
+            activityResults.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // إعادة تعيين النشاط
+        function resetActivity() {
+            // إعادة تعيين جميع الاختيارات
+            typeOptions.forEach(option => {
+                option.classList.remove('selected', 'bg-blue-100', 'border-blue-400', 'bg-green-100', 'border-green-400', 'bg-red-100', 'border-red-400');
+            });
+            
+            // إعادة تعيين المتغيرات
+            activitySelections = {};
+            
+            // إخفاء النتائج
+            activityResults.classList.add('hidden');
+        }
+        
+        // التعامل مع مفاتيح لوحة المفاتيح
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowRight' || event.key === 'PageUp') {
+                prevSlide();
+            } else if (event.key === 'ArrowLeft' || event.key === 'PageDown' || event.key === ' ') {
+                nextSlide();
+            }
+        });
+        
+        // تهيئة الأحداث
+        function init() {
+            // أحداث أزرار التنقل
+            prevBtn.addEventListener('click', prevSlide);
+            nextBtn.addEventListener('click', nextSlide);
+            
+            // أحداث القائمة
+            menuBtn.addEventListener('click', () => {
+                slideMenu.classList.remove('hidden');
+            });
+            
+            closeMenuBtn.addEventListener('click', () => {
+                slideMenu.classList.add('hidden');
+            });
+            
+            // أحداث عناصر القائمة
+            slideMenuItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const slideIndex = parseInt(item.dataset.slide) - 1;
+                    showSlide(slideIndex);
+                });
+            });
+            
+            // أحداث النشاط التفاعلي
+            if (checkActivityBtn) {
+                checkActivityBtn.addEventListener('click', checkActivity);
+            }
+            
+            if (resetActivityBtn) {
+                resetActivityBtn.addEventListener('click', resetActivity);
+            }
+            
+            // إغلاق القائمة بالنقر خارجها
+            slideMenu.addEventListener('click', (event) => {
+                if (event.target === slideMenu) {
+                    slideMenu.classList.add('hidden');
+                }
+            });
+            
+            // تهيئة اختيارات النشاط
+            setupActivityOptions();
+            
+            // تهيئة الشريحة الأولى
+            showSlide(0);
+        }
+        
+        // تهيئة الصفحة عند التحميل
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
