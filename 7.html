@@ -1,0 +1,2834 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المحاضرة السابعة: الحساسات في أنظمة الواقع المعزز</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Cairo', sans-serif;
+        }
+        
+        .slide {
+            min-height: 100vh;
+            padding: 2rem;
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .slide.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .sensor-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-top: 4px solid;
+        }
+        
+        .sensor-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .comparison-table th, .comparison-table td {
+            padding: 12px 16px;
+            text-align: center;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .comparison-table tr:hover {
+            background-color: #f9fafb;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background-color: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #4F46E5, #7C3AED);
+            transition: width 0.5s ease;
+        }
+        
+        .sensor-visual {
+            background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+            height: 40px;
+            border-radius: 20px;
+            position: relative;
+            margin: 2rem 0;
+        }
+        
+        .sensor-point {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        
+        .fusion-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .glow {
+            box-shadow: 0 0 15px rgba(79, 70, 229, 0.4);
+        }
+        
+        .hover-grow {
+            transition: transform 0.3s ease;
+        }
+        
+        .hover-grow:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <!-- شريط التقدم -->
+    <div class="fixed top-0 left-0 right-0 z-50">
+        <div class="progress-bar">
+            <div id="progressFill" class="progress-fill" style="width: 7.14%"></div>
+        </div>
+    </div>
+    
+    <!-- شريط التنقل -->
+    <nav class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg z-40 p-2 flex items-center space-x-2 space-x-reverse">
+        <button id="prevBtn" class="p-3 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+        <div class="px-4 py-2 text-sm font-medium text-gray-700">
+            <span id="currentSlide">1</span> / 14
+        </div>
+        <button id="nextBtn" class="p-3 rounded-full bg-purple-600 hover:bg-purple-700 text-white">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button id="menuBtn" class="p-3 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700">
+            <i class="fas fa-bars"></i>
+        </button>
+    </nav>
+    
+    <!-- قائمة الشرائح -->
+    <div id="slideMenu" class="fixed inset-0 bg-black/70 z-50 hidden items-center justify-center">
+        <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4 max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-800">قائمة الشرائح</h3>
+                <button id="closeMenuBtn" class="p-2 rounded-full hover:bg-gray-100">
+                    <i class="fas fa-times text-gray-600"></i>
+                </button>
+            </div>
+            <div class="space-y-2">
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="1">
+                    <span class="font-medium text-gray-700">1. العنوان والأهداف</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="2">
+                    <span class="font-medium text-gray-700">2. مقدمة المحاضرة</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="3">
+                    <span class="font-medium text-gray-700">3. الأهداف التعليمية</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="4">
+                    <span class="font-medium text-gray-700">4. ما هي الحساسات؟</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="5">
+                    <span class="font-medium text-gray-700">5. أهمية الحساسات في AR</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="6">
+                    <span class="font-medium text-gray-700">6. أنواع الحساسات (1)</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="7">
+                    <span class="font-medium text-gray-700">7. أنواع الحساسات (2)</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="8">
+                    <span class="font-medium text-gray-700">8. دمج الحساسات</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="9">
+                    <span class="font-medium text-gray-700">9. تأثير الحساسات على UX</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="10">
+                    <span class="font-medium text-gray-700">10. التحديات</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="11">
+                    <span class="font-medium text-gray-700">11. فيديو TED</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="12">
+                    <span class="font-medium text-gray-700">12. أسئلة نقاش</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="13">
+                    <span class="font-medium text-gray-700">13. نشاط صفي</span>
+                </button>
+                <button class="slide-menu-item w-full text-right p-3 rounded-lg hover:bg-purple-50 border border-transparent hover:border-purple-200" data-slide="14">
+                    <span class="font-medium text-gray-700">14. خاتمة وواجب</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- الشرائح -->
+    <div id="slidesContainer">
+        <!-- الشريحة 1: العنوان والأهداف -->
+        <section id="slide1" class="slide active bg-gradient-to-br from-blue-50 to-indigo-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="text-center mb-12">
+                    <span class="inline-block px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold mb-4">المحاضرة السابعة</span>
+                    <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                        الحساسات ودورها في أنظمة الواقع المعزز
+                    </h1>
+                    <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                        Sensors in Augmented Reality Systems – Theoretical Expansion
+                    </p>
+                </div>
+                
+                <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 border-r-4 border-blue-500 pr-4">
+                        <i class="fas fa-satellite-dish text-blue-600 ml-2"></i>
+                        الحواس الخفية خلف الواقع المعزز
+                    </h2>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-gradient-to-r from-blue-50 to-white p-6 rounded-xl border border-blue-100">
+                            <div class="flex items-center mb-4">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center ml-3">
+                                    <i class="fas fa-eye text-blue-600"></i>
+                                </div>
+                                <h3 class="text-lg font-bold text-gray-800">العين الحسية</h3>
+                            </div>
+                            <p class="text-gray-700">إذا كانت الرؤية الحاسوبية هي عين AR، فإن الحساسات هي حواسه المتعددة</p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-r from-indigo-50 to-white p-6 rounded-xl border border-indigo-100">
+                            <div class="flex items-center mb-4">
+                                <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center ml-3">
+                                    <i class="fas fa-compass text-indigo-600"></i>
+                                </div>
+                                <h3 class="text-lg font-bold text-gray-800">التوجيه الدقيق</h3>
+                            </div>
+                            <p class="text-gray-700">كيف "تشعر" أنظمة AR بالحركة والاتجاه والموقع؟</p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-r from-purple-50 to-white p-6 rounded-xl border border-purple-100">
+                            <div class="flex items-center mb-4">
+                                <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center ml-3">
+                                    <i class="fas fa-brain text-purple-600"></i>
+                                </div>
+                                <h3 class="text-lg font-bold text-gray-800">الدمج الذكي</h3>
+                            </div>
+                            <p class="text-gray-700">كيف تدمج أنظمة AR بيانات حساسات متعددة لتحقيق الاستقرار؟</p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-r from-violet-50 to-white p-6 rounded-xl border border-violet-100">
+                            <div class="flex items-center mb-4">
+                                <div class="w-10 h-10 rounded-full bg-violet-100 flex items-center justify-center ml-3">
+                                    <i class="fas fa-lightbulb text-violet-600"></i>
+                                </div>
+                                <h3 class="text-lg font-bold text-gray-800">التفاعل الطبيعي</h3>
+                            </div>
+                            <p class="text-gray-700">كيف تترجم الحساسات حركات المستخدم إلى تفاعلات رقمية؟</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-12">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-question-circle text-blue-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">هذه المحاضرة تجيب عن: كيف "يشعر" الواقع المعزز بالعالم من حوله؟</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 2: مقدمة المحاضرة -->
+        <section id="slide2" class="slide bg-gradient-to-br from-amber-50 to-orange-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-amber-700">2</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">مقدمة المحاضرة: الحواس الرقمية للواقع المعزز</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-8">
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                            <i class="fas fa-link text-amber-600 ml-2"></i>
+                            استكمال الصورة: من الرؤية إلى الإحساس
+                        </h3>
+                        
+                        <div class="bg-amber-50 p-6 rounded-xl border border-amber-200 mb-8">
+                            <div class="flex items-center justify-center mb-6">
+                                <div class="text-center">
+                                    <div class="text-5xl mb-4">🤖 → 👁️ → ✋</div>
+                                    <p class="text-xl text-gray-800">
+                                        إذا كانت المحاضرة السابقة أجابت عن <span class="font-bold text-blue-700">"كيف يرى AR"</span>
+                                    </p>
+                                    <p class="text-xl text-gray-800 mt-2">
+                                        فهذه المحاضرة تجيب عن <span class="font-bold text-amber-700">"كيف يشعر AR"</span>
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div class="bg-white p-5 rounded-xl text-center">
+                                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
+                                        <i class="fas fa-eye text-blue-600"></i>
+                                    </div>
+                                    <h4 class="font-bold text-gray-800 mb-2">المحاضرة السابقة</h4>
+                                    <p class="text-gray-700 text-sm">الرؤية الحاسوبية: عين AR</p>
+                                    <p class="text-blue-600 text-xs mt-2">كيف يفهم ما يراه؟</p>
+                                </div>
+                                
+                                <div class="bg-white p-5 rounded-xl text-center">
+                                    <div class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
+                                        <i class="fas fa-hand-pointer text-amber-600"></i>
+                                    </div>
+                                    <h4 class="font-bold text-gray-800 mb-2">المحاضرة الحالية</h4>
+                                    <p class="text-gray-700 text-sm">الحساسات: حواس AR</p>
+                                    <p class="text-amber-600 text-xs mt-2">كيف يشعر بالحركة والاتجاه؟</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gradient-to-r from-orange-50 to-amber-50 p-6 rounded-2xl border border-orange-200">
+                            <h4 class="text-xl font-bold text-gray-800 mb-4 text-center">حقيقة أساسية في أنظمة AR</h4>
+                            <div class="flex items-center justify-center">
+                                <div class="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center ml-6 flex-shrink-0">
+                                    <i class="fas fa-exclamation text-2xl text-orange-600"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xl text-gray-800 font-medium">
+                                        أنظمة AR لا تعتمد على الكاميرا فقط، بل على مجموعة من الحساسات
+                                    </p>
+                                    <p class="text-gray-700 mt-2">
+                                        التي تشعر بالحركة، تحدد الاتجاه، تقيس الموقع، وتفسر تفاعل المستخدم مع البيئة
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                            <i class="fas fa-road text-blue-600 ml-2"></i>
+                            نهج المحاضرة: النظرية التطبيقية
+                        </h3>
+                        
+                        <div class="relative">
+                            <!-- خط المسار -->
+                            <div class="hidden md:block absolute right-1/2 transform translate-x-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-400 to-purple-500"></div>
+                            
+                            <div class="grid md:grid-cols-3 gap-8">
+                                <div class="text-center relative z-10">
+                                    <div class="w-16 h-16 rounded-full bg-blue-600 text-white flex items-center justify-center mx-auto mb-4 text-xl font-bold">
+                                        1
+                                    </div>
+                                    <h4 class="font-bold text-gray-800 mb-2">فهم المفاهيم</h4>
+                                    <p class="text-gray-700 text-sm">أنواع الحساسات ووظائفها</p>
+                                </div>
+                                
+                                <div class="text-center relative z-10">
+                                    <div class="w-16 h-16 rounded-full bg-purple-600 text-white flex items-center justify-center mx-auto mb-4 text-xl font-bold">
+                                        2
+                                    </div>
+                                    <h4 class="font-bold text-gray-800 mb-2">الدمج والتكامل</h4>
+                                    <p class="text-gray-700 text-sm">كيف تعمل الحساسات معًا</p>
+                                </div>
+                                
+                                <div class="text-center relative z-10">
+                                    <div class="w-16 h-16 rounded-full bg-green-600 text-white flex items-center justify-center mx-auto mb-4 text-xl font-bold">
+                                        3
+                                    </div>
+                                    <h4 class="font-bold text-gray-800 mb-2">التأثير على UX</h4>
+                                    <p class="text-gray-700 text-sm">كيف تؤثر على تجربة المستخدم</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-10">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-graduation-cap text-amber-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">من البصر إلى الإحساس: رحلة استكمال فهم أنظمة AR</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 3: الأهداف التعليمية -->
+        <section id="slide3" class="slide bg-gradient-to-br from-teal-50 to-cyan-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-teal-700">3</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">الأهداف التعليمية للمحاضرة</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-bullseye text-teal-600 ml-2"></i>
+                            بنهاية هذه المحاضرة ستكون قادرًا على:
+                        </h3>
+                        
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <!-- الهدف 1 -->
+                            <div class="bg-gradient-to-r from-blue-50 to-white p-5 rounded-xl border border-blue-200">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center ml-3">
+                                        <span class="font-bold text-blue-600">١</span>
+                                    </div>
+                                    <h4 class="text-lg font-bold text-gray-800">فهم مفهوم الحساسات</h4>
+                                </div>
+                                <p class="text-gray-700">
+                                    فهم مفهوم الحساسات ودورها الأساسي في أنظمة الواقع المعزز
+                                </p>
+                            </div>
+                            
+                            <!-- الهدف 2 -->
+                            <div class="bg-gradient-to-r from-purple-50 to-white p-5 rounded-xl border border-purple-200">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center ml-3">
+                                        <span class="font-bold text-purple-600">٢</span>
+                                    </div>
+                                    <h4 class="text-lg font-bold text-gray-800">التمييز بين أنواع الحساسات</h4>
+                                </div>
+                                <p class="text-gray-700">
+                                    التمييز بين أنواع الحساسات المستخدمة في AR وربط كل حساس بوظيفته
+                                </p>
+                            </div>
+                            
+                            <!-- الهدف 3 -->
+                            <div class="bg-gradient-to-r from-green-50 to-white p-5 rounded-xl border border-green-200">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center ml-3">
+                                        <span class="font-bold text-green-600">٣</span>
+                                    </div>
+                                    <h4 class="text-lg font-bold text-gray-800">فهم دمج الحساسات</h4>
+                                </div>
+                                <p class="text-gray-700">
+                                    فهم أهمية دمج الحساسات (Sensor Fusion) وكيفية عملها
+                                </p>
+                            </div>
+                            
+                            <!-- الهدف 4 -->
+                            <div class="bg-gradient-to-r from-yellow-50 to-white p-5 rounded-xl border border-yellow-200">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center ml-3">
+                                        <span class="font-bold text-yellow-600">٤</span>
+                                    </div>
+                                    <h4 class="text-lg font-bold text-gray-800">إدراك تأثيرها على الدقة</h4>
+                                </div>
+                                <p class="text-gray-700">
+                                    إدراك تأثير الحساسات على دقة واستقرار تجربة AR
+                                </p>
+                            </div>
+                            
+                            <!-- الهدف 5 -->
+                            <div class="bg-gradient-to-r from-red-50 to-white p-5 rounded-xl border border-red-200">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center ml-3">
+                                        <span class="font-bold text-red-600">٥</span>
+                                    </div>
+                                    <h4 class="text-lg font-bold text-gray-800">تحليل التحديات</h4>
+                                </div>
+                                <p class="text-gray-700">
+                                    فهم التحديات المرتبطة بالحساسات في بيئات مختلفة
+                                </p>
+                            </div>
+                            
+                            <!-- الهدف 6 -->
+                            <div class="bg-gradient-to-r from-indigo-50 to-white p-5 rounded-xl border border-indigo-200">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center ml-3">
+                                        <span class="font-bold text-indigo-600">٦</span>
+                                    </div>
+                                    <h4 class="text-lg font-bold text-gray-800">ربط النظرية بالتطبيق</h4>
+                                </div>
+                                <p class="text-gray-700">
+                                    ربط مفاهيم الحساسات بتجارب AR التي يستخدمها الطلاب يوميًا
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-teal-100 to-cyan-100 p-6 rounded-2xl">
+                        <h4 class="text-xl font-bold text-gray-800 mb-4 text-center">
+                            <i class="fas fa-chart-line text-teal-700 ml-2"></i>
+                            المعرفة التراكمية: من الرؤية إلى الإحساس
+                        </h4>
+                        
+                        <div class="flex items-center justify-center flex-wrap">
+                            <div class="text-center m-4">
+                                <div class="w-16 h-16 rounded-full bg-blue-600 text-white flex items-center justify-center mx-auto mb-2 text-xl font-bold">
+                                    👁️
+                                </div>
+                                <p class="font-bold text-gray-800">كيف يرى؟</p>
+                                <p class="text-sm text-gray-600">(المحاضرة السادسة)</p>
+                            </div>
+                            
+                            <i class="fas fa-arrow-left text-2xl text-teal-600 mx-2"></i>
+                            
+                            <div class="text-center m-4">
+                                <div class="w-16 h-16 rounded-full bg-purple-600 text-white flex items-center justify-center mx-auto mb-2 text-xl font-bold">
+                                    ✋
+                                </div>
+                                <p class="font-bold text-gray-800">كيف يشعر؟</p>
+                                <p class="text-sm text-gray-600">(هذه المحاضرة)</p>
+                            </div>
+                            
+                            <i class="fas fa-arrow-left text-2xl text-teal-600 mx-2"></i>
+                            
+                            <div class="text-center m-4">
+                                <div class="w-16 h-16 rounded-full bg-green-600 text-white flex items-center justify-center mx-auto mb-2 text-xl font-bold">
+                                    🤖
+                                </div>
+                                <p class="font-bold text-gray-800">كيف يتفاعل؟</p>
+                                <p class="text-sm text-gray-600">(محاضرات قادمة)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-umbrella text-teal-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">من عين واحدة إلى حواس متعددة: استكمال فهم آلية عمل AR</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 4: ما هي الحساسات؟ -->
+        <section id="slide4" class="slide bg-gradient-to-br from-purple-50 to-pink-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-purple-700">4</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">ما هي الحساسات (Sensors)؟ تعريف منهجي</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                            <i class="fas fa-microchip text-purple-600 ml-2"></i>
+                            التعريف المنهجي
+                        </h3>
+                        
+                        <div class="bg-purple-50 p-6 rounded-xl border border-purple-200 mb-8">
+                            <p class="text-lg text-gray-800 mb-6 text-center">
+                                الحساس هو أداة أو نظام:
+                            </p>
+                            
+                            <div class="bg-white p-5 rounded-xl mb-6">
+                                <div class="text-3xl text-center text-purple-600 mb-4">
+                                    <i class="fas fa-exchange-alt"></i>
+                                </div>
+                                <p class="text-xl text-gray-800 text-center font-bold">
+                                    <span class="text-purple-700">تستشعر تغيّرًا فيزيائيًا</span> في البيئة
+                                    <br>
+                                    وتحوله إلى <span class="text-blue-600">بيانات رقمية</span> قابلة للمعالجة
+                                </p>
+                            </div>
+                            
+                            <div class="grid md:grid-cols-3 gap-4 mb-6">
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-broadcast-tower text-blue-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">المدخلات الفيزيائية</p>
+                                    <p class="text-gray-600 text-xs">حركة، ضوء، حرارة، مجال مغناطيسي</p>
+                                </div>
+                                
+                                <i class="fas fa-arrow-left text-2xl text-purple-600 flex items-center justify-center"></i>
+                                
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-cogs text-green-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">الحساس</p>
+                                    <p class="text-gray-600 text-xs">تحويل التناظري إلى رقمي</p>
+                                </div>
+                                
+                                <i class="fas fa-arrow-left text-2xl text-purple-600 flex items-center justify-center"></i>
+                                
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-database text-red-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">المخرجات الرقمية</p>
+                                    <p class="text-gray-600 text-xs">بيانات رقمية قابلة للمعالجة</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                            <i class="fas fa-random text-blue-600 ml-2"></i>
+                            ما الذي تجمعه الحساسات في أنظمة AR؟
+                        </h3>
+                        
+                        <div class="bg-blue-50 p-6 rounded-xl border border-blue-200">
+                            <div class="text-center mb-6">
+                                <div class="text-3xl">📍 + 📏 + 🧭 + ⚡ + 💡</div>
+                            </div>
+                            
+                            <div class="grid md:grid-cols-5 gap-4">
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="text-4xl mb-3">📍</div>
+                                    <h4 class="font-bold text-gray-800 mb-2">الموقع</h4>
+                                    <p class="text-gray-700 text-sm">أين يوجد الجهاز؟</p>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="text-4xl mb-3">📏</div>
+                                    <h4 class="font-bold text-gray-800 mb-2">الحركة</h4>
+                                    <p class="text-gray-700 text-sm">كيف يتحرك الجهاز؟</p>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="text-4xl mb-3">🧭</div>
+                                    <h4 class="font-bold text-gray-800 mb-2">الاتجاه</h4>
+                                    <p class="text-gray-700 text-sm">إلى أين يتجه الجهاز؟</p>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="text-4xl mb-3">⚡</div>
+                                    <h4 class="font-bold text-gray-800 mb-2">التسارع</h4>
+                                    <p class="text-gray-700 text-sm">ما هي سرعة الحركة؟</p>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="text-4xl mb-3">💡</div>
+                                    <h4 class="font-bold text-gray-800 mb-2">الإضاءة</h4>
+                                    <p class="text-gray-700 text-sm">ما هي شدة الإضاءة؟</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-purple-100 to-pink-100 p-6 rounded-2xl">
+                        <h4 class="text-xl font-bold text-gray-800 mb-4 text-center">
+                            <i class="fas fa-balance-scale text-purple-700 ml-2"></i>
+                            تشبيه توضيحي: الحساسات = الحواس البشرية
+                        </h4>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="comparison-table w-full">
+                                <thead>
+                                    <tr class="bg-purple-100">
+                                        <th class="font-bold text-gray-800">الحاسة البشرية</th>
+                                        <th class="font-bold text-gray-800">الحساس المقابل</th>
+                                        <th class="font-bold text-gray-800">الوظيفة في AR</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="font-bold text-gray-800">الرؤية</td>
+                                        <td><span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">الكاميرا</span></td>
+                                        <td class="text-sm text-gray-700">رؤية البيئة المحيطة</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-bold text-gray-800">السمع</td>
+                                        <td><span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">الميكروفون</span></td>
+                                        <td class="text-sm text-gray-700">التعرف على الأصوات والأوامر</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-bold text-gray-800">اللمس</td>
+                                        <td><span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">شاشة اللمس</span></td>
+                                        <td class="text-sm text-gray-700">التفاعل المباشر مع العناصر</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-bold text-gray-800">التوازن</td>
+                                        <td><span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">الجيروسكوب</span></td>
+                                        <td class="text-sm text-gray-700">الشعور بالاتجاه والحركة</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-bold text-gray-800">حاسة الاتجاه</td>
+                                        <td><span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm">البوصلة الرقمية</span></td>
+                                        <td class="text-sm text-gray-700">معرفة الاتجاه بالنسبة للشمال</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-puzzle-piece text-purple-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">الحساسات: مترجمون بين العالم الفيزيائي والبيانات الرقمية</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 5: أهمية الحساسات في AR -->
+        <section id="slide5" class="slide bg-gradient-to-br from-indigo-50 to-blue-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-indigo-700">5</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">لماذا الحساسات أساسية في الواقع المعزز؟</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                            <i class="fas fa-exclamation-circle text-indigo-600 ml-2"></i>
+                            الواقع المعزز بدون حساسات
+                        </h3>
+                        
+                        <div class="bg-red-50 p-6 rounded-xl border border-red-200 mb-8">
+                            <p class="text-lg text-gray-800 mb-6 text-center">
+                                <span class="font-bold text-red-700">بدون الحساسات</span>، ستفشل أنظمة AR في تحقيق هدفها الأساسي: الدمج الطبيعي بين العالمين الرقمي والحقيقي
+                            </p>
+                            
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div class="bg-white p-5 rounded-xl">
+                                    <h4 class="font-bold text-red-800 mb-3 flex items-center">
+                                        <i class="fas fa-times-circle text-red-600 ml-2"></i>
+                                        لا يعرف موقع المستخدم
+                                    </h4>
+                                    <p class="text-gray-700 text-sm">
+                                        لن يعرف النظام أين يوجد المستخدم في الفضاء، ولن يتمكن من وضع العناصر في أماكنها الصحيحة.
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-white p-5 rounded-xl">
+                                    <h4 class="font-bold text-red-800 mb-3 flex items-center">
+                                        <i class="fas fa-times-circle text-red-600 ml-2"></i>
+                                        لا يثبت العناصر الرقمية
+                                    </h4>
+                                    <p class="text-gray-700 text-sm">
+                                        العناصر الرقمية ستطفو بشكل عشوائي أو تتحرك بطريقة غير طبيعية مع حركة المستخدم.
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-white p-5 rounded-xl">
+                                    <h4 class="font-bold text-red-800 mb-3 flex items-center">
+                                        <i class="fas fa-times-circle text-red-600 ml-2"></i>
+                                        لا يستجيب للحركة
+                                    </h4>
+                                    <p class="text-gray-700 text-sm">
+                                        لن يستطيع النظام تتبع حركة المستخدم أو الجهاز، مما يفقد التفاعل معناه.
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-white p-5 rounded-xl">
+                                    <h4 class="font-bold text-red-800 mb-3 flex items-center">
+                                        <i class="fas fa-times-circle text-red-600 ml-2"></i>
+                                        تجربة غير واقعية
+                                    </h4>
+                                    <p class="text-gray-700 text-sm">
+                                        ستفقد التجربة مصداقيتها وتصبح مزعجة وغير مفيدة للمستخدم.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                            <i class="fas fa-check-circle text-green-600 ml-2"></i>
+                            المعادلة الأساسية للواقع المعزز
+                        </h3>
+                        
+                        <div class="grid md:grid-cols-3 gap-6 mb-8">
+                            <div class="sensor-card bg-white rounded-xl shadow-md p-6 border-t-blue-500">
+                                <div class="flex items-center mb-4">
+                                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center ml-3">
+                                        <i class="fas fa-eye text-blue-600"></i>
+                                    </div>
+                                    <h4 class="text-xl font-bold text-gray-800 mr-3">الرؤية الحاسوبية<br><span class="text-lg text-blue-600">(الرؤية)</span></h4>
+                                </div>
+                                <p class="text-gray-700">
+                                    تفهم ما تلتقطه الكاميرا: أسطح، أجسام، أنماط
+                                </p>
+                            </div>
+                            
+                            <div class="sensor-card bg-white rounded-xl shadow-md p-6 border-t-green-500">
+                                <div class="flex items-center mb-4">
+                                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center ml-3">
+                                        <i class="fas fa-satellite-dish text-green-600"></i>
+                                    </div>
+                                    <h4 class="text-xl font-bold text-gray-800 mr-3">الحساسات<br><span class="text-lg text-green-600">(الإحساس)</span></h4>
+                                </div>
+                                <p class="text-gray-700">
+                                    تشعر بالحركة، الاتجاه، الموقع، والتفاعل
+                                </p>
+                            </div>
+                            
+                            <div class="sensor-card bg-white rounded-xl shadow-md p-6 border-t-purple-500">
+                                <div class="flex items-center mb-4">
+                                    <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center ml-3">
+                                        <i class="fas fa-robot text-purple-600"></i>
+                                    </div>
+                                    <h4 class="text-xl font-bold text-gray-800 mr-3">نظام AR ذكي<br><span class="text-lg text-purple-600">(التكامل)</span></h4>
+                                </div>
+                                <p class="text-gray-700">
+                                    يدمج الرؤية والإحساس لخلق تجربة واقعية
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-indigo-100 to-blue-100 p-6 rounded-2xl">
+                        <h4 class="text-xl font-bold text-gray-800 mb-4 text-center">
+                            <i class="fas fa-lightbulb text-indigo-700 ml-2"></i>
+                            تشبيه توضيحي: قائد الطائرة
+                        </h4>
+                        
+                        <div class="flex flex-col md:flex-row items-center justify-center">
+                            <div class="text-center md:ml-8 mb-6 md:mb-0">
+                                <div class="w-24 h-24 rounded-full bg-indigo-100 flex items-center justify-center mx-auto mb-4">
+                                    <i class="fas fa-eye text-indigo-600 text-4xl"></i>
+                                </div>
+                                <p class="font-bold text-gray-800">الرؤية الحاسوبية</p>
+                                <p class="text-gray-600 text-sm">نافذة الطائرة</p>
+                                <div class="mt-2">
+                                    <span class="inline-block px-3 py-1 bg-gray-200 text-gray-800 rounded-full text-sm">يرى الخارج</span>
+                                </div>
+                            </div>
+                            
+                            <div class="text-3xl text-indigo-600 mx-8">+</div>
+                            
+                            <div class="text-center mb-6 md:mb-0">
+                                <div class="w-24 h-24 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-4">
+                                    <i class="fas fa-tachometer-alt text-purple-600 text-4xl"></i>
+                                </div>
+                                <p class="font-bold text-gray-800">الحساسات</p>
+                                <p class="text-gray-600 text-sm">أجهزة القياس</p>
+                                <div class="mt-2">
+                                    <span class="inline-block px-3 py-1 bg-purple-200 text-purple-800 rounded-full text-sm">يقيس السرعة والارتفاع</span>
+                                </div>
+                            </div>
+                            
+                            <div class="text-3xl text-indigo-600 mx-8">=</div>
+                            
+                            <div class="text-center md:mr-8">
+                                <div class="w-24 h-24 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+                                    <i class="fas fa-plane text-green-600 text-4xl"></i>
+                                </div>
+                                <p class="font-bold text-gray-800">طيران آمن</p>
+                                <p class="text-gray-600 text-sm">توجيه دقيق</p>
+                                <div class="mt-2">
+                                    <span class="inline-block px-3 py-1 bg-green-200 text-green-800 rounded-full text-sm">يطير بدقة</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 text-center">
+                            <div class="inline-block bg-white p-4 rounded-xl">
+                                <p class="text-gray-800 font-bold">
+                                    📌 الحساسات = <span class="text-indigo-700">أساس الاستقرار والدقة</span> في أنظمة الواقع المعزز
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-heartbeat text-indigo-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">بدون الحساسات، AR يفقد إحساسه بالعالم، ويصبح مجرد عرض صور بدون تفاعل</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 6: أنواع الحساسات (1) -->
+        <section id="slide6" class="slide bg-gradient-to-br from-yellow-50 to-amber-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-yellow-700">6</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">أنواع الحساسات في AR (الجزء الأول)</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <!-- الحساس 1: الكاميرا -->
+                    <div class="mb-12">
+                        <div class="flex items-center mb-6">
+                            <div class="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center ml-4">
+                                <i class="fas fa-camera text-2xl text-blue-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-800">١. الكاميرا<br><span class="text-lg text-blue-600">(Camera Sensor)</span></h3>
+                            </div>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <div class="bg-blue-50 p-5 rounded-xl border border-blue-200">
+                                    <h4 class="font-bold text-blue-800 mb-3">الوظيفة الأساسية:</h4>
+                                    <ul class="list-disc pr-6 text-gray-700 space-y-2">
+                                        <li>أهم حساس في أنظمة AR</li>
+                                        <li>تلتقط <span class="font-bold">البيئة الحقيقية</span> المحيطة</li>
+                                        <li>تُستخدم للرؤية الحاسوبية <span class="font-bold">والتتبع البصري</span></li>
+                                        <li>بوابة <span class="font-bold">الربط بين العالمين</span> الرقمي والحقيقي</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="mt-6 bg-white p-4 rounded-lg border border-blue-300">
+                                    <h5 class="font-bold text-gray-800 mb-2">معلومة تقنية:</h5>
+                                    <p class="text-gray-700 text-sm">
+                                        في AR، الكاميرا ليست مجرد أداة تسجيل، بل هي حساس يستخدم لتحليل المشهد وفهمه.
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="bg-gradient-to-r from-blue-50 to-white p-5 rounded-xl border border-blue-300">
+                                    <h4 class="font-bold text-gray-800 mb-3">كيف تستخدم في AR؟</h4>
+                                    
+                                    <div class="space-y-4">
+                                        <div class="flex items-start">
+                                            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center ml-3 mt-1 flex-shrink-0">
+                                                <span class="font-bold text-blue-600">١</span>
+                                            </div>
+                                            <div>
+                                                <p class="text-gray-700 text-sm">التقاط المشهد الحقيقي بشكل مستمر</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex items-start">
+                                            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center ml-3 mt-1 flex-shrink-0">
+                                                <span class="font-bold text-blue-600">٢</span>
+                                            </div>
+                                            <div>
+                                                <p class="text-gray-700 text-sm">تحليل الصور للتعرف على الأسطح والأجسام</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex items-start">
+                                            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center ml-3 mt-1 flex-shrink-0">
+                                                <span class="font-bold text-blue-600">٣</span>
+                                            </div>
+                                            <div>
+                                                <p class="text-gray-700 text-sm">تتبع الحركة والتغيرات في المشهد</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex items-start">
+                                            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center ml-3 mt-1 flex-shrink-0">
+                                                <span class="font-bold text-blue-600">٤</span>
+                                            </div>
+                                            <div>
+                                                <p class="text-gray-700 text-sm">دمج العناصر الرقمية مع المشهد الحقيقي</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-6 bg-yellow-50 p-4 rounded-lg">
+                                        <h5 class="font-bold text-gray-800 mb-2">التحدي الرئيسي:</h5>
+                                        <p class="text-gray-700 text-sm">
+                                            الإضاءة الضعيفة تؤثر سلبًا على جودة التحليل البصري.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- الحساس 2: مقياس التسارع -->
+                    <div class="mb-12">
+                        <div class="flex items-center mb-6">
+                            <div class="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center ml-4">
+                                <i class="fas fa-running text-2xl text-green-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-800">٢. مقياس التسارع<br><span class="text-lg text-green-600">(Accelerometer)</span></h3>
+                            </div>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <div class="bg-green-50 p-5 rounded-xl border border-green-200">
+                                    <h4 class="font-bold text-green-800 mb-3">الوظيفة الأساسية:</h4>
+                                    <ul class="list-disc pr-6 text-gray-700 space-y-2">
+                                        <li>يقيس <span class="font-bold">الحركة الخطية</span> للجهاز</li>
+                                        <li>يحدد <span class="font-bold">التسارع والتباطؤ</span> في الحركة</li>
+                                        <li>يستشعر <span class="font-bold">قوة الجاذبية</span> الأرضية</li>
+                                        <li>يساعد في معرفة <span class="font-bold">اتجاه الجهاز</span> (أفقي/عمودي)</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="mt-6 bg-white p-4 rounded-lg border border-green-300">
+                                    <h5 class="font-bold text-gray-800 mb-2">مثال تطبيقي:</h5>
+                                    <p class="text-gray-700 text-sm">
+                                        عندما تهز هاتفك لتفعيل خاصية معينة، مقياس التسارع هو من يستشعر هذه الحركة.
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="bg-gradient-to-r from-green-50 to-white p-5 rounded-xl border border-green-300">
+                                    <h4 class="font-bold text-gray-800 mb-3">دوره في AR:</h4>
+                                    
+                                    <div class="space-y-4">
+                                        <div class="bg-white p-4 rounded-lg">
+                                            <div class="flex items-center mb-2">
+                                                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center ml-3">
+                                                    <i class="fas fa-arrows-alt-h text-blue-600"></i>
+                                                </div>
+                                                <h5 class="font-bold text-gray-800">تتبع الحركة الخطية</h5>
+                                            </div>
+                                            <p class="text-gray-700 text-sm">
+                                                معرفة متى وكيف يتحرك الجهاز في خط مستقيم.
+                                            </p>
+                                        </div>
+                                        
+                                        <div class="bg-white p-4 rounded-lg">
+                                            <div class="flex items-center mb-2">
+                                                <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center ml-3">
+                                                    <i class="fas fa-compress-arrows-alt text-purple-600"></i>
+                                                </div>
+                                                <h5 class="font-bold text-gray-800">استشعار الاهتزاز</h5>
+                                            </div>
+                                            <p class="text-gray-700 text-sm">
+                                                اكتشاف الحركات السريعة والمفاجئة للجهاز.
+                                            </p>
+                                        </div>
+                                        
+                                        <div class="bg-white p-4 rounded-lg">
+                                            <div class="flex items-center mb-2">
+                                                <div class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center ml-3">
+                                                    <i class="fas fa-mobile-alt text-yellow-600"></i>
+                                                </div>
+                                                <h5 class="font-bold text-gray-800">تحديد اتجاه الجهاز</h5>
+                                            </div>
+                                            <p class="text-gray-700 text-sm">
+                                                معرفة إذا كان الجهاز أفقيًا أو عموديًا بناءً على الجاذبية.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- الحساس 3: الجيروسكوب -->
+                    <div>
+                        <div class="flex items-center mb-6">
+                            <div class="w-14 h-14 rounded-full bg-purple-100 flex items-center justify-center ml-4">
+                                <i class="fas fa-sync-alt text-2xl text-purple-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-800">٣. الجيروسكوب<br><span class="text-lg text-purple-600">(Gyroscope)</span></h3>
+                            </div>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <div class="bg-purple-50 p-5 rounded-xl border border-purple-200">
+                                    <h4 class="font-bold text-purple-800 mb-3">الوظيفة الأساسية:</h4>
+                                    <ul class="list-disc pr-6 text-gray-700 space-y-2">
+                                        <li>يقيس <span class="font-bold">الدوران والحركة الزاوية</span></li>
+                                        <li>يحدد <span class="font-bold">معدل الدوران</span> حول المحاور الثلاثة</li>
+                                        <li>يدعم <span class="font-bold">تتبع الاتجاه الدقيق</span></li>
+                                        <li>مهم جدًا لتجارب AR <span class="font-bold">المستقرة</span></li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="mt-6 bg-white p-4 rounded-lg border border-purple-300">
+                                    <h5 class="font-bold text-gray-800 mb-2">فارق دقيق:</h5>
+                                    <p class="text-gray-700 text-sm">
+                                        مقياس التسارع: يرصد الحركة الخطية | الجيروسكوب: يرصد الدوران والحركة الزاوية
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="bg-gradient-to-r from-purple-50 to-white p-5 rounded-xl border border-purple-300">
+                                    <h4 class="font-bold text-gray-800 mb-3">أهميته في AR:</h4>
+                                    
+                                    <div class="space-y-4">
+                                        <div class="bg-white p-4 rounded-lg">
+                                            <div class="flex items-center mb-2">
+                                                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center ml-3">
+                                                    <i class="fas fa-undo-alt text-blue-600"></i>
+                                                </div>
+                                                <h5 class="font-bold text-gray-800">تتبع الدوران الدقيق</h5>
+                                            </div>
+                                            <p class="text-gray-700 text-sm">
+                                                عندما تدير هاتفك، الجيروسكوب هو من يخبر النظام بزاوية الدوران.
+                                            </p>
+                                        </div>
+                                        
+                                        <div class="bg-white p-4 rounded-lg">
+                                            <div class="flex items-center mb-2">
+                                                <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center ml-3">
+                                                    <i class="fas fa-crosshairs text-green-600"></i>
+                                                </div>
+                                                <h5 class="font-bold text-gray-800">تحسين الاستقرار</h5>
+                                            </div>
+                                            <p class="text-gray-700 text-sm">
+                                                يحافظ على ثبات العناصر الرقمية حتى عند تحريك الجهاز بسرعة.
+                                            </p>
+                                        </div>
+                                        
+                                        <div class="bg-white p-4 rounded-lg">
+                                            <div class="flex items-center mb-2">
+                                                <div class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center ml-3">
+                                                    <i class="fas fa-vr-cardboard text-yellow-600"></i>
+                                                </div>
+                                                <h5 class="font-bold text-gray-800">تجارب الغمرية</h5>
+                                            </div>
+                                            <p class="text-gray-700 text-sm">
+                                                أساسي في نظارات AR/VR لتتبع حركة رأس المستخدم بدقة.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-dice-three text-yellow-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">الكاميرا ترى، مقياس التسارع يشعر بالحركة، الجيروسكوب يتابع الدوران: ثلاثية أساسية</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 7: أنواع الحساسات (2) -->
+        <section id="slide7" class="slide bg-gradient-to-br from-blue-50 to-cyan-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-blue-700">7</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">أنواع الحساسات في AR (الجزء الثاني)</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <!-- الحساس 4: البوصلة الرقمية -->
+                    <div class="mb-12">
+                        <div class="flex items-center mb-6">
+                            <div class="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center ml-4">
+                                <i class="fas fa-compass text-2xl text-red-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-800">٤. البوصلة الرقمية<br><span class="text-lg text-red-600">(Magnetometer)</span></h3>
+                            </div>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <div class="bg-red-50 p-5 rounded-xl border border-red-200">
+                                    <h4 class="font-bold text-red-800 mb-3">الوظيفة الأساسية:</h4>
+                                    <ul class="list-disc pr-6 text-gray-700 space-y-2">
+                                        <li>تحديد <span class="font-bold">الاتجاه بالنسبة للشمال المغناطيسي</span></li>
+                                        <li>تدعم <span class="font-bold">التوجيه المكاني الدقيق</span></li>
+                                        <li>تستخدم <span class="font-bold">المجال المغناطيسي الأرضي</span></li>
+                                        <li>تعمل مع الجيروسكوب لتحسين <span class="font-bold">دقة الاتجاه</span></li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="mt-6 bg-white p-4 rounded-lg border border-red-300">
+                                    <h5 class="font-bold text-gray-800 mb-2">معلومة تقنية:</h5>
+                                    <p class="text-gray-700 text-sm">
+                                        البوصلة الرقمية هي في الأساس مستشعر للمجال المغناطيسي، يحول شدة واتجاه المجال إلى بيانات رقمية.
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="bg-gradient-to-r from-red-50 to-white p-5 rounded-xl border border-red-300">
+                                    <h4 class="font-bold text-gray-800 mb-3">دورها في AR:</h4>
+                                    
+                                    <div class="space-y-4">
+                                        <div class="bg-white p-4 rounded-lg">
+                                            <div class="flex items-center mb-2">
+                                                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center ml-3">
+                                                    <i class="fas fa-map-marked-alt text-blue-600"></i>
+                                                </div>
+                                                <h5 class="font-bold text-gray-800">التطبيقات الجغرافية</h5>
+                                            </div>
+                                            <p class="text-gray-700 text-sm">
+                                                تطبيقات AR الخارجية التي تعتمد على الاتجاه الحقيقي للمستخدم.
+                                            </p>
+                                        </div>
+                                        
+                                        <div class="bg-white p-4 rounded-lg">
+                                            <div class="flex items-center mb-2">
+                                                <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center ml-3">
+                                                    <i class="fas fa-hiking text-green-600"></i>
+                                                </div>
+                                                <h5 class="font-bold text-gray-800">الملاحة الخارجية</h5>
+                                            </div>
+                                            <p class="text-gray-700 text-sm">
+                                                إرشادات AR للوصول إلى وجهات محددة بناءً على الاتجاه الحقيقي.
+                                            </p>
+                                        </div>
+                                        
+                                        <div class="bg-white p-4 rounded-lg">
+                                            <div class="flex items-center mb-2">
+                                                <div class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center ml-3">
+                                                    <i class="fas fa-university text-yellow-600"></i>
+                                                </div>
+                                                <h5 class="font-bold text-gray-800">السياحة المعرفية</h5>
+                                            </div>
+                                            <p class="text-gray-700 text-sm">
+                                                عند توجيه الجهاز نحو معلم تاريخي، تظهر معلومات عنه.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-6 bg-blue-50 p-4 rounded-lg">
+                                        <h5 class="font-bold text-gray-800 mb-2">التحدي:</h5>
+                                        <p class="text-gray-700 text-sm">
+                                            المجالات المغناطيسية المحيطة (المباني، الأجهزة) قد تشوش على دقة القياس.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- الحساس 5: نظام تحديد الموقع -->
+                    <div class="mb-12">
+                        <div class="flex items-center mb-6">
+                            <div class="w-14 h-14 rounded-full bg-indigo-100 flex items-center justify-center ml-4">
+                                <i class="fas fa-satellite text-2xl text-indigo-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-800">٥. نظام تحديد الموقع<br><span class="text-lg text-indigo-600">(GPS)</span></h3>
+                            </div>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <div class="bg-indigo-50 p-5 rounded-xl border border-indigo-200">
+                                    <h4 class="font-bold text-indigo-800 mb-3">الوظيفة الأساسية:</h4>
+                                    <ul class="list-disc pr-6 text-gray-700 space-y-2">
+                                        <li>يحدد <span class="font-bold">الموقع الجغرافي</span> للجهاز</li>
+                                        <li>يعتمد على <span class="font-bold">شبكة الأقمار الصناعية</span></li>
+                                        <li>يستخدم في <span class="font-bold">AR الخارجي</span> (Outdoor AR)</li>
+                                        <li>دقة تتراوح بين <span class="font-bold">5-10 أمتار</span> (للمدنيين)</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="mt-6 bg-white p-4 rounded-lg border border-indigo-300">
+                                    <h5 class="font-bold text-gray-800 mb-2">مثال تطبيقي:</h5>
+                                    <p class="text-gray-700 text-sm">
+                                        لعبة Pokémon GO: تحدد موقعك الحقيقي على الخريطة، وتظهر Pokémon في أماكن محددة بناءً على موقعك.
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="bg-gradient-to-r from-indigo-50 to-white p-5 rounded-xl border border-indigo-300">
+                                    <h4 class="font-bold text-gray-800 mb-3">تطبيقات AR المعتمدة على GPS:</h4>
+                                    
+                                    <div class="space-y-4">
+                                        <div class="bg-white p-4 rounded-lg">
+                                            <div class="flex items-center mb-2">
+                                                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center ml-3">
+                                                    <i class="fas fa-gamepad text-blue-600"></i>
+                                                </div>
+                                                <h5 class="font-bold text-gray-800">الألعاب الخارجية</h5>
+                                            </div>
+                                            <p class="text-gray-700 text-sm">
+                                                ألعاب AR التي تدمج العالم الحقيقي مع التحديات الرقمية بناءً على الموقع.
+                                            </p>
+                                        </div>
+                                        
+                                        <div class="bg-white p-4 rounded-lg">
+                                            <div class="flex items-center mb-2">
+                                                <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center ml-3">
+                                                    <i class="fas fa-map-signs text-green-600"></i>
+                                                </div>
+                                                <h5 class="font-bold text-gray-800">السياحة التفاعلية</h5>
+                                            </div>
+                                            <p class="text-gray-700 text-sm">
+                                                عند الوصول إلى معلم سياحي، تظهر معلومات وتجارب AR مرتبطة به.
+                                            </p>
+                                        </div>
+                                        
+                                        <div class="bg-white p-4 rounded-lg">
+                                            <div class="flex items-center mb-2">
+                                                <div class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center ml-3">
+                                                    <i class="fas fa-shopping-bag text-yellow-600"></i>
+                                                </div>
+                                                <h5 class="font-bold text-gray-800">التسوق الموقعي</h5>
+                                            </div>
+                                            <p class="text-gray-700 text-sm">
+                                                عند الاقتراب من متجر، تظهر عروض وخصومات خاصة عبر AR.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- الحساس 6: حساسات العمق -->
+                    <div>
+                        <div class="flex items-center mb-6">
+                            <div class="w-14 h-14 rounded-full bg-teal-100 flex items-center justify-center ml-4">
+                                <i class="fas fa-ruler-vertical text-2xl text-teal-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-800">٦. حساسات العمق<br><span class="text-lg text-teal-600">(Depth Sensors - مفهوميًا)</span></h3>
+                            </div>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <div class="bg-teal-50 p-5 rounded-xl border border-teal-200">
+                                    <h4 class="font-bold text-teal-800 mb-3">الوظيفة الأساسية:</h4>
+                                    <ul class="list-disc pr-6 text-gray-700 space-y-2">
+                                        <li>تقيس <span class="font-bold">المسافة بين الكاميرا والأجسام</span></li>
+                                        <li>تعزز <span class="font-bold">الواقعية والتفاعل</span> مع العناصر</li>
+                                        <li>تستخدم تقنيات مثل <span class="font-bold">LiDAR، ToF</span></li>
+                                        <li><span class="font-bold">غير متوفرة</span> في كل الأجهزة</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="mt-6 bg-white p-4 rounded-lg border border-teal-300">
+                                    <h5 class="font-bold text-gray-800 mb-2">ملاحظة مهمة:</h5>
+                                    <p class="text-gray-700 text-sm">
+                                        حساسات العمق تعتبر من التقنيات المتقدمة، وغالبًا ما توجد في الأجهزة المتطورة مثل iPhone Pro وأجهزة AR المتخصصة.
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="bg-gradient-to-r from-teal-50 to-white p-5 rounded-xl border border-teal-300">
+                                    <h4 class="font-bold text-gray-800 mb-3">تطبيقات متقدمة:</h4>
+                                    
+                                    <div class="space-y-4">
+                                        <div class="bg-white p-4 rounded-lg">
+                                            <div class="flex items-center mb-2">
+                                                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center ml-3">
+                                                    <i class="fas fa-couch text-blue-600"></i>
+                                                </div>
+                                                <h5 class="font-bold text-gray-800">تزيين المنزل</h5>
+                                            </div>
+                                            <p class="text-gray-700 text-sm">
+                                                تطبيقات الأثاث الافتراضي تستخدم حساسات العمق لوضع الأثاث بدقة في المساحات.
+                                            </p>
+                                        </div>
+                                        
+                                        <div class="bg-white p-4 rounded-lg">
+                                            <div class="flex items-center mb-2">
+                                                <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center ml-3">
+                                                    <i class="fas fa-user-friends text-green-600"></i>
+                                                </div>
+                                                <h5 class="font-bold text-gray-800">التفاعل مع الأشخاص</h5>
+                                            </div>
+                                            <p class="text-gray-700 text-sm">
+                                                في مؤتمرات الفيديو المعززة، يمكن وضع عناصر رقمية خلف الأشخاص بدقة.
+                                            </p>
+                                        </div>
+                                        
+                                        <div class="bg-white p-4 rounded-lg">
+                                            <div class="flex items-center mb-2">
+                                                <div class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center ml-3">
+                                                    <i class="fas fa-paint-roller text-yellow-600"></i>
+                                                </div>
+                                                <h5 class="font-bold text-gray-800">التجسيد الواقعي</h5>
+                                            </div>
+                                            <p class="text-gray-700 text-sm">
+                                                العناصر الرقمية تبدو وكأنها جزء حقيقي من المشهد، مع الظلال والانعكاسات الصحيحة.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-layer-group text-blue-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">البوصلة توجه، GPS يحدد الموقع، حساسات العمق تقيس المسافات: تكامل للحصول على صورة كاملة</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 8: دمج الحساسات -->
+        <section id="slide8" class="slide bg-gradient-to-br from-green-50 to-emerald-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-green-700">8</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">دمج الحساسات (Sensor Fusion)</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                            <i class="fas fa-cogs text-green-600 ml-2"></i>
+                            ما هو Sensor Fusion؟
+                        </h3>
+                        
+                        <div class="bg-green-50 p-6 rounded-xl border border-green-200 mb-8">
+                            <div class="flex items-center justify-center mb-6">
+                                <div class="text-center">
+                                    <div class="text-5xl mb-4">🧠 + 👁️ + ✋ + 🧭 = 🎯</div>
+                                    <p class="text-xl text-gray-800">
+                                        Sensor Fusion هو عملية:
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white p-5 rounded-xl mb-6">
+                                <div class="text-3xl text-center text-green-600 mb-4">
+                                    <i class="fas fa-brain"></i>
+                                </div>
+                                <p class="text-xl text-gray-800 text-center font-bold">
+                                    دمج <span class="text-green-700">بيانات عدة حساسات</span> مختلفة
+                                    <br>
+                                    للحصول على <span class="text-blue-600">نتيجة أدق وأكثر موثوقية</span>
+                                </p>
+                            </div>
+                            
+                            <div class="grid md:grid-cols-3 gap-4 mb-6">
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-camera text-blue-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">كاميرا</p>
+                                    <p class="text-gray-600 text-xs">ترى المشهد</p>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-sync-alt text-purple-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">جيروسكوب</p>
+                                    <p class="text-gray-600 text-xs">يقيس الدوران</p>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-running text-red-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">مقياس التسارع</p>
+                                    <p class="text-gray-600 text-xs">يقيس الحركة</p>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center">
+                                <i class="fas fa-arrow-down text-2xl text-green-600 mb-4"></i>
+                                <div class="bg-gradient-to-r from-green-100 to-emerald-100 p-4 rounded-lg">
+                                    <p class="font-bold text-gray-800">Sensor Fusion</p>
+                                    <p class="text-gray-700 text-sm">دمج البيانات للحصول على نتيجة أدق</p>
+                                </div>
+                                <i class="fas fa-arrow-down text-2xl text-green-600 mt-4"></i>
+                                <div class="bg-green-200 p-4 rounded-lg mt-4">
+                                    <p class="font-bold text-gray-800">تتبع حركة مستقر وواقعي</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                            <i class="fas fa-list-ol text-blue-600 ml-2"></i>
+                            أهمية Sensor Fusion في AR
+                        </h3>
+                        
+                        <div class="space-y-6">
+                            <!-- أهمية 1 -->
+                            <div class="bg-gradient-to-r from-blue-50 to-white p-5 rounded-xl border border-blue-200">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center ml-3">
+                                        <i class="fas fa-search-minus"></i>
+                                    </div>
+                                    <h4 class="text-xl font-bold text-gray-800">يقلل الأخطاء</h4>
+                                </div>
+                                <p class="text-gray-700">
+                                    كل حساس لديه أخطاء محددة. دمج بيانات عدة حساسات يقلل من الأخطاء الكلية.
+                                </p>
+                                <div class="mt-3 flex items-center text-blue-600">
+                                    <i class="fas fa-chart-line ml-2"></i>
+                                    <span class="text-sm">مثال: الجيروسكوب يتحسن مع مرور الوقت، بينما مقياس التسارع يعطي قراءات فورية دقيقة</span>
+                                </div>
+                            </div>
+                            
+                            <!-- أهمية 2 -->
+                            <div class="bg-gradient-to-r from-purple-50 to-white p-5 rounded-xl border border-purple-200">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-10 h-10 rounded-full bg-purple-600 text-white flex items-center justify-center ml-3">
+                                        <i class="fas fa-shield-alt"></i>
+                                    </div>
+                                    <h4 class="text-xl font-bold text-gray-800">يزيد الثبات</h4>
+                                </div>
+                                <p class="text-gray-700">
+                                    عندما يفشل حساس أو يتعطل، يمكن للنظام الاعتماد على الحساسات الأخرى.
+                                </p>
+                                <div class="mt-3 flex items-center text-purple-600">
+                                    <i class="fas fa-backup ml-2"></i>
+                                    <span class="text-sm">مثال: في بيئة مظلمة حيث تفشل الكاميرا، يمكن الاعتماد على الجيروسكوب ومقياس التسارع</span>
+                                </div>
+                            </div>
+                            
+                            <!-- أهمية 3 -->
+                            <div class="bg-gradient-to-r from-green-50 to-white p-5 rounded-xl border border-green-200">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-10 h-10 rounded-full bg-green-600 text-white flex items-center justify-center ml-3">
+                                        <i class="fas fa-user-check"></i>
+                                    </div>
+                                    <h4 class="text-xl font-bold text-gray-800">يحسن تجربة المستخدم</h4>
+                                </div>
+                                <p class="text-gray-700">
+                                    يخلق تجربة AR أكثر استقرارًا وواقعية، مما يزيد من رضا المستخدم.
+                                </p>
+                                <div class="mt-3 flex items-center text-green-600">
+                                    <i class="fas fa-smile ml-2"></i>
+                                    <span class="text-sm">مثال: العناصر الرقمية تبقى ثابتة في مكانها حتى مع الحركة السريعة</span>
+                                </div>
+                            </div>
+                            
+                            <!-- أهمية 4 -->
+                            <div class="bg-gradient-to-r from-yellow-50 to-white p-5 rounded-xl border border-yellow-200">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-10 h-10 rounded-full bg-yellow-600 text-white flex items-center justify-center ml-3">
+                                        <i class="fas fa-puzzle-piece"></i>
+                                    </div>
+                                    <h4 class="text-xl font-bold text-gray-800">يعوض قصور أي حساس منفرد</h4>
+                                </div>
+                                <p class="text-gray-700">
+                                    كل حساس له نقاط قوة وضعف. الدمج يعوض نقاط الضعف بنقاط القوة من حساسات أخرى.
+                                </p>
+                                <div class="mt-3 flex items-center text-yellow-600">
+                                    <i class="fas fa-handshake ml-2"></i>
+                                    <span class="text-sm">مثال: الجيروسكوب دقيق في القصير المدى، والبوصلة دقيقة في الطويل المدى</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-green-100 to-emerald-100 p-6 rounded-2xl">
+                        <h4 class="text-xl font-bold text-gray-800 mb-4 text-center">
+                            <i class="fas fa-exclamation-triangle text-green-700 ml-2"></i>
+                            لماذا لا يكفي حساس واحد في AR؟
+                        </h4>
+                        
+                        <div class="flex items-start">
+                            <div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center ml-4 mt-1 flex-shrink-0">
+                                <i class="fas fa-info-circle text-yellow-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-lg text-gray-800 mb-3">
+                                    <span class="font-bold">❗ كل حساس له حدود وتحديات</span>
+                                </p>
+                                <div class="grid md:grid-cols-2 gap-4 mt-4">
+                                    <div class="bg-white p-4 rounded-lg">
+                                        <h5 class="font-bold text-gray-800 mb-2">الجيروسكوب وحده:</h5>
+                                        <p class="text-gray-700 text-sm">
+                                            يتراكم الخطأ مع مرور الوقت (يسمى Drift)
+                                        </p>
+                                    </div>
+                                    
+                                    <div class="bg-white p-4 rounded-lg">
+                                        <h5 class="font-bold text-gray-800 mb-2">مقياس التسارع وحده:</h5>
+                                        <p class="text-gray-700 text-sm">
+                                            لا يميز بين الحركة والتسارع الناتج عن الجاذبية
+                                        </p>
+                                    </div>
+                                    
+                                    <div class="bg-white p-4 rounded-lg">
+                                        <h5 class="font-bold text-gray-800 mb-2">البوصلة وحدها:</h5>
+                                        <p class="text-gray-700 text-sm">
+                                            تتأثر بالمجالات المغناطيسية المحيطة
+                                        </p>
+                                    </div>
+                                    
+                                    <div class="bg-white p-4 rounded-lg">
+                                        <h5 class="font-bold text-gray-800 mb-2">الكاميرا وحدها:</h5>
+                                        <p class="text-gray-700 text-sm">
+                                            تفشل في الظلام أو عند عدم وجود تفاصيل مرئية كافية
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-cogs text-green-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">دمج الحساسات: حيث يصبح المجموع أكبر من مجموع الأجزاء</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 9: تأثير الحساسات على UX -->
+        <section id="slide9" class="slide bg-gradient-to-br from-orange-50 to-red-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-orange-700">9</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">تأثير الحساسات على تجربة المستخدم (UX)</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                            <i class="fas fa-user-check text-orange-600 ml-2"></i>
+                            المستخدم لا يرى الحساسات، لكنه يشعر بنتيجتها
+                        </h3>
+                        
+                        <div class="bg-orange-50 p-6 rounded-xl border border-orange-200 mb-8">
+                            <p class="text-lg text-gray-800 mb-6 text-center">
+                                جودة ودقة الحساسات تؤثر <span class="font-bold text-orange-700">مباشرة</span> على جربة المستخدم في تطبيقات AR
+                            </p>
+                            
+                            <div class="overflow-x-auto">
+                                <table class="comparison-table w-full">
+                                    <thead>
+                                        <tr class="bg-orange-100">
+                                            <th class="font-bold text-gray-800">جودة الحساسات</th>
+                                            <th class="font-bold text-gray-800">تأثيرها على AR</th>
+                                            <th class="font-bold text-gray-800">تجربة المستخدم</th>
+                                            <th class="font-bold text-gray-800">مثال تطبيقي</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="font-bold text-red-700">ضعيفة</td>
+                                            <td class="text-sm text-gray-700">عناصر غير مستقرة، تأخير في الاستجابة</td>
+                                            <td><span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm">اهتزاز وعدم استقرار</span></td>
+                                            <td class="text-sm text-gray-700">عنصر يطفو ويتحرك عشوائيًا</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-yellow-700">متوسطة</td>
+                                            <td class="text-sm text-gray-700">عناصر مستقرة نسبيًا، بعض التأخير</td>
+                                            <td><span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">تجربة مقبولة</span></td>
+                                            <td class="text-sm text-gray-700">عنصر يبقى في مكانه لكن مع تأخير بسيط عند الحركة السريعة</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-green-700">عالية</td>
+                                            <td class="text-sm text-gray-700">عناصر مستقرة تمامًا، استجابة فورية</td>
+                                            <td><span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">إحساس واقعي وسلس</span></td>
+                                            <td class="text-sm text-gray-700">عنصر يبدو وكأنه جزء حقيقي من المشهد</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-purple-700">متقدمة</td>
+                                            <td class="text-sm text-gray-700">تفاعلات معقدة، واقعية عالية</td>
+                                            <td><span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">تجربة غمرية واقعية</span></td>
+                                            <td class="text-sm text-gray-700">تفاعل طبيعي مع العناصر كما لو كانت حقيقية</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                            <i class="fas fa-mobile-alt text-blue-600 ml-2"></i>
+                            كيف تؤثر جودة الهاتف على تجربة AR؟
+                        </h3>
+                        
+                        <div class="grid md:grid-cols-3 gap-6 mb-8">
+                            <div class="sensor-card bg-white rounded-xl shadow-md p-6 border-t-red-500">
+                                <div class="flex items-center mb-4">
+                                    <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center ml-3">
+                                        <i class="fas fa-mobile text-red-600"></i>
+                                    </div>
+                                    <h4 class="text-xl font-bold text-gray-800 mr-3">هواتف اقتصادية<br><span class="text-lg text-red-600">(Low-end)</span></h4>
+                                </div>
+                                <p class="text-gray-700 mb-4">
+                                    حساسات أساسية فقط، دقة منخفضة
+                                </p>
+                                <div class="space-y-2">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-times text-red-500 ml-2 text-sm"></i>
+                                        <span class="text-gray-700 text-sm">AR متقطع وغير مستقر</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-times text-red-500 ml-2 text-sm"></i>
+                                        <span class="text-gray-700 text-sm">تأخير ملحوظ في الاستجابة</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-times text-red-500 ml-2 text-sm"></i>
+                                        <span class="text-gray-700 text-sm">عناصر تطفو وتتحرك عشوائيًا</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="sensor-card bg-white rounded-xl shadow-md p-6 border-t-yellow-500">
+                                <div class="flex items-center mb-4">
+                                    <div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center ml-3">
+                                        <i class="fas fa-mobile-alt text-yellow-600"></i>
+                                    </div>
+                                    <h4 class="text-xl font-bold text-gray-800 mr-3">هواتف متوسطة<br><span class="text-lg text-yellow-600">(Mid-range)</span></h4>
+                                </div>
+                                <p class="text-gray-700 mb-4">
+                                    حساسات جيدة، دقة مقبولة
+                                </p>
+                                <div class="space-y-2">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-check text-yellow-500 ml-2 text-sm"></i>
+                                        <span class="text-gray-700 text-sm">AR يعمل بشكل مقبول</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-check text-yellow-500 ml-2 text-sm"></i>
+                                        <span class="text-gray-700 text-sm">استجابة مناسبة لمعظم التطبيقات</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-times text-red-500 ml-2 text-sm"></i>
+                                        <span class="text-gray-700 text-sm">مشاكل في الحركات السريعة</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="sensor-card bg-white rounded-xl shadow-md p-6 border-t-green-500">
+                                <div class="flex items-center mb-4">
+                                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center ml-3">
+                                        <i class="fas fa-mobile-alt text-green-600"></i>
+                                    </div>
+                                    <h4 class="text-xl font-bold text-gray-800 mr-3">هواتف متطورة<br><span class="text-lg text-green-600">(High-end)</span></h4>
+                                </div>
+                                <p class="text-gray-700 mb-4">
+                                    حساسات متطورة، دقة عالية
+                                </p>
+                                <div class="space-y-2">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-check text-green-500 ml-2 text-sm"></i>
+                                        <span class="text-gray-700 text-sm">AR سلس ومستقر</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-check text-green-500 ml-2 text-sm"></i>
+                                        <span class="text-gray-700 text-sm">استجابة فورية حتى للحركات السريعة</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-check text-green-500 ml-2 text-sm"></i>
+                                        <span class="text-gray-700 text-sm">واقعية عالية مع حساسات عمق</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-orange-100 to-red-100 p-6 rounded-2xl">
+                        <h4 class="text-xl font-bold text-gray-800 mb-4 text-center">
+                            <i class="fas fa-lightbulb text-orange-700 ml-2"></i>
+                            معادلة بسيطة لفهم العلاقة
+                        </h4>
+                        
+                        <div class="flex flex-col items-center justify-center">
+                            <div class="text-center mb-6">
+                                <div class="inline-block bg-white p-4 rounded-xl shadow-md">
+                                    <p class="text-xl font-bold text-gray-800">
+                                        جودة الحساسات <span class="text-orange-600">+</span> دقة المعالجة <span class="text-orange-600">=</span> تجربة AR
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="grid md:grid-cols-3 gap-6">
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
+                                        <i class="fas fa-microchip text-blue-600 text-2xl"></i>
+                                    </div>
+                                    <p class="font-bold text-gray-800">جودة الحساسات</p>
+                                    <p class="text-gray-700 text-sm mt-2">
+                                        الدقة، سرعة الاستجابة، نقاء البيانات
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-4">
+                                        <i class="fas fa-brain text-purple-600 text-2xl"></i>
+                                    </div>
+                                    <p class="font-bold text-gray-800">دقة المعالجة</p>
+                                    <p class="text-gray-700 text-sm mt-2">
+                                        خوارزميات الدمج، سرعة المعالج، كفاءة البرمجيات
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+                                        <i class="fas fa-user text-green-600 text-2xl"></i>
+                                    </div>
+                                    <p class="font-bold text-gray-800">تجربة AR</p>
+                                    <p class="text-gray-700 text-sm mt-2">
+                                        الاستقرار، الواقعية، رضا المستخدم
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 text-center">
+                            <div class="inline-block bg-white p-4 rounded-xl">
+                                <p class="text-gray-800 font-bold">
+                                    📌 المستخدم العادي لا يعرف عن الحساسات، لكنه <span class="text-orange-700">يشعر بالفرق</span> بين تجربة AR الجيدة والسيئة
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-infinity text-orange-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">تجربة AR الجيدة: عندما تنسى أن ما تراه ليس حقيقيًا</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 10: التحديات -->
+        <section id="slide10" class="slide bg-gradient-to-br from-indigo-50 to-purple-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-indigo-700">10</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">التحديات المرتبطة بالحساسات في AR</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 mb-8">
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                            <i class="fas fa-exclamation-triangle text-indigo-600 ml-2"></i>
+                            لماذا قد تفشل الحساسات أحيانًا؟
+                        </h3>
+                        
+                        <div class="bg-indigo-50 p-6 rounded-xl border border-indigo-200 mb-8">
+                            <p class="text-lg text-gray-800 mb-6 text-center">
+                                رغم التقدم التقني، تظل هناك <span class="font-bold text-indigo-700">تحديات أساسية</span> تواجه الحساسات وتؤثر على أداء أنظمة AR.
+                            </p>
+                            
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div class="bg-white p-5 rounded-xl">
+                                    <div class="flex items-center mb-3">
+                                        <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center ml-3">
+                                            <i class="fas fa-wave-square text-red-600"></i>
+                                        </div>
+                                        <h4 class="font-bold text-gray-800">الضوضاء في البيانات</h4>
+                                    </div>
+                                    <p class="text-gray-700 text-sm">
+                                        جميع الحساسات تنتج بيانات بها درجة من الضوضاء (Noise) التي يجب تصفيتها.
+                                    </p>
+                                    <div class="mt-3">
+                                        <span class="inline-block px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm">تحدي تقني</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white p-5 rounded-xl">
+                                    <div class="flex items-center mb-3">
+                                        <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center ml-3">
+                                            <i class="fas fa-battery-quarter text-yellow-600"></i>
+                                        </div>
+                                        <h4 class="font-bold text-gray-800">استهلاك الطاقة</h4>
+                                    </div>
+                                    <p class="text-gray-700 text-sm">
+                                        تشغيل الحساسات باستمرار يستنزف بطارية الجهاز بسرعة.
+                                    </p>
+                                    <div class="mt-3">
+                                        <span class="inline-block px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">تحدي عملي</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white p-5 rounded-xl">
+                                    <div class="flex items-center mb-3">
+                                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center ml-3">
+                                            <i class="fas fa-mobile text-blue-600"></i>
+                                        </div>
+                                        <h4 class="font-bold text-gray-800">اختلاف جودة الحساسات</h4>
+                                    </div>
+                                    <p class="text-gray-700 text-sm">
+                                        جودة الحساسات تختلف بين الأجهزة، مما يؤثر على تجربة AR.
+                                    </p>
+                                    <div class="mt-3">
+                                        <span class="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">تحدي توافقي</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white p-5 rounded-xl">
+                                    <div class="flex items-center mb-3">
+                                        <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center ml-3">
+                                            <i class="fas fa-building text-purple-600"></i>
+                                        </div>
+                                        <h4 class="font-bold text-gray-800">البيئات المغلقة أو المعقدة</h4>
+                                    </div>
+                                    <p class="text-gray-700 text-sm">
+                                        بعض الحساسات تفقد دقتها في البيئات المغلقة أو ذات التداخل الكهرومغناطيسي.
+                                    </p>
+                                    <div class="mt-3">
+                                        <span class="inline-block px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">تحدي بيئي</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                            <i class="fas fa-chart-line text-blue-600 ml-2"></i>
+                            تأثير التحديات على تطبيقات AR المختلفة
+                        </h3>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="comparison-table w-full">
+                                <thead>
+                                    <tr class="bg-indigo-100">
+                                        <th class="font-bold text-gray-800">نوع التطبيق</th>
+                                        <th class="font-bold text-gray-800">الحساسات الأساسية</th>
+                                        <th class="font-bold text-gray-800">التحدي الرئيسي</th>
+                                        <th class="font-bold text-gray-800">الحل المقترح</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="font-bold text-red-700">AR الداخلي<br>(الأثاث، الديكور)</td>
+                                        <td class="text-sm text-gray-700">كاميرا، جيروسكوب، حساسات عمق</td>
+                                        <td class="text-sm text-gray-700">الإضاءة المتغيرة، الأسطح العاكسة</td>
+                                        <td class="text-sm text-gray-700">استخدام فلاش LED، خوارزميات تصحيح الإضاءة</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-bold text-yellow-700">AR الخارجي<br>(الألعاب، السياحة)</td>
+                                        <td class="text-sm text-gray-700">GPS، بوصلة، كاميرا، مقياس تسارع</td>
+                                        <td class="text-sm text-gray-700">تداخل GPS، ضوء الشمس القوي</td>
+                                        <td class="text-sm text-gray-700">دمج GPS مع WiFi/خلوي، فلتر استقطاب للكاميرا</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-bold text-blue-700">AR الصناعي<br>(الصيانة، التدريب)</td>
+                                        <td class="text-sm text-gray-700">كاميرا، جيروسكوب، مقياس تسارع</td>
+                                        <td class="text-sm text-gray-700">الاهتزازات، المجالات الكهرومغناطيسية</td>
+                                        <td class="text-sm text-gray-700">عزل الحساسات، مرشحات رقمية متقدمة</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-bold text-green-700">AR الطبي<br>(الجراحة، التشخيص)</td>
+                                        <td class="text-sm text-gray-700">كاميرا، حساسات عمق، جيروسكوب</td>
+                                        <td class="text-sm text-gray-700">معدات طبية تشوش على الحساسات</td>
+                                        <td class="text-sm text-gray-700">تصميم حساسات طبية متخصصة، عزل كهرومغناطيسي</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-indigo-100 to-purple-100 p-6 rounded-2xl">
+                        <h4 class="text-xl font-bold text-gray-800 mb-4 text-center">
+                            <i class="fas fa-lightbulb text-indigo-700 ml-2"></i>
+                            المستقبل: اتجاهات تطوير الحساسات لأنظمة AR
+                        </h4>
+                        
+                        <div class="text-center">
+                            <div class="inline-block bg-white p-6 rounded-xl shadow-md">
+                                <div class="text-2xl font-bold text-gray-800 mb-4">
+                                    التحديات الحالية <span class="text-red-600">دفعت</span> نحو <span class="text-green-600">تطورات مستقبلية</span>
+                                </div>
+                                
+                                <div class="grid md:grid-cols-2 gap-6">
+                                    <div>
+                                        <h5 class="font-bold text-gray-800 mb-3">الاتجاهات التقنية:</h5>
+                                        <ul class="list-disc pr-6 text-gray-700 text-sm space-y-2 text-right">
+                                            <li>حساسات أكثر دقة واستقرارًا</li>
+                                            <li>استهلاك أقل للطاقة</li>
+                                            <li>دمج أفضل بين الحساسات</li>
+                                            <li>حساسات متخصصة لتطبيقات محددة</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div>
+                                        <h5 class="font-bold text-gray-800 mb-3">الاتجاهات البرمجية:</h5>
+                                        <ul class="list-disc pr-6 text-gray-700 text-sm space-y-2 text-right">
+                                            <li>خوارزميات ذكاء اصطناعي لتحسين الدقة</li>
+                                            <li>معالجة أكثر كفاءة للبيانات</li>
+                                            <li>تكيف ذاتي مع الظروف البيئية</li>
+                                            <li>تعلم الآلة للتنبؤ بالأخطاء وتصحيحها</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <p class="text-gray-600 mt-6 text-sm">
+                                    مع تطور تقنيات الحساسات ومعالجة البيانات، ستتحسن قدرة AR على العمل في ظروف مختلفة وتقديم تجارب أكثر استقرارًا وواقعية.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-mountain text-indigo-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">التحديات تدفع الابتكار، وكل تحدٍ يحل يفتح آفاقًا جديدة لتطبيقات AR</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 11: فيديو TED -->
+        <section id="slide11" class="slide bg-gradient-to-br from-red-50 to-pink-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-red-700">11</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">فيديو TED / تجربة عالمية</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-10">
+                    <div class="text-center mb-10">
+                        <div class="inline-block p-4 bg-gradient-to-r from-red-100 to-pink-100 rounded-full mb-6">
+                            <i class="fas fa-video text-4xl text-red-600"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold text-gray-800 mb-6">فيديو TED: مستقبل الحساسات والتفاعل البشري الحاسوبي</h3>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-8 mb-12">
+                        <div>
+                            <div class="bg-gradient-to-r from-red-50 to-pink-50 p-6 rounded-2xl border border-red-200 h-full">
+                                <div class="flex items-center mb-4">
+                                    <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center ml-4">
+                                        <i class="fas fa-user-tie text-red-600 text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xl font-bold text-gray-800">David Eagleman</h4>
+                                        <p class="text-gray-600">عالم أعصاب، مخترع، ومؤلف</p>
+                                    </div>
+                                </div>
+                                
+                                <h5 class="font-bold text-gray-800 mb-3">عنوان المحاضرة:</h5>
+                                <p class="text-lg text-gray-800 mb-4">
+                                    <strong>"Can we create new senses for humans?"</strong>
+                                </p>
+                                
+                                <div class="bg-white p-4 rounded-lg mb-6">
+                                    <p class="text-gray-700">
+                                        يتحدث ديفيد إيجلمان عن كيف يمكن للحساسات والواجهات الحسية الجديدة أن توسع من إدراكنا البشري، وكيف يمكن لهذه التقنيات أن تغير طريقة تفاعلنا مع العالم الرقمي.
+                                    </p>
+                                </div>
+                                
+                                <a href="https://www.ted.com/talks/david_eagleman_can_we_create_new_senses_for_humans" target="_blank" class="inline-flex items-center px-5 py-3 bg-red-600 text-white rounded-full font-medium hover:bg-red-700 transition-colors">
+                                    <i class="fas fa-external-link-alt ml-2"></i>
+                                    مشاهدة على TED.com
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border border-blue-200 h-full">
+                                <h4 class="text-xl font-bold text-gray-800 mb-6">لماذا هذا الفيديو مهم لهذه المحاضرة؟</h4>
+                                
+                                <div class="space-y-4">
+                                    <div class="flex items-start">
+                                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center ml-3 mt-1 flex-shrink-0">
+                                            <i class="fas fa-check text-blue-600"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="font-bold text-gray-800 mb-1">يربط بين الحساسات والإدراك البشري</h5>
+                                            <p class="text-gray-700 text-sm">يوضح كيف يمكن للحساسات أن توسع من قدراتنا الإدراكية.</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex items-start">
+                                        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center ml-3 mt-1 flex-shrink-0">
+                                            <i class="fas fa-check text-green-600"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="font-bold text-gray-800 mb-1">يتحدث عن مستقبل التفاعل</h5>
+                                            <p class="text-gray-700 text-sm">يتنبأ بكيفية تطور التفاعل بين البشر والحواسيب عبر الحساسات المتقدمة.</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex items-start">
+                                        <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center ml-3 mt-1 flex-shrink-0">
+                                            <i class="fas fa-check text-purple-600"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="font-bold text-gray-800 mb-1">يحفز التفكير الإبداعي</h5>
+                                            <p class="text-gray-700 text-sm">يشجع على التفكير في تطبيقات جديدة للحساسات في AR وVR.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-8 bg-white p-4 rounded-lg">
+                                    <h5 class="font-bold text-gray-800 mb-2">مهمة المشاهدة:</h5>
+                                    <p class="text-gray-700 text-sm">
+                                        بعد مشاهدة الفيديو، فكر في: كيف يمكن لحساسات جديدة أن تغير تجارب AR في المستقبل؟ ما هي "الحواس" الجديدة التي قد نضيفها لأنظمة AR؟
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-red-100 to-pink-100 p-6 rounded-2xl">
+                        <h4 class="text-xl font-bold text-gray-800 mb-6 text-center">💡 مفيد لفهم كيف يمكن للحساسات أن تكون بوابة لتجارب إنسانية جديدة</h4>
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="bg-white p-5 rounded-xl">
+                                <h5 class="font-bold text-gray-800 mb-3">توسيع الإدراك</h5>
+                                <p class="text-gray-700 text-sm">
+                                    كيف يمكن لحساسات جديدة أن تسمح لنا "بأن نرى" ما هو غير مرئي (مثل الأشعة تحت الحمراء، المجالات المغناطيسية).
+                                </p>
+                            </div>
+                            
+                            <div class="bg-white p-5 rounded-xl">
+                                <h5 class="font-bold text-gray-800 mb-3">تفاعل طبيعي</h5>
+                                <p class="text-gray-700 text-sm">
+                                    كيف تجعلنا الحساسات المتقدمة نتفاعل مع العالم الرقمي بشكل طبيعي كما نتفاعل مع العالم الحقيقي.
+                                </p>
+                            </div>
+                            
+                            <div class="bg-white p-5 rounded-xl">
+                                <h5 class="font-bold text-gray-800 mb-3">مستقبل AR</h5>
+                                <p class="text-gray-700 text-sm">
+                                    كيف ستغير الحساسات المتطورة من تجارب AR، من مجرد عرض معلومات إلى تجارب غمرية كاملة.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-globe-americas text-red-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">الحساسات ليست مجرد أدوات قياس، بل هي بوابات لتجارب إنسانية جديدة</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 12: أسئلة نقاش -->
+        <section id="slide12" class="slide bg-gradient-to-br from-teal-50 to-emerald-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-teal-700">12</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">أسئلة نقاش داخل الصف</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-10">
+                    <div class="text-center mb-10">
+                        <div class="inline-block p-4 bg-gradient-to-r from-teal-100 to-emerald-100 rounded-full mb-6">
+                            <i class="fas fa-comments text-4xl text-teal-600"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold text-gray-800 mb-6">نقاش تفاعلي: تحليل وتفكير نقدي</h3>
+                        <p class="text-lg text-gray-700 max-w-2xl mx-auto">
+                        أسئلة تحفز التفكير النقدي والتحليلي حول دور الحساسات في أنظمة الواقع المعزز
+                        </p>
+                    </div>
+                    
+                    <!-- السؤال 1 -->
+                    <div class="mb-8">
+                        <div class="bg-gray-100 p-5 rounded-xl mb-4">
+                            <div class="flex items-center mb-3">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center ml-3">
+                                    <span class="font-bold text-blue-600">١</span>
+                                </div>
+                                <h4 class="text-xl font-bold text-gray-800">لماذا لا يكفي حساس واحد في AR؟</h4>
+                            </div>
+                            <p class="text-gray-700">
+                                ناقش مع زملائك الأسباب التي تجعل أنظمة الواقع المعزز تحتاج إلى عدة حساسات تعمل معًا، ولماذا لا يمكن الاعتماد على حساس واحد فقط.
+                            </p>
+                        </div>
+                        
+                        <div class="bg-blue-50 p-5 rounded-xl">
+                            <h5 class="font-bold text-gray-800 mb-3">نقاط للنقاش:</h5>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div class="bg-white p-4 rounded-lg">
+                                    <h6 class="font-bold text-gray-800 mb-2">من ناحية الدقة:</h6>
+                                    <ul class="list-disc pr-6 text-gray-700 text-sm space-y-1">
+                                        <li>كل حساس له نسبة خطأ معينة</li>
+                                        <li>دمج عدة حساسات يقلل الخطأ الكلي</li>
+                                        <li>حساسات مختلفة تكمل بعضها البعض</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-lg">
+                                    <h6 class="font-bold text-gray-800 mb-2">من ناحية الموثوقية:</h6>
+                                    <ul class="list-disc pr-6 text-gray-700 text-sm space-y-1">
+                                        <li>إذا فشل حساس، يمكن الاعتماد على الآخرين</li>
+                                        <li>حساسات مختلفة تعمل في ظروف مختلفة</li>
+                                        <li>التكرار يزيد من موثوقية النظام</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 bg-white p-4 rounded-lg">
+                                <h6 class="font-bold text-gray-800 mb-2">مثال عملي:</h6>
+                                <p class="text-gray-700 text-sm">
+                                    نظام تتبع الطائرات: يستخدم GPS، البوصلة، مقياس التسارع، والجيروسكوب معًا. لو اعتمد على GPS فقط، سيفشل النظام إذا انقطع الاتصال بالأقمار الصناعية.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- السؤال 2 -->
+                    <div class="mb-8">
+                        <div class="bg-gray-100 p-5 rounded-xl mb-4">
+                            <div class="flex items-center mb-3">
+                                <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center ml-3">
+                                    <span class="font-bold text-green-600">٢</span>
+                                </div>
+                                <h4 class="text-xl font-bold text-gray-800">أي حساس تعتقد أنه الأكثر أهمية في AR؟ ولماذا؟</h4>
+                            </div>
+                            <p class="text-gray-700">
+                                ناقش مع زملائك أهمية كل حساس، واختاروا الحساس الذي تعتقدون أنه الأكثر أهمية، مع شرح أسباب اختياركم.
+                            </p>
+                        </div>
+                        
+                        <div class="bg-green-50 p-5 rounded-xl">
+                            <h5 class="font-bold text-gray-800 mb-3">خيارات للنقاش:</h5>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div class="bg-white p-4 rounded-lg">
+                                    <div class="flex items-center mb-2">
+                                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center ml-3">
+                                            <i class="fas fa-camera text-blue-600"></i>
+                                        </div>
+                                        <h6 class="font-bold text-gray-800">الكاميرا</h6>
+                                    </div>
+                                    <p class="text-gray-700 text-sm">
+                                        بدونها، لا يمكن رؤية العالم الحقيقي أو دمج العناصر الرقمية معه.
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-lg">
+                                    <div class="flex items-center mb-2">
+                                        <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center ml-3">
+                                            <i class="fas fa-sync-alt text-purple-600"></i>
+                                        </div>
+                                        <h6 class="font-bold text-gray-800">الجيروسكوب</h6>
+                                    </div>
+                                    <p class="text-gray-700 text-sm">
+                                        بدون تتبع الدوران الدقيق، ستفقد العناصر استقرارها مع حركة المستخدم.
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-lg">
+                                    <div class="flex items-center mb-2">
+                                        <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center ml-3">
+                                            <i class="fas fa-compass text-red-600"></i>
+                                        </div>
+                                        <h6 class="font-bold text-gray-800">البوصلة الرقمية</h6>
+                                    </div>
+                                    <p class="text-gray-700 text-sm">
+                                        مهمة للتوجيه في الفضاء، خاصة في تطبيقات AR الخارجية.
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-lg">
+                                    <div class="flex items-center mb-2">
+                                        <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center ml-3">
+                                            <i class="fas fa-satellite text-indigo-600"></i>
+                                        </div>
+                                        <h6 class="font-bold text-gray-800">GPS</h6>
+                                    </div>
+                                    <p class="text-gray-700 text-sm">
+                                        أساسي لتطبيقات AR الجغرافية والألعاب الخارجية.
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 bg-white p-4 rounded-lg">
+                                <h6 class="font-bold text-gray-800 mb-2">الحقيقة:</h6>
+                                <p class="text-gray-700 text-sm">
+                                    لا يوجد حساس "أهم" من الآخر، بل النظام يحتاج إلى جميع الحساسات معًا. كل حساس يكمل الآخر، والإجابة الصحيحة هي: <span class="font-bold">جميع الحساسات مهمة، وكل منها يؤدي دورًا لا يمكن الاستغناء عنه</span>.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- السؤال 3 -->
+                    <div class="mb-8">
+                        <div class="bg-gray-100 p-5 rounded-xl mb-4">
+                            <div class="flex items-center mb-3">
+                                <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center ml-3">
+                                    <span class="font-bold text-purple-600">٣</span>
+                                </div>
+                                <h4 class="text-xl font-bold text-gray-800">كيف تؤثر جودة الهاتف على تجربة AR؟</h4>
+                            </div>
+                            <p class="text-gray-700">
+                                ناقش مع زملائك العلاقة بين سعر الهاتف وجودة تجربة الواقع المعزز، وهل يمكن لهاتف رخيص أن يقدم تجربة AR جيدة؟
+                            </p>
+                        </div>
+                        
+                        <div class="bg-purple-50 p-5 rounded-xl">
+                            <h5 class="font-bold text-gray-800 mb-3">عوامل الجودة المؤثرة:</h5>
+                            <div class="grid md:grid-cols-3 gap-4">
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-2">
+                                        <i class="fas fa-microchip text-blue-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">جودة الحساسات</p>
+                                    <p class="text-gray-700 text-xs">(الدقة، سرعة الاستجابة)</p>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-2">
+                                        <i class="fas fa-brain text-green-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">قوة المعالج</p>
+                                    <p class="text-gray-700 text-xs">(سرعة معالجة البيانات)</p>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-lg text-center">
+                                    <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center mx-auto mb-2">
+                                        <i class="fas fa-battery-full text-yellow-600"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800 text-sm">كفاءة الطاقة</p>
+                                    <p class="text-gray-700 text-xs">(مدة تشغيل AR)</p>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 bg-white p-4 rounded-lg">
+                                <h6 class="font-bold text-gray-800 mb-2">الخلاصة:</h6>
+                                <p class="text-gray-700 text-sm">
+                                    الهواتف المتطورة تحتوي على حساسات أكثر دقة ومعالجات أقوى، مما يسمح بتجارب AR أفضل. لكن مع التطور التقني، أصبحت الهواتف المتوسطة قادرة على تقديم تجارب AR مقبولة للتطبيقات الأساسية.
+                                </p>
+                            </div>
+                            
+                            <div class="mt-4 bg-yellow-50 p-4 rounded-lg">
+                                <h6 class="font-bold text-gray-800 mb-2">معلومة:</h6>
+                                <p class="text-gray-700 text-sm">
+                                    بعض الهواتف الرخيصة قد لا تحتوي على جميع الحساسات اللازمة لـ AR، أو قد تكون دقة حساساتها منخفضة، مما يؤثر سلبًا على تجربة AR.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-10">
+                        <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                            <i class="fas fa-brain text-teal-600 text-2xl"></i>
+                            <p class="text-lg text-gray-800 font-medium">النقاش التفاعلي يساعد على فهم تعقيد أنظمة AR وتكامل مكوناتها</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 13: نشاط صفي -->
+        <section id="slide13" class="slide bg-gradient-to-br from-purple-50 to-indigo-50">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-purple-700">13</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">نشاط صفي (اختياري)</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-10">
+                    <div class="text-center mb-10">
+                        <div class="inline-block p-4 bg-gradient-to-r from-purple-100 to-indigo-100 rounded-full mb-6">
+                            <i class="fas fa-hands-helping text-4xl text-purple-600"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold text-gray-800 mb-6">نشاط عملي: اكتشاف الحساسات في هاتفك</h3>
+                        <p class="text-lg text-gray-700 max-w-2xl mx-auto">
+                        نشاط عملي بسيط لفهم الحساسات المتوفرة في الهواتف الذكية وكيف تعمل
+                        </p>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-8 mb-10">
+                        <div class="bg-gradient-to-br from-purple-50 to-white p-6 rounded-2xl border border-purple-200 shadow-md">
+                            <h4 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                <i class="fas fa-tasks text-blue-500 ml-2"></i>
+                                النشاط: فحص وتجربة الحساسات
+                            </h4>
+                            
+                            <div class="space-y-4">
+                                <div class="flex items-start">
+                                    <div class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center ml-3 mt-1 flex-shrink-0">
+                                        <span class="font-bold text-blue-600">١</span>
+                                    </div>
+                                    <div>
+                                        <h5 class="font-bold text-gray-800 mb-1">التحضير</h5>
+                                        <p class="text-gray-700 text-sm">
+                                            كل طالب يحتاج هاتفًا ذكيًا. يمكن العمل في مجموعات إذا كان عدد الهواتف محدودًا.
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                    <div class="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center ml-3 mt-1 flex-shrink-0">
+                                        <span class="font-bold text-green-600">٢</span>
+                                    </div>
+                                    <div>
+                                        <h5 class="font-bold text-gray-800 mb-1">المهمة 1: فحص الحساسات</h5>
+                                        <p class="text-gray-700 text-sm">
+                                            استخدام تطبيقات مثل "Sensor Box" أو "Phone Tester" لمعرفة الحساسات المتوفرة في الهاتف.
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                    <div class="w-6 h-6 rounded-full bg-yellow-100 flex items-center justify-center ml-3 mt-1 flex-shrink-0">
+                                        <span class="font-bold text-yellow-600">٣</span>
+                                    </div>
+                                    <div>
+                                        <h5 class="font-bold text-gray-800 mb-1">المهمة 2: تجربة الحساسات</h5>
+                                        <p class="text-gray-700 text-sm">
+                                            اختبار كل حساس بشكل عملي وتسجيل ملاحظاتك.
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                    <div class="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center ml-3 mt-1 flex-shrink-0">
+                                        <span class="font-bold text-red-600">٤</span>
+                                    </div>
+                                    <div>
+                                        <h5 class="font-bold text-gray-800 mb-1">التحليل</h5>
+                                        <p class="text-gray-700 text-sm">
+                                            مقارنة الهواتف المختلفة وتحليل تأثير اختلاف الحساسات على تجربة AR.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-indigo-50 to-white p-6 rounded-2xl border border-indigo-200 shadow-md">
+                            <h4 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                <i class="fas fa-clipboard-list text-green-500 ml-2"></i>
+                                قائمة الاختبارات المقترحة
+                            </h4>
+                            
+                            <div class="space-y-3">
+                                <div class="bg-white p-3 rounded-lg">
+                                    <h5 class="font-bold text-gray-800 mb-1">١. الجيروسكوب</h5>
+                                    <p class="text-gray-700 text-xs">
+                                        قم بتدوير الهاتف في جميع الاتجاهات ولاحظ كيف يتغير المؤشر
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-white p-3 rounded-lg">
+                                    <h5 class="font-bold text-gray-800 mb-1">٢. مقياس التسارع</h5>
+                                    <p class="text-gray-700 text-xs">
+                                        حرك الهاتف بسرعة ولاحظ كيف يستجيب المؤشر للحركة المفاجئة
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-white p-3 rounded-lg">
+                                    <h5 class="font-bold text-gray-800 mb-1">٣. البوصلة الرقمية</h5>
+                                    <p class="text-gray-700 text-xs">
+                                        قم بتوجيه الهاتف نحو الشمال ولاحظ دقة المؤشر
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-white p-3 rounded-lg">
+                                    <h5 class="font-bold text-gray-800 mb-1">٤. مستشعر الضوء</h5>
+                                    <p class="text-gray-700 text-xs">
+                                        غطّي حساس الضوء بيدك ولاحظ كيف تتغير قراءة الإضاءة
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-10">
+                        <h4 class="text-xl font-bold text-gray-800 mb-6 text-center">
+                            <i class="fas fa-chart-bar text-blue-600 ml-2"></i>
+                            نموذج تسجيل النتائج
+                        </h4>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="comparison-table w-full">
+                                <thead>
+                                    <tr class="bg-blue-100">
+                                        <th class="font-bold text-gray-800">الحساس</th>
+                                        <th class="font-bold text-gray-800">هل متوفر؟</th>
+                                        <th class="font-bold text-gray-800">سرعة الاستجابة</th>
+                                        <th class="font-bold text-gray-800">الدقة</th>
+                                        <th class="font-bold text-gray-800">تأثير على AR</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="font-bold text-gray-800">الجيروسكوب</td>
+                                        <td><span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">نعم</span></td>
+                                        <td><span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">سريع</span></td>
+                                        <td><span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">متوسطة</span></td>
+                                        <td class="text-sm text-gray-700">يؤثر على استقرار العناصر عند الدوران</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-bold text-gray-800">مقياس التسارع</td>
+                                        <td><span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">نعم</span></td>
+                                        <td><span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">سريع جدًا</span></td>
+                                        <td><span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">عالية</span></td>
+                                        <td class="text-sm text-gray-700">يؤثر على تتبع الحركة الخطية</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-bold text-gray-800">البوصلة الرقمية</td>
+                                        <td><span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">في بعض الأجهزة</span></td>
+                                        <td><span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">متوسطة</span></td>
+                                        <td><span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm">منخفضة</span></td>
+                                        <td class="text-sm text-gray-700">يؤثر على تطبيقات AR الجغرافية</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-bold text-gray-800">مستشعر الضوء</td>
+                                        <td><span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">نعم</span></td>
+                                        <td><span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">سريع</span></td>
+                                        <td><span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">عالية</span></td>
+                                        <td class="text-sm text-gray-700">يؤثر على جودة الصورة في ظروف إضاءة مختلفة</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-purple-100 to-indigo-100 p-6 rounded-2xl">
+                        <h4 class="text-xl font-bold text-gray-800 mb-4 text-center">
+                            <i class="fas fa-lightbulb text-purple-700 ml-2"></i>
+                            أهداف النشاط التعليمية
+                        </h4>
+                        
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="bg-white p-5 rounded-xl">
+                                <h5 class="font-bold text-gray-800 mb-3">الأهداف المباشرة:</h5>
+                                <ul class="list-disc pr-6 text-gray-700 text-sm space-y-2">
+                                    <li>فهم الحساسات المتوفرة في الهواتف الذكية</li>
+                                    <li>معرفة كيف تعمل هذه الحساسات عمليًا</li>
+                                    <li>مقارنة أداء الحساسات بين الهواتف المختلفة</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="bg-white p-5 rounded-xl">
+                                <h5 class="font-bold text-gray-800 mb-3">المهارات المكتسبة:</h5>
+                                <ul class="list-disc pr-6 text-gray-700 text-sm space-y-2">
+                                    <li>الفحص التقني للأجهزة</li>
+                                    <li>الملاحظة والتحليل العلمي</li>
+                                    <li>التفكير النقدي في تصميم الأنظمة</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-flask text-purple-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">التعلم بالتجربة: من النظرية إلى الاختبار العملي للحساسات</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- الشريحة 14: خاتمة وواجب -->
+        <section id="slide14" class="slide bg-gradient-to-br from-gray-50 to-slate-100">
+            <div class="max-w-6xl mx-auto pt-12">
+                <div class="flex items-center mb-10">
+                    <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center ml-4">
+                        <span class="text-2xl font-bold text-gray-700">14</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900">خاتمة المحاضرة وواجب منزلي</h2>
+                </div>
+                
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-10">
+                    <div class="text-center mb-10">
+                        <div class="inline-block p-4 bg-gradient-to-r from-gray-100 to-blue-100 rounded-full mb-6">
+                            <i class="fas fa-flag-checkered text-4xl text-blue-600"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold text-gray-800 mb-6">الخلاصة والتكامل</h3>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-8 mb-10">
+                        <div class="bg-gradient-to-br from-gray-50 to-white p-6 rounded-2xl border border-gray-200 shadow-md">
+                            <h4 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                <i class="fas fa-check-circle text-green-500 ml-2"></i>
+                                ما تعلمناه اليوم
+                            </h4>
+                            <ul class="space-y-3 text-gray-700">
+                                <li class="flex items-start">
+                                    <i class="fas fa-star text-yellow-500 mt-1 ml-2"></i>
+                                    <span>الحساسات هي حواس الواقع المعزز التي تشعر بالحركة وتحدد الاتجاه وتقيس الموقع</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-star text-yellow-500 mt-1 ml-2"></i>
+                                    <span>أنواع الحساسات الأساسية: الكاميرا، مقياس التسارع، الجيروسكوب، البوصلة الرقمية، GPS، حساسات العمق</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-star text-yellow-500 mt-1 ml-2"></i>
+                                    <span>دمج الحساسات (Sensor Fusion) ضروري للحصول على دقة وثبات أعلى</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-star text-yellow-500 mt-1 ml-2"></i>
+                                    <span>جودة الحساسات تؤثر مباشرة على تجربة المستخدم في تطبيقات AR</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-star text-yellow-500 mt-1 ml-2"></i>
+                                    <span>الحساسات تواجه تحديات مثل الضوضاء، استهلاك الطاقة، واختلاف الجودة بين الأجهزة</span>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-blue-50 to-white p-6 rounded-2xl border border-blue-200 shadow-md">
+                            <h4 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                <i class="fas fa-eye text-blue-500 ml-2"></i>
+                                الجدول الزمني للمقرر
+                            </h4>
+                            <p class="text-gray-700 mb-4">
+                                بعد فهم كيف "يشعر" الواقع المعزز بالعالم، سننتقل إلى:
+                            </p>
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <p class="text-gray-800 font-medium mb-2">المحاضرة القادمة:</p>
+                                <p class="text-gray-700">
+                                    <span class="font-bold text-blue-600">واجهات المستخدم في AR: التصميم والتجربة</span> - كيف نصمم تجارب AR سلسة وطبيعية للمستخدمين.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-gray-100 to-blue-100 p-6 rounded-2xl mb-10">
+                        <h4 class="text-xl font-bold text-gray-800 mb-6 text-center">واجب منزلي</h4>
+                        
+                        <div class="bg-white p-6 rounded-xl">
+                            <h5 class="font-bold text-gray-800 mb-4">المهمة:</h5>
+                            <p class="text-gray-700 mb-6">
+                                قم بتحليل تطبيق AR تستخدمه من ناحية الحساسات، واكتب تقريرًا يشرح كيف يستفيد التطبيق من الحساسات المختلفة لتحسين تجربة المستخدم.
+                            </p>
+                            
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <h6 class="font-bold text-gray-800 mb-3">عناصر التحليل:</h6>
+                                    <ul class="list-disc pr-6 text-gray-700 text-sm space-y-2">
+                                        <li>ما هي الحساسات التي يستخدمها التطبيق؟</li>
+                                        <li>كيف يستفيد من كل حساس لتحسين التجربة؟</li>
+                                        <li>ما هي نقاط القوة والضعف في استخدام الحساسات؟</li>
+                                        <li>كيف يمكن تحسين استخدام الحساسات في هذا التطبيق؟</li>
+                                    </ul>
+                                </div>
+                                
+                                <div>
+                                    <h6 class="font-bold text-gray-800 mb-3">المخرجات المطلوبة:</h6>
+                                    <ul class="list-disc pr-6 text-gray-700 text-sm space-y-2">
+                                        <li>تقرير تحليلي (400-500 كلمة)</li>
+                                        <li>تحديد الحساسات المستخدمة ووظيفة كل منها</li>
+                                        <li>ربط الملاحظات بمفاهيم المحاضرة</li>
+                                        <li>تقديم مقترحات تطويرية</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                                <p class="text-gray-800 font-medium mb-2">تطبيقات مقترحة للتحليل:</p>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <span class="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">IKEA Place</span>
+                                    <span class="inline-block px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">Pokémon GO</span>
+                                    <span class="inline-block px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">Google Maps AR</span>
+                                    <span class="inline-block px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm">فلاتر Snapchat/Instagram</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                            <i class="fas fa-graduation-cap text-gray-600 text-2xl"></i>
+                            <p class="text-lg text-gray-800 font-medium">الآن فهمنا كيف "يشعر" الواقع المعزز، استعدوا لتعلم كيف "يتفاعل" مع المستخدمين!</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="inline-flex items-center space-x-4 space-x-reverse bg-white px-6 py-4 rounded-full shadow-lg">
+                        <i class="fas fa-rocket text-blue-600 text-2xl"></i>
+                        <p class="text-lg text-gray-800 font-medium">محاضرة قادمة: واجهات المستخدم في AR: التصميم والتجربة</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <script>
+        // التحكم في الشرائح
+        const slidesContainer = document.getElementById('slidesContainer');
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const menuBtn = document.getElementById('menuBtn');
+        const closeMenuBtn = document.getElementById('closeMenuBtn');
+        const slideMenu = document.getElementById('slideMenu');
+        const slideMenuItems = document.querySelectorAll('.slide-menu-item');
+        const progressFill = document.getElementById('progressFill');
+        const currentSlideElement = document.getElementById('currentSlide');
+        
+        let currentSlide = 1;
+        const totalSlides = slides.length;
+        
+        // تهيئة العرض
+        function initSlides() {
+            showSlide(currentSlide);
+            updateProgressBar();
+            updateNavigationButtons();
+        }
+        
+        // عرض شريحة معينة
+        function showSlide(slideNumber) {
+            // إخفاء جميع الشرائح
+            slides.forEach(slide => {
+                slide.classList.remove('active');
+            });
+            
+            // عرض الشريحة المطلوبة
+            const targetSlide = document.getElementById(`slide${slideNumber}`);
+            if (targetSlide) {
+                targetSlide.classList.add('active');
+                currentSlide = slideNumber;
+                currentSlideElement.textContent = currentSlide;
+                updateProgressBar();
+                updateNavigationButtons();
+            }
+        }
+        
+        // تحديث شريط التقدم
+        function updateProgressBar() {
+            const progressPercentage = (currentSlide / totalSlides) * 100;
+            progressFill.style.width = `${progressPercentage}%`;
+        }
+        
+        // تحديث أزرار التنقل
+        function updateNavigationButtons() {
+            prevBtn.disabled = currentSlide === 1;
+            nextBtn.disabled = currentSlide === totalSlides;
+            
+            if (currentSlide === totalSlides) {
+                nextBtn.innerHTML = '<i class="fas fa-check"></i>';
+                nextBtn.classList.remove('bg-purple-600', 'hover:bg-purple-700');
+                nextBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+            } else {
+                nextBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+                nextBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                nextBtn.classList.add('bg-purple-600', 'hover:bg-purple-700');
+            }
+        }
+        
+        // الانتقال للشريحة التالية
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                showSlide(currentSlide + 1);
+            }
+        }
+        
+        // الانتقال للشريحة السابقة
+        function prevSlide() {
+            if (currentSlide > 1) {
+                showSlide(currentSlide - 1);
+            }
+        }
+        
+        // فتح/إغلاق قائمة الشرائح
+        function toggleSlideMenu() {
+            slideMenu.classList.toggle('hidden');
+            slideMenu.classList.toggle('flex');
+        }
+        
+        // أحداث المستخدم
+        prevBtn.addEventListener('click', prevSlide);
+        nextBtn.addEventListener('click', nextSlide);
+        menuBtn.addEventListener('click', toggleSlideMenu);
+        closeMenuBtn.addEventListener('click', toggleSlideMenu);
+        
+        // إغلاق القائمة عند النقر خارجها
+        slideMenu.addEventListener('click', function(e) {
+            if (e.target === slideMenu) {
+                toggleSlideMenu();
+            }
+        });
+        
+        // التنقل من القائمة
+        slideMenuItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const slideNumber = parseInt(this.dataset.slide);
+                showSlide(slideNumber);
+                toggleSlideMenu();
+            });
+        });
+        
+        // التنقل بالسهمين في لوحة المفاتيح
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                prevSlide();
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                nextSlide();
+            } else if (e.key === 'Escape') {
+                slideMenu.classList.add('hidden');
+                slideMenu.classList.remove('flex');
+            }
+        });
+        
+        // بدء العرض
+        initSlides();
+        
+        // إضافة تأثيرات إضافية
+        document.addEventListener('DOMContentLoaded', function() {
+            // إضافة تأثيرات للبطاقات عند التمرير
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+            
+            // مراقبة العناصر لإضافة تأثيرات
+            document.querySelectorAll('.sensor-card').forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                observer.observe(card);
+            });
+            
+            // إضافة تأثير Pulse لعناصر Sensor Fusion
+            const fusionElements = document.querySelectorAll('.fusion-animation');
+            fusionElements.forEach(el => {
+                setInterval(() => {
+                    el.classList.toggle('glow');
+                }, 2000);
+            });
+            
+            // إضافة تأثير Hover Grow للبطاقات
+            document.querySelectorAll('.hover-grow').forEach(element => {
+                element.addEventListener('mouseenter', function() {
+                    this.classList.add('glow');
+                });
+                
+                element.addEventListener('mouseleave', function() {
+                    this.classList.remove('glow');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
